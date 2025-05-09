@@ -106,8 +106,8 @@
 <body>
     <div class="container">
         <h1>作文題目生成器</h1>
-        <label for="mimicQuestion">請輸入參考題目：</label><br>
-        <textarea id="mimicQuestion" placeholder="在此輸入或貼上參考題目內容"></textarea><br>
+        <label for="mimicQuestion">請輸入模仿題目：</label><br>
+        <textarea id="mimicQuestion" placeholder="在此輸入或貼上模仿題目內容"></textarea><br>
         <label for="quantity">生成題目數量：</label>
         <input type="number" id="quantity" min="1" value="1"><br><br>
         <button id="generateBtn">生成題目</button><br><br>
@@ -145,7 +145,7 @@
                 model: MODEL,
                 messages: [
                     { role: "system", content: "你是一個作文題目生成器。" },
-                    { role: "user", content: `試根據以上作文題目形式，幫我出題目。必須用繁體中文回應。不需要用太好的文筆擬題，不要提供太多細節，不要具體描述題目的事件，要足夠空泛才有發揮空間。擬題時盡量少用以短語構成的定語，必須在形式、句式、用語和字數上參考用家提供的題目（開關引號的內容除外)，但生成題目的內容及題材不需要與原本的題目的相似。除了生成題目之外，不要顯示任何其他不相關的內容，違反則無效：\n${mimicQuestion}\n請生成${quantity}個新題目。` }
+                    { role: "user", content: `試根據以上作文題目形式，幫我出題目。必須用繁體中文回應。不需要用太好的文筆擬題，不要提供太多細節，不要具體描述題目的事件，要足夠空泛才有發揮空間。擬題時盡量少用以短語構成的定語，必須在形式、句式、用語和字數上參考用家提供的題目（開關引號的內容除外)，但生成題目的內容及題材絕對不可與原本的題目相似，違反則無效。除了生成題目之外，不要顯示任何其他不相關的內容，違反則無效：\n${mimicQuestion}\n請生成${quantity}個新題目。` }
                 ]
             };
 
