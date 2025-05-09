@@ -85,6 +85,7 @@
             word-wrap: break-word;
             max-height: 300px;
             overflow-y: auto;
+            line-height: 2; /* 增加行距 */
         }
         @media (max-width: 600px) {
             h1 {
@@ -176,7 +177,9 @@
         }
 
         function displayQuestions(questions) {
-            outputDiv.textContent = questions;
+            // 將題目按行分割並確保每行之間有換行符
+            const formattedQuestions = questions.split('\n').join('\n\n');
+            outputDiv.textContent = formattedQuestions;
         }
     </script>
 </body>
