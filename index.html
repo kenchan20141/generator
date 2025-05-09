@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作文題目生成器</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://i.ibb.co/rGjHnWSk/image.png');
+            background-repeat: repeat;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            opacity: 0.9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-size: 18px;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #loading {
+            font-size: 18px;
+            color: #333;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            label {
+                font-size: 16px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #output {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>作文題目生成器</h1>
+        <label for="mimicQuestion">請輸入模仿題目：</label><br>
+        <textarea id="mimicQuestion" placeholder="在此輸入或貼上模仿題目內容"></textarea><br>
+        <label for="quantity">生成題目數量：</label>
+        <input type="number" id="quantity" min="1" value="1"><br><br>
+        <button id="generateBtn">生成題目</button><br><br>
+        <div id="loading">AI正在思考，請稍候...</div>
+        <div id="output"></div>
+    </div>
 
+    <script type="text/javascript">
+        const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
+        const MODEL = "DeepSeek-R1";
+        const API_KEY = "sk-O6GT79mshyCgqyaTaq60FA"; // 注意：在實際部署中應使用環境變量管理API密鑰
+
+        const mimicQuestionInput = document.getElementById('mimicQuestion');
+        const quantityInput = document.getElementById('quantity');
+        const generateBtn = document.getElementById('generateBtn');
+        const loadingDiv = document.getElementById('loading');
+        const outputDiv = document.getElementById('output');
+
+        generateBtn.addEventListener('click', () => {
+            const mimicQuestion = mimicQuestionInput.value.trim();
+            if (!mimicQuestion) {
+                alert('請輸入模仿題目');
+                return;
+            }
+            const quantity = quantityInput.value;
+            generateQuestions(mimicQuestion, quantity);
+        });
+
+        async function generateQuestions(mimicQuestion, quantity) {
+            loadingDiv.style.display = 'block';
+            generateBtn.disabled = true;
+            outputDiv.textContent = '';
+
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個作文題目生成器。" },
+                    { role: "user", content: `試根據以上作文題目形式，幫我出題目。必須用繁體中文回應。不需要用太好的文筆擬題，不要提供太多細節，不要具體描述題目的事件，要足夠空泛才有發揮空間。擬題時盡量少用以短語構成的定語，必須在形式和字數上參考用家提供的題目，但生成題目的內容及題材不需要與原本的題目的相似。除了生成題目之外，不要顯示任何其他不相關的內容，違反則無效：\n${mimicQuestion}\n請生成${quantity}個新題目。` }
+                ]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
+                }
+
+                const data = await response.json();
+                const generatedQuestions = data.choices[0].message.content;
+                displayQuestions(generatedQuestions);
+            } catch (error) {
+                console.error('錯誤：', error);
+                outputDiv.textContent = '生成題目時出錯，請稍後再試';
+            } finally {
+                loadingDiv.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function displayQuestions(questions) {
+            outputDiv.textContent = questions;
+        }
+    </script>
+</body>
+</html>
