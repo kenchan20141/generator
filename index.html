@@ -176,8 +176,10 @@
         }
 
         function displayQuestions(questions) {
+            // 修剪開頭和結尾的空白符號
+            const trimmedQuestions = questions.trim();
             // 將題目按行分割並確保每行之間有換行符
-            const formattedQuestions = questions.split('\n').join('\n\n');
+            const formattedQuestions = trimmedQuestions.split('\n').join('\n\n');
             outputDiv.textContent = formattedQuestions;
         }
     </script>
