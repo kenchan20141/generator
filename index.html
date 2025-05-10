@@ -42,7 +42,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中文卷二題目生成器</title>
+    <title>DSE中文 AI擬卷</title>
     <style>
         body {
             font-family: 'Noto Serif TC', 'cwTeXHei', 'cwTeXFangSong', 'cwTeXKai', 'cwTeXMing', 'PingFang TC', 'Microsoft JhengHei', serif;
@@ -60,8 +60,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 800px;
+            width: 85%;
             opacity: 0.9;
             box-sizing: border-box;
         }
@@ -172,7 +171,43 @@
             margin-bottom: 20px;
         }
         .inputGroup {
-            margin-bottom: 15px; /* 統一所有輸入組的底部間距 */
+            margin-bottom: 15px;
+        }
+        .referenceQA {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sequence {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .addReferenceBtn {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 30px;
+            text-align: center;
+            padding: 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        .addReferenceBtn:hover {
+            background-color: #45a049;
+        }
+        .outputGroup {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .outputGroup .sequence {
+            margin-right: 10px;
+            font-weight: bold;
         }
         @media (max-width: 600px) {
             h1 {
@@ -193,12 +228,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>中文卷二題目生成器</h1>
+        <h1>DSE中文 AI擬卷</h1>
         <div id="generatorSelector" class="inputGroup">
-            <label for="generatorType">選擇生成器類型：</label>
+            <label for="generatorType">選擇擬卷範疇：</label>
             <select id="generatorType">
-                <option value="essay">作文題目生成器</option>
-                <option value="practical">實用文題目生成器</option>
+<option value="reading">閱讀</option>
+                <option value="essay">長文</option>
+                <option value="practical">實用文</option>
+                
             </select>
         </div>
         <div id="essayInputs" class="inputSection">
@@ -317,7 +354,25 @@
                 <textarea id="refMaterial2" placeholder="在此輸入參考資料二"></textarea>
             </div>
         </div>
-        <button id="generateBtn">生成題目</button>
+        <div id="readingInputs" class="inputSection" style="display: none;">
+            <div class="inputGroup">
+                <label for="refPassage">參考篇章：</label>
+                <textarea id="refPassage" placeholder="在此輸入參考篇章"></textarea>
+            </div>
+            <div id="referenceQAContainer" class="inputGroup">
+                <label>參考題目與答案：</label>
+                <div class="referenceQA">
+                    <span class="sequence">1.</span>
+                    <textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>
+                </div>
+                <button class="addReferenceBtn" onclick="addReferenceQA()">+</button>
+            </div>
+            <div class="inputGroup">
+                <label for="targetPassage">擬題篇章：</label>
+                <textarea id="targetPassage" placeholder="在此輸入擬題篇章"></textarea>
+            </div>
+        </div>
+        <button id="generateBtn">生成</button>
         <div id="loading">AI正在思考，請稍候...</div>
         <div id="output"></div>
     </div>
@@ -330,6 +385,7 @@
         const generatorTypeSelect = document.getElementById('generatorType');
         const essayInputs = document.getElementById('essayInputs');
         const practicalInputs = document.getElementById('practicalInputs');
+        const readingInputs = document.getElementById('readingInputs');
         const generateBtn = document.getElementById('generateBtn');
         const loadingDiv = document.getElementById('loading');
         const outputDiv = document.getElementById('output');
@@ -338,31 +394,35 @@
         const customTopicInput = document.getElementById('customTopic');
 
         generatorTypeSelect.addEventListener('change', () => {
-            if (generatorTypeSelect.value === 'essay') {
-                essayInputs.style.display = 'block';
-                practicalInputs.style.display = 'none';
-            } else {
-                essayInputs.style.display = 'none';
-                practicalInputs.style.display = 'block';
-            }
+            const type = generatorTypeSelect.value;
+            essayInputs.style.display = type === 'essay' ? 'block' : 'none';
+            practicalInputs.style.display = type === 'practical' ? 'block' : 'none';
+            readingInputs.style.display = type === 'reading' ? 'block' : 'none';
         });
 
         topicSelect.addEventListener('change', () => {
-            if (topicSelect.value === 'custom') {
-                customTopicGroup.style.display = 'block';
-            } else {
-                customTopicGroup.style.display = 'none';
-            }
+            customTopicGroup.style.display = topicSelect.value === 'custom' ? 'block' : 'none';
         });
 
         generateBtn.addEventListener('click', () => {
             const generatorType = generatorTypeSelect.value;
             if (generatorType === 'essay') {
                 generateEssayQuestions();
-            } else {
+            } else if (generatorType === 'practical') {
                 generatePracticalQuestions();
+            } else if (generatorType === 'reading') {
+                generateReadingQuestions();
             }
         });
+
+        function addReferenceQA() {
+            const container = document.getElementById('referenceQAContainer');
+            const currentCount = container.querySelectorAll('.referenceQA').length;
+            const newQA = document.createElement('div');
+            newQA.className = 'referenceQA';
+            newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
+            container.insertBefore(newQA, container.lastElementChild);
+        }
 
         async function generateEssayQuestions() {
             const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
@@ -522,6 +582,105 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
                     <p>${parsed.material2}</p>
                 </div>
             `;
+        }
+
+        async function generateReadingQuestions() {
+            const refPassage = document.getElementById('refPassage').value.trim();
+            const targetPassage = document.getElementById('targetPassage').value.trim();
+            const refQAElements = document.querySelectorAll('.refQuestionAnswer');
+            const refQAs = Array.from(refQAElements).map(el => el.value.trim()).filter(val => val);
+
+            if (!refPassage || !targetPassage || refQAs.length === 0) {
+                alert('請輸入所有參考內容和擬題篇章');
+                return;
+            }
+
+            loadingDiv.style.display = 'block';
+            generateBtn.disabled = true;
+            outputDiv.innerHTML = '';
+
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                    { role: "user", content: `請根據以下參考篇章和參考題目與答案，為擬題篇章生成相應的題目和答案：
+
+參考篇章：
+${refPassage}
+
+參考題目與答案：
+${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
+
+擬題篇章：
+${targetPassage}
+
+請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
+
+請以以下格式輸出生成的題目和答案：
+題目1：[生成的題目1]
+答案1：[生成的答案1]
+題目2：[生成的題目2]
+答案2：[生成的答案2]
+...` }
+                ]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
+                }
+
+                const data = await response.json();
+                const generatedContent = data.choices[0].message.content;
+                const parsed = parseReadingResponse(generatedContent, refQAs.length);
+                if (parsed.some(item => item.question === '未生成' || item.answer === '未生成')) {
+                    outputDiv.textContent = '生成內容失敗，請重試';
+                } else {
+                    displayReadingQuestions(parsed);
+                }
+            } catch (error) {
+                console.error('錯誤：', error);
+                outputDiv.textContent = '生成題目時出錯，請稍後再試';
+            } finally {
+                loadingDiv.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function parseReadingResponse(response, count) {
+            const parts = response.split(/\n(?=題目\d+：|答案\d+：)/);
+            const parsed = [];
+            for (let i = 1; i <= count; i++) {
+                const question = parts.find(part => part.startsWith(`題目${i}：`))?.replace(`題目${i}：`, '').trim() || '未生成';
+                const answer = parts.find(part => part.startsWith(`答案${i}：`))?.replace(`答案${i}：`, '').trim() || '未生成';
+                parsed.push({ question, answer });
+            }
+            return parsed;
+        }
+
+        function displayReadingQuestions(parsed) {
+            outputDiv.innerHTML = parsed.map((item, index) => `
+                <div class="outputGroup">
+                    <span class="sequence">${index + 1}.</span>
+                    <div class="outputSection">
+                        <h3>題目</h3>
+                        <p>${item.question}</p>
+                    </div>
+                    <div class="outputSection">
+                        <h3>答案</h3>
+                        <p>${item.answer}</p>
+                    </div>
+                </div>
+            `).join('');
         }
     </script>
 </body>
