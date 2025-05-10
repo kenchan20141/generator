@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
@@ -144,12 +183,13 @@
             font-weight: bold;
         }
         .controlButtons {
-            display: flex;
+            text-align: center;
             justify-content: center;
-            gap: 10px;
+            gap: 5px;
             margin-top: 10px;
         }
         .addReferenceBtn, .removeReferenceBtn, .clearReferenceBtn {
+            display: inline-block;
             background-color: #5d6d7e;
             color: white;
             width: 30px;
@@ -162,8 +202,9 @@
             border-radius: 50%;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin: 0 5px;
         }
-        .addReferenceBtn:hover, .removeReferenceBtn:hover, .clearReferenceBtn:hover {
+        .addReferenceBtn:hover, .removeReferenceBtn:hover {
             background-color: #4a5a6b;
         }
         .clearReferenceBtn {
@@ -326,10 +367,6 @@
             </div>
         </div>
         <div id="readingInputs" class="inputSection">
-            <div class="inputGroup">
-                <label for="refPassage">參考篇章：</label>
-                <textarea id="refPassage" placeholder="在此輸入參考篇章"></textarea>
-            </div>
             <div id="referenceQAContainer" class="inputGroup">
                 <label>參考題目與答案：</label>
                 <div id="referenceQAList">
@@ -341,7 +378,7 @@
                 <div class="controlButtons">
                     <button class="addReferenceBtn" onclick="addReferenceQA()">+</button>
                     <button class="removeReferenceBtn" onclick="removeReferenceQA()">-</button>
-                    <button class="clearReferenceBtn" onclick="clearReferenceQA()" title="清空">&#10006;</button>
+                    <button class="clearReferenceBtn" onclick="clearReferenceQA()" title="清空">✖</button>
                 </div>
             </div>
             <div class="inputGroup">
@@ -432,16 +469,14 @@
         });
 
         function addReferenceQA() {
-            const list = document.getElementById('referenceQAList');
-            const currentCount = list.querySelectorAll('.referenceQA').length;
-            if (currentCount < 3) {
-                const newQA = document.createElement('div');
-                newQA.className = 'referenceQA';
-                newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
-                list.appendChild(newQA);
-                updateControlButtons();
-            }
-        }
+    const list = document.getElementById('referenceQAList');
+    const currentCount = list.querySelectorAll('.referenceQA').length;
+    const newQA = document.createElement('div');
+    newQA.className = 'referenceQA';
+    newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
+    list.appendChild(newQA);
+    updateControlButtons();
+}
 
         function removeReferenceQA() {
             const list = document.getElementById('referenceQAList');
@@ -459,14 +494,14 @@
             });
         }
 
-        function updateControlButtons() {
-            const list = document.getElementById('referenceQAList');
-            const currentCount = list.querySelectorAll('.referenceQA').length;
-            const addBtn = document.querySelector('.addReferenceBtn');
-            const removeBtn = document.querySelector('.removeReferenceBtn');
-            addBtn.disabled = currentCount >= 3;
-            removeBtn.disabled = currentCount <= 1;
-        }
+       function updateControlButtons() {
+    const list = document.getElementById('referenceQAList');
+    const currentCount = list.querySelectorAll('.referenceQA').length;
+    const addBtn = document.querySelector('.addReferenceBtn');
+    const removeBtn = document.querySelector('.removeReferenceBtn');
+    addBtn.disabled = false; // 始終啟用添加按鈕
+    removeBtn.disabled = currentCount <= 1;
+}
 
         // 初始化按鈕狀態
         updateControlButtons();
@@ -632,13 +667,12 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
         }
 
         async function generateReadingQuestions() {
-            const refPassage = document.getElementById('refPassage').value.trim();
             const targetPassage = document.getElementById('targetPassage').value.trim();
             const refQAElements = document.querySelectorAll('.refQuestionAnswer');
             const refQAs = Array.from(refQAElements).map(el => el.value.trim()).filter(val => val);
 
-            if (!refPassage || !targetPassage || refQAs.length === 0) {
-                alert('請輸入所有參考內容和擬題篇章');
+            if (!targetPassage || refQAs.length === 0) {
+                alert('請輸入擬題篇章和至少一個參考題目與答案');
                 return;
             }
 
@@ -646,22 +680,17 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             generateBtn.disabled = true;
             outputDiv.innerHTML = '';
 
-            const maxChunkSize = 3000;
-            const generateInChunks = async (refPassageChunk, targetPassageChunk, qaChunk) => {
-                const requestBody = {
-                    model: MODEL,
-                    messages: [
-                        { role: "system", content: "你是一個閱讀卷題目生成器。" },
-                        { role: "user", content: `請根據以下參考篇章和參考題目與答案，為擬題篇章生成相應的題目和答案：
-
-參考篇章：
-${refPassageChunk}
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                    { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成相應的題目和答案：
 
 參考題目與答案：
-${qaChunk.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
+${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
 
 擬題篇章：
-${targetPassageChunk}
+${targetPassage}
 
 請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。生成的題目不得包含答案內容，答案不得與其他題目混淆。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 
@@ -671,9 +700,10 @@ ${targetPassageChunk}
 題目2：[生成的題目2]
 答案2：[生成的答案2]
 ...` }
-                    ]
-                };
+                ]
+            };
 
+            try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -688,27 +718,8 @@ ${targetPassageChunk}
                 }
 
                 const data = await response.json();
-                return data.choices[0].message.content;
-            };
-
-            try {
-                let allGeneratedContent = '';
-                if (refPassage.length + targetPassage.length + refQAs.join('').length > maxChunkSize) {
-                    const chunkSize = Math.ceil(refQAs.length / Math.ceil((refPassage.length + targetPassage.length + refQAs.join('').length) / maxChunkSize));
-                    const promises = [];
-                    for (let i = 0; i < refQAs.length; i += chunkSize) {
-                        const qaChunk = refQAs.slice(i, i + chunkSize);
-                        const refPassageChunk = refPassage.slice(0, maxChunkSize / 3);
-                        const targetPassageChunk = targetPassage.slice(0, maxChunkSize / 3);
-                        promises.push(generateInChunks(refPassageChunk, targetPassageChunk, qaChunk));
-                    }
-                    const chunkContents = await Promise.all(promises);
-                    allGeneratedContent = chunkContents.join('\n');
-                } else {
-                    allGeneratedContent = await generateInChunks(refPassage, targetPassage, refQAs);
-                }
-
-                const parsed = parseReadingResponse(allGeneratedContent, refQAs.length);
+                const generatedContent = data.choices[0].message.content;
+                const parsed = parseReadingResponse(generatedContent, refQAs.length);
                 displayReadingQuestions(parsed);
             } catch (error) {
                 console.error('錯誤：', error);
