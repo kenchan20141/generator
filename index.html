@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
@@ -182,23 +143,34 @@
             margin-right: 10px;
             font-weight: bold;
         }
-        .addReferenceBtn {
+        .controlButtons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .addReferenceBtn, .removeReferenceBtn, .clearReferenceBtn {
+            background-color: #5d6d7e;
+            color: white;
             width: 30px;
             height: 30px;
             font-size: 20px;
             line-height: 30px;
             text-align: center;
             padding: 0;
-            background-color: #4CAF50;
-            color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px;
         }
-        .addReferenceBtn:hover {
-            background-color: #45a049;
+        .addReferenceBtn:hover, .removeReferenceBtn:hover, .clearReferenceBtn:hover {
+            background-color: #4a5a6b;
+        }
+        .clearReferenceBtn {
+            background-color: #dc3545;
+        }
+        .clearReferenceBtn:hover {
+            background-color: #c82333;
         }
         .outputGroup {
             margin-bottom: 20px;
@@ -360,11 +332,17 @@
             </div>
             <div id="referenceQAContainer" class="inputGroup">
                 <label>參考題目與答案：</label>
-                <div class="referenceQA">
-                    <span class="sequence">1.</span>
-                    <textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>
+                <div id="referenceQAList">
+                    <div class="referenceQA">
+                        <span class="sequence">1.</span>
+                        <textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>
+                    </div>
                 </div>
-                <button class="addReferenceBtn" onclick="addReferenceQA()" style="background-color: #5d6d7e;">+</button>
+                <div class="controlButtons">
+                    <button class="addReferenceBtn" onclick="addReferenceQA()">+</button>
+                    <button class="removeReferenceBtn" onclick="removeReferenceQA()">-</button>
+                    <button class="clearReferenceBtn" onclick="clearReferenceQA()" title="清空">&#10006;</button>
+                </div>
             </div>
             <div class="inputGroup">
                 <label for="targetPassage">擬題篇章：</label>
@@ -377,9 +355,48 @@
     </div>
 
     <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+
+        async function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    const workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    const sheetNames = workbook.SheetNames;
+
+                    const processSheet = async (sheetName) => {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                        const filteredData = jsonData.filter(row => row.some(filledCell));
+
+                        const headerRowIndex = filteredData.findIndex((row, index) =>
+                            row.filter(filledCell).length >= (filteredData[index + 1]?.filter(filledCell).length || 0)
+                        ) || 0;
+
+                        const csv = XLSX.utils.sheet_to_csv(XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)));
+                        return csv;
+                    };
+
+                    const csvPromises = sheetNames.map(sheetName => processSheet(sheetName));
+                    const csvResults = await Promise.all(csvPromises);
+
+                    return csvResults.length > 0 ? csvResults[0] : "";
+                } catch (e) {
+                    console.error('Error processing file:', e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
         const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
         const MODEL = "DeepSeek-R1";
-        const API_KEY = "sk-O6GT79mshyCgqyaTaq60FA"; // 注意：在實際部署中應使用環境變量管理API密鑰
+        const API_KEY = "sk-O6GT79mshyCgqyaTaq60FA";
 
         const generatorTypeSelect = document.getElementById('generatorType');
         const essayInputs = document.getElementById('essayInputs');
@@ -415,13 +432,44 @@
         });
 
         function addReferenceQA() {
-            const container = document.getElementById('referenceQAContainer');
-            const currentCount = container.querySelectorAll('.referenceQA').length;
-            const newQA = document.createElement('div');
-            newQA.className = 'referenceQA';
-            newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
-            container.insertBefore(newQA, container.lastElementChild);
+            const list = document.getElementById('referenceQAList');
+            const currentCount = list.querySelectorAll('.referenceQA').length;
+            if (currentCount < 3) {
+                const newQA = document.createElement('div');
+                newQA.className = 'referenceQA';
+                newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
+                list.appendChild(newQA);
+                updateControlButtons();
+            }
         }
+
+        function removeReferenceQA() {
+            const list = document.getElementById('referenceQAList');
+            const currentCount = list.querySelectorAll('.referenceQA').length;
+            if (currentCount > 1) {
+                list.removeChild(list.lastElementChild);
+                updateControlButtons();
+            }
+        }
+
+        function clearReferenceQA() {
+            const textareas = document.querySelectorAll('.refQuestionAnswer');
+            textareas.forEach(textarea => {
+                textarea.value = '';
+            });
+        }
+
+        function updateControlButtons() {
+            const list = document.getElementById('referenceQAList');
+            const currentCount = list.querySelectorAll('.referenceQA').length;
+            const addBtn = document.querySelector('.addReferenceBtn');
+            const removeBtn = document.querySelector('.removeReferenceBtn');
+            addBtn.disabled = currentCount >= 3;
+            removeBtn.disabled = currentCount <= 1;
+        }
+
+        // 初始化按鈕狀態
+        updateControlButtons();
 
         async function generateEssayQuestions() {
             const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
@@ -598,8 +646,7 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             generateBtn.disabled = true;
             outputDiv.innerHTML = '';
 
-            // 分割長內容以避免API限制
-            const maxChunkSize = 3000; // 每個請求的最大字符數
+            const maxChunkSize = 3000;
             const generateInChunks = async (refPassageChunk, targetPassageChunk, qaChunk) => {
                 const requestBody = {
                     model: MODEL,
@@ -616,9 +663,9 @@ ${qaChunk.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
 擬題篇章：
 ${targetPassageChunk}
 
-請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
+請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。生成的題目不得包含答案內容，答案不得與其他題目混淆。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 
-請以以下格式輸出生成的題目和答案：
+請以以下格式輸出生成的題目和答案，且嚴格遵循此格式：
 題目1：[生成的題目1]
 答案1：[生成的答案1]
 題目2：[生成的題目2]
@@ -648,13 +695,15 @@ ${targetPassageChunk}
                 let allGeneratedContent = '';
                 if (refPassage.length + targetPassage.length + refQAs.join('').length > maxChunkSize) {
                     const chunkSize = Math.ceil(refQAs.length / Math.ceil((refPassage.length + targetPassage.length + refQAs.join('').length) / maxChunkSize));
+                    const promises = [];
                     for (let i = 0; i < refQAs.length; i += chunkSize) {
                         const qaChunk = refQAs.slice(i, i + chunkSize);
-                        const refPassageChunk = refPassage.slice(0, maxChunkSize / 3); // 簡單分割，實際可根據需要優化
+                        const refPassageChunk = refPassage.slice(0, maxChunkSize / 3);
                         const targetPassageChunk = targetPassage.slice(0, maxChunkSize / 3);
-                        const chunkContent = await generateInChunks(refPassageChunk, targetPassageChunk, qaChunk);
-                        allGeneratedContent += chunkContent + '\n';
+                        promises.push(generateInChunks(refPassageChunk, targetPassageChunk, qaChunk));
                     }
+                    const chunkContents = await Promise.all(promises);
+                    allGeneratedContent = chunkContents.join('\n');
                 } else {
                     allGeneratedContent = await generateInChunks(refPassage, targetPassage, refQAs);
                 }
@@ -685,11 +734,11 @@ ${targetPassageChunk}
             outputDiv.innerHTML = parsed.map((item, index) => `
                 <div class="outputGroup">
                     <span class="sequence">${index + 1}.</span>
-                    <div class="outputSection">
+                    <div class="outputSection" style="flex: 1; margin-right: 10px;">
                         <h3>題目</h3>
                         <p>${item.question}</p>
                     </div>
-                    <div class="outputSection">
+                    <div class="outputSection" style="flex: 1;">
                         <h3>答案</h3>
                         <p>${item.answer}</p>
                     </div>
