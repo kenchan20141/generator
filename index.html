@@ -1,9 +1,48 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>作文題目生成器</title>
+    <title>DSE中文卷二題目生成器</title>
     <style>
         body {
             font-family: 'Noto Serif TC', 'cwTeXHei', 'cwTeXFangSong', 'cwTeXKai', 'cwTeXMing', 'PingFang TC', 'Microsoft JhengHei', serif;
@@ -14,24 +53,37 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
         .container {
             background: white;
-            padding: 10px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 80%;
             max-width: 800px;
             opacity: 0.9;
+            box-sizing: border-box;
         }
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
+        }
+        #generatorSelector {
+            margin-bottom: 20px;
         }
         label {
             font-size: 18px;
             color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select {
+            padding: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         textarea {
             width: 100%;
@@ -41,7 +93,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: vertical;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             box-sizing: border-box;
         }
         input[type="number"] {
@@ -50,6 +102,14 @@
             margin-left: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
@@ -60,6 +120,8 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: block;
+            margin: 0 auto;
         }
         button:hover {
             background-color: #45a049;
@@ -71,12 +133,12 @@
         #loading {
             font-size: 18px;
             color: #333;
-            margin-top: 10px;
+            margin-top: 15px;
             display: none;
             text-align: center;
         }
         #output {
-            margin-top: 10px;
+            margin-top: 15px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -85,6 +147,32 @@
             word-wrap: break-word;
             max-height: 300px;
             overflow-y: auto;
+        }
+        .outputSection {
+            margin-bottom: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            word-wrap: break-word;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .outputSection h3 {
+            margin: 0 0 2px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .outputSection p {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .inputSection {
+            margin-bottom: 20px;
+        }
+        .inputGroup {
+            margin-bottom: 15px; /* 統一所有輸入組的底部間距 */
         }
         @media (max-width: 600px) {
             h1 {
@@ -105,12 +193,131 @@
 </head>
 <body>
     <div class="container">
-        <h1>作文題目生成器</h1>
-        <label for="mimicQuestion">請輸入參考題目：</label><br>
-        <textarea id="mimicQuestion" placeholder="在此輸入或貼上參考題目內容"></textarea><br>
-        <label for="quantity">生成題目數量：</label>
-        <input type="number" id="quantity" min="1" value="1"><br><br>
-        <button id="generateBtn">生成題目</button><br><br>
+        <h1>DSE中文卷二題目生成器</h1>
+        <div id="generatorSelector" class="inputGroup">
+            <label for="generatorType">選擇生成器類型：</label>
+            <select id="generatorType">
+                <option value="essay">作文題目生成器</option>
+                <option value="practical">實用文題目生成器</option>
+            </select>
+        </div>
+        <div id="essayInputs" class="inputSection">
+            <div class="inputGroup">
+                <label for="mimicQuestion">請輸入參考題目：</label>
+                <textarea id="mimicQuestion" placeholder="在此輸入或貼上參考題目內容"></textarea>
+            </div>
+            <div class="inputGroup">
+                <label for="quantity">生成題目數量：</label>
+                <input type="number" id="quantity" min="1" value="3">
+            </div>
+        </div>
+        <div id="practicalInputs" class="inputSection" style="display: none;">
+            <div class="inputGroup">
+                <label for="topicSelect">選擇主題：</label>
+                <select id="topicSelect">
+                    <option value="random">隨機</option>
+                    <option value="custom">自訂</option>
+                    <option value="運動">運動</option>
+                    <option value="生涯規劃">生涯規劃</option>
+                    <option value="責任">責任</option>
+                    <option value="教育">教育</option>
+                    <option value="文化">文化</option>
+                    <option value="社會">社會</option>
+                    <option value="歷史">歷史</option>
+                    <option value="地理">地理</option>
+                    <option value="藝術">藝術</option>
+                    <option value="體育">體育</option>
+                    <option value="法律">法律</option>
+                    <option value="健康">健康</option>
+                    <option value="心理">心理</option>
+                    <option value="家庭">家庭</option>
+                    <option value="友誼">友誼</option>
+                    <option value="愛情">愛情</option>
+                    <option value="就業">就業</option>
+                    <option value="經濟">經濟</option>
+                    <option value="生態">生態</option>
+                    <option value="能源">能源</option>
+                    <option value="資源">資源</option>
+                    <option value="安全">安全</option>
+                    <option value="網路">網路</option>
+                    <option value="媒體">媒體</option>
+                    <option value="資訊">資訊</option>
+                    <option value="道德">道德</option>
+                    <option value="誠信">誠信</option>
+                    <option value="公平">公平</option>
+                    <option value="自由">自由</option>
+                    <option value="權利">權利</option>
+                    <option value="義務">義務</option>
+                    <option value="隱私">隱私</option>
+                    <option value="禮儀">禮儀</option>
+                    <option value="榜樣">榜樣</option>
+                    <option value="創新">創新</option>
+                    <option value="創業">創業</option>
+                    <option value="消費">消費</option>
+                    <option value="儲蓄">儲蓄</option>
+                    <option value="民族">民族</option>
+                    <option value="語言">語言</option>
+                    <option value="宗教">宗教</option>
+                    <option value="傳統">傳統</option>
+                    <option value="現代">現代</option>
+                    <option value="城鄉">城鄉</option>
+                    <option value="社區">社區</option>
+                    <option value="公益">公益</option>
+                    <option value="慈善">慈善</option>
+                    <option value="災害">災害</option>
+                    <option value="醫療">醫療</option>
+                    <option value="疾病">疾病</option>
+                    <option value="飲食">飲食</option>
+                    <option value="旅遊">旅遊</option>
+                    <option value="建築">建築</option>
+                    <option value="娛樂">娛樂</option>
+                    <option value="音樂">音樂</option>
+                    <option value="電影">電影</option>
+                    <option value="文學">文學</option>
+                    <option value="人口">人口</option>
+                    <option value="性別">性別</option>
+                    <option value="年齡">年齡</option>
+                    <option value="職業">職業</option>
+                    <option value="學業">學業</option>
+                    <option value="考試">考試</option>
+                    <option value="升學">升學</option>
+                    <option value="校園">校園</option>
+                    <option value="師生">師生</option>
+                    <option value="同學">同學</option>
+                    <option value="課外">課外</option>
+                    <option value="社團">社團</option>
+                    <option value="競賽">競賽</option>
+                    <option value="志願">志願</option>
+                    <option value="壓力">壓力</option>
+                    <option value="自律">自律</option>
+                    <option value="時間">時間</option>
+                    <option value="興趣">興趣</option>
+                    <option value="習慣">習慣</option>
+                    <option value="遊戲">遊戲</option>
+                    <option value="睡眠">睡眠</option>
+                    <option value="氣候">氣候</option>
+                    <option value="汙染">汙染</option>
+                    <option value="閱讀">閱讀</option>
+                </select>
+            </div>
+            <div id="customTopicGroup" class="inputGroup" style="display: none;">
+                <label for="customTopic">請輸入自訂主題：</label>
+                <input type="text" id="customTopic" placeholder="請輸入自訂主題">
+            </div>
+            <div class="inputGroup">
+                <label for="refQuestion">參考題目：</label>
+                <textarea id="refQuestion" placeholder="在此輸入參考題目"></textarea>
+            </div>
+            <div class="inputGroup">
+                <label for="refMaterial1">參考資料一：</label>
+                <textarea id="refMaterial1" placeholder="在此輸入參考資料一"></textarea>
+            </div>
+            <div class="inputGroup">
+                <label for="refMaterial2">參考資料二：</label>
+                <textarea id="refMaterial2" placeholder="在此輸入參考資料二"></textarea>
+            </div>
+        </div>
+        <button id="generateBtn">生成題目</button>
         <div id="loading">AI正在思考，請稍候...</div>
         <div id="output"></div>
     </div>
@@ -120,23 +327,50 @@
         const MODEL = "DeepSeek-R1";
         const API_KEY = "sk-O6GT79mshyCgqyaTaq60FA"; // 注意：在實際部署中應使用環境變量管理API密鑰
 
-        const mimicQuestionInput = document.getElementById('mimicQuestion');
-        const quantityInput = document.getElementById('quantity');
+        const generatorTypeSelect = document.getElementById('generatorType');
+        const essayInputs = document.getElementById('essayInputs');
+        const practicalInputs = document.getElementById('practicalInputs');
         const generateBtn = document.getElementById('generateBtn');
         const loadingDiv = document.getElementById('loading');
         const outputDiv = document.getElementById('output');
+        const topicSelect = document.getElementById('topicSelect');
+        const customTopicGroup = document.getElementById('customTopicGroup');
+        const customTopicInput = document.getElementById('customTopic');
 
-        generateBtn.addEventListener('click', () => {
-            const mimicQuestion = mimicQuestionInput.value.trim();
-            if (!mimicQuestion) {
-                alert('請輸入模仿題目');
-                return;
+        generatorTypeSelect.addEventListener('change', () => {
+            if (generatorTypeSelect.value === 'essay') {
+                essayInputs.style.display = 'block';
+                practicalInputs.style.display = 'none';
+            } else {
+                essayInputs.style.display = 'none';
+                practicalInputs.style.display = 'block';
             }
-            const quantity = quantityInput.value;
-            generateQuestions(mimicQuestion, quantity);
         });
 
-        async function generateQuestions(mimicQuestion, quantity) {
+        topicSelect.addEventListener('change', () => {
+            if (topicSelect.value === 'custom') {
+                customTopicGroup.style.display = 'block';
+            } else {
+                customTopicGroup.style.display = 'none';
+            }
+        });
+
+        generateBtn.addEventListener('click', () => {
+            const generatorType = generatorTypeSelect.value;
+            if (generatorType === 'essay') {
+                generateEssayQuestions();
+            } else {
+                generatePracticalQuestions();
+            }
+        });
+
+        async function generateEssayQuestions() {
+            const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
+            if (!mimicQuestion) {
+                alert('請輸入參考題目');
+                return;
+            }
+            const quantity = document.getElementById('quantity').value;
             loadingDiv.style.display = 'block';
             generateBtn.disabled = true;
             outputDiv.textContent = '';
@@ -165,7 +399,7 @@
 
                 const data = await response.json();
                 const generatedQuestions = data.choices[0].message.content;
-                displayQuestions(generatedQuestions);
+                displayEssayQuestions(generatedQuestions);
             } catch (error) {
                 console.error('錯誤：', error);
                 outputDiv.textContent = '生成題目時出錯，請稍後再試';
@@ -175,12 +409,119 @@
             }
         }
 
-        function displayQuestions(questions) {
-            // 修剪開頭和結尾的空白符號
+        function displayEssayQuestions(questions) {
             const trimmedQuestions = questions.trim();
-            // 將題目按行分割並確保每行之間有換行符
             const formattedQuestions = trimmedQuestions.split('\n').join('\n\n');
             outputDiv.textContent = formattedQuestions;
+        }
+
+        async function generatePracticalQuestions() {
+            const selectedTopic = topicSelect.value;
+            const refQuestion = document.getElementById('refQuestion').value.trim();
+            const refMaterial1 = document.getElementById('refMaterial1').value.trim();
+            const refMaterial2 = document.getElementById('refMaterial2').value.trim();
+            if (!refQuestion || !refMaterial1 || !refMaterial2) {
+                alert('請輸入所有參考內容');
+                return;
+            }
+            loadingDiv.style.display = 'block';
+            generateBtn.disabled = true;
+            outputDiv.innerHTML = '';
+
+            let topicInstruction;
+            if (selectedTopic === 'custom') {
+                const customTopic = customTopicInput.value.trim();
+                if (!customTopic) {
+                    alert('請輸入自訂主題');
+                    loadingDiv.style.display = 'none';
+                    generateBtn.disabled = false;
+                    return;
+                }
+                topicInstruction = `請以「${customTopic}」為主題。`;
+            } else if (selectedTopic === 'random') {
+                topicInstruction = '請隨機選擇一個主題，且該主題必須與以下列出的所有主題（運動、生涯規劃、責任、教育、文化、社會、歷史、地理、藝術、體育、法律、健康、心理、家庭、友誼、愛情、就業、經濟、生態、能源、資源、安全、網路、媒體、資訊、道德、誠信、公平、自由、權利、義務、隱私、禮儀、榜樣、創新、創業、消費、儲蓄、民族、語言、宗教、傳統、現代、城鄉、社區、公益、慈善、災害、醫療、疾病、飲食、旅遊、建築、娛樂、音樂、電影、文學、人口、性別、年齡、職業、學業、考試、升學、校園、師生、同學、課外、社團、競賽、志願、壓力、自律、時間、興趣、習慣、遊戲、睡眠、氣候、汙染、閱讀）不同，例如可以選擇「科技發展」、「全球化」等其他主題。';
+            } else {
+                topicInstruction = `請以「${selectedTopic}」為主題。`;
+            }
+
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個實用文題目生成器。" },
+                    { role: "user", content: `請根據以下參考內容生成相應的實用文題目和資料：
+
+參考題目：
+${refQuestion}
+
+參考資料一：
+${refMaterial1}
+
+參考資料二：
+${refMaterial2}
+
+${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內容的風格和形式，但內容和題材必須不同。生成的題目應與參考題目在形式和字數上相似，但內容和題材必須不同。生成的資料一應與參考資料一在形式和風格上相似，但內容和題材必須不同；生成的資料二應與參考資料二在形式和風格上相似，但內容和題材必須不同。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
+
+請以以下格式輸出生成的題目和資料：
+題目：[生成的題目]
+資料一：[生成的資料一]
+資料二：[生成的資料二]` }
+                ]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
+                }
+
+                const data = await response.json();
+                const generatedContent = data.choices[0].message.content;
+                const parsed = parsePracticalResponse(generatedContent);
+                if (parsed.question === '未生成' || parsed.material1 === '未生成' || parsed.material2 === '未生成') {
+                    outputDiv.textContent = '生成內容失敗，請重試';
+                } else {
+                    displayPracticalQuestions(parsed);
+                }
+            } catch (error) {
+                console.error('錯誤：', error);
+                outputDiv.textContent = '生成題目時出錯，請稍後再試';
+            } finally {
+                loadingDiv.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function parsePracticalResponse(response) {
+            const parts = response.split(/\n(?=題目：|資料一：|資料二：)/);
+            const question = parts.find(part => part.startsWith('題目：'))?.replace('題目：', '').trim() || '未生成';
+            const material1 = parts.find(part => part.startsWith('資料一：'))?.replace('資料一：', '').trim() || '未生成';
+            const material2 = parts.find(part => part.startsWith('資料二：'))?.replace('資料二：', '').trim() || '未生成';
+            return { question, material1, material2 };
+        }
+
+        function displayPracticalQuestions(parsed) {
+            outputDiv.innerHTML = `
+                <div class="outputSection">
+                    <h3>題目</h3>
+                    <p>${parsed.question}</p>
+                </div>
+                <div class="outputSection">
+                    <h3>資料一</h3>
+                    <p>${parsed.material1}</p>
+                </div>
+                <div class="outputSection">
+                    <h3>資料二</h3>
+                    <p>${parsed.material2}</p>
+                </div>
+            `;
         }
     </script>
 </body>
