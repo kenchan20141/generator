@@ -60,7 +60,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 85%;
+            width: 90%;
             opacity: 0.9;
             box-sizing: border-box;
         }
@@ -232,13 +232,12 @@
         <div id="generatorSelector" class="inputGroup">
             <label for="generatorType">選擇擬卷範疇：</label>
             <select id="generatorType">
-<option value="reading">閱讀</option>
+                <option value="reading">閱讀</option>
                 <option value="essay">長文</option>
                 <option value="practical">實用文</option>
-                
             </select>
         </div>
-        <div id="essayInputs" class="inputSection">
+        <div id="essayInputs" class="inputSection" style="display: none;">
             <div class="inputGroup">
                 <label for="mimicQuestion">請輸入參考題目：</label>
                 <textarea id="mimicQuestion" placeholder="在此輸入或貼上參考題目內容"></textarea>
@@ -354,7 +353,7 @@
                 <textarea id="refMaterial2" placeholder="在此輸入參考資料二"></textarea>
             </div>
         </div>
-        <div id="readingInputs" class="inputSection" style="display: none;">
+        <div id="readingInputs" class="inputSection">
             <div class="inputGroup">
                 <label for="refPassage">參考篇章：</label>
                 <textarea id="refPassage" placeholder="在此輸入參考篇章"></textarea>
@@ -365,7 +364,7 @@
                     <span class="sequence">1.</span>
                     <textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>
                 </div>
-                <button class="addReferenceBtn" onclick="addReferenceQA()">+</button>
+                <button class="addReferenceBtn" onclick="addReferenceQA()" style="background-color: #7fb3d5;">+</button>
             </div>
             <div class="inputGroup">
                 <label for="targetPassage">擬題篇章：</label>
@@ -599,20 +598,23 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             generateBtn.disabled = true;
             outputDiv.innerHTML = '';
 
-            const requestBody = {
-                model: MODEL,
-                messages: [
-                    { role: "system", content: "你是一個閱讀卷題目生成器。" },
-                    { role: "user", content: `請根據以下參考篇章和參考題目與答案，為擬題篇章生成相應的題目和答案：
+            // 分割長內容以避免API限制
+            const maxChunkSize = 3000; // 每個請求的最大字符數
+            const generateInChunks = async (refPassageChunk, targetPassageChunk, qaChunk) => {
+                const requestBody = {
+                    model: MODEL,
+                    messages: [
+                        { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                        { role: "user", content: `請根據以下參考篇章和參考題目與答案，為擬題篇章生成相應的題目和答案：
 
 參考篇章：
-${refPassage}
+${refPassageChunk}
 
 參考題目與答案：
-${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
+${qaChunk.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
 
 擬題篇章：
-${targetPassage}
+${targetPassageChunk}
 
 請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 
@@ -622,10 +624,9 @@ ${targetPassage}
 題目2：[生成的題目2]
 答案2：[生成的答案2]
 ...` }
-                ]
-            };
+                    ]
+                };
 
-            try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -640,13 +641,26 @@ ${targetPassage}
                 }
 
                 const data = await response.json();
-                const generatedContent = data.choices[0].message.content;
-                const parsed = parseReadingResponse(generatedContent, refQAs.length);
-                if (parsed.some(item => item.question === '未生成' || item.answer === '未生成')) {
-                    outputDiv.textContent = '生成內容失敗，請重試';
+                return data.choices[0].message.content;
+            };
+
+            try {
+                let allGeneratedContent = '';
+                if (refPassage.length + targetPassage.length + refQAs.join('').length > maxChunkSize) {
+                    const chunkSize = Math.ceil(refQAs.length / Math.ceil((refPassage.length + targetPassage.length + refQAs.join('').length) / maxChunkSize));
+                    for (let i = 0; i < refQAs.length; i += chunkSize) {
+                        const qaChunk = refQAs.slice(i, i + chunkSize);
+                        const refPassageChunk = refPassage.slice(0, maxChunkSize / 3); // 簡單分割，實際可根據需要優化
+                        const targetPassageChunk = targetPassage.slice(0, maxChunkSize / 3);
+                        const chunkContent = await generateInChunks(refPassageChunk, targetPassageChunk, qaChunk);
+                        allGeneratedContent += chunkContent + '\n';
+                    }
                 } else {
-                    displayReadingQuestions(parsed);
+                    allGeneratedContent = await generateInChunks(refPassage, targetPassage, refQAs);
                 }
+
+                const parsed = parseReadingResponse(allGeneratedContent, refQAs.length);
+                displayReadingQuestions(parsed);
             } catch (error) {
                 console.error('錯誤：', error);
                 outputDiv.textContent = '生成題目時出錯，請稍後再試';
@@ -660,8 +674,8 @@ ${targetPassage}
             const parts = response.split(/\n(?=題目\d+：|答案\d+：)/);
             const parsed = [];
             for (let i = 1; i <= count; i++) {
-                const question = parts.find(part => part.startsWith(`題目${i}：`))?.replace(`題目${i}：`, '').trim() || '未生成';
-                const answer = parts.find(part => part.startsWith(`答案${i}：`))?.replace(`答案${i}：`, '').trim() || '未生成';
+                const question = parts.find(part => part.startsWith(`題目${i}：`))?.replace(`題目${i}：`, '').trim() || '生成失敗，請檢查輸入內容並重試';
+                const answer = parts.find(part => part.startsWith(`答案${i}：`))?.replace(`答案${i}：`, '').trim() || '生成失敗，請檢查輸入內容並重試';
                 parsed.push({ question, answer });
             }
             return parsed;
