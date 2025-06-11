@@ -3,511 +3,2636 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSE中文 AI擬題</title>
+    <title>DSE中文 AI擬題系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-gray: #4B5563;
+            --secondary-gray: #6B7280;
+            --accent-gray: #9CA3AF;
+            --primary-blue: #1F2937;
+            --secondary-blue: #374151;
+            --accent-blue: #4B5563;
+            --primary-purple: #6D28D9;
+            --secondary-purple: #7C3AED;
+            --accent-purple: #8B5CF6;
+            --primary-green: #065F46;
+            --secondary-green: #047857;
+            --accent-green: #34D399;
+            --primary-rose: #9F1239;
+            --secondary-rose: #BE123C;
+            --accent-rose: #F43F5E;
+            --primary-amber: #B45309;
+            --secondary-amber: #D97706;
+            --accent-amber: #F59E0B;
+            --primary-indigo: #3730A3;
+            --secondary-indigo: #4338CA;
+            --accent-indigo: #4F46E5;
+            --primary-cyan: #0E7490;
+            --secondary-cyan: #0891B2;
+            --accent-cyan: #06B6D4;
+            --divider-color: #9CA3AF;
+        }
+
         body {
             font-family: 'Noto Serif TC', 'cwTeXHei', 'cwTeXFangSong', 'cwTeXKai', 'cwTeXMing', 'PingFang TC', 'Microsoft JhengHei', serif;
-            background-image: url('https://i.ibb.co/rGjHnWSk/image.png');
-            background-repeat: repeat;
-            margin: 0;
-            padding: 20px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+            background-attachment: fixed;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
+            border-radius: 999px;
+            margin: 2rem 0;
+        }
+
+        .h-1.bg-gradient-to-r {
+            background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid rgba(75, 85, 99, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 24px;
+        }
+
+        .sidebar-card {
+            backdrop-filter: blur(15px);
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, rgba(55, 65, 81, 0.1) 100%);
+            border: 2px solid rgba(75, 85, 99, 0.3);
+            box-shadow: 0 20px 40px rgba(75, 85, 99, 0.15);
+            border-radius: 20px;
+        }
+
+        .question-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-left: 6px solid var(--primary-gray);
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #cd6155 0%, #a93226 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 8px 25px rgba(75, 85, 99, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(75, 85, 99, 0.4);
+            background: linear-gradient(135deg, var(--secondary-gray) 0%, var(--accent-gray) 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .type-selector-btn {
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .type-selector-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .type-selector-btn:hover::before {
+            left: 100%;
+        }
+
+        .type-selector-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(75, 85, 99, 0.2);
+            border-color: var(--accent-gray);
+        }
+
+        .type-selector-btn.selected {
+            border-color: var(--primary-gray);
+            background: linear-gradient(135deg, #a9cce3 0%, rgba(213, 245, 227, 0.8) 100%);
+            box-shadow: 0 10px 30px rgba(75, 85, 99, 0.25);
+        }
+
+        .quantity-control {
             display: flex;
-            justify-content: center;
             align-items: center;
+            background: white;
+            border: 2px solid var(--accent-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .quantity-btn:hover {
+            background: linear-gradient(135deg, var(--secondary-indigo) 0%, var(--accent-indigo) 100%);
+            transform: scale(1.05);
+        }
+
+        .quantity-input {
+            border: none;
+            width: 60px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-gray);
+            background: transparent;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 70px;
+            height: 36px;
+            background: #e2e8f0;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(34px);
+        }
+
+        .floating-generate-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-rose) 0%, var(--secondary-rose) 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(225, 29, 72, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .floating-generate-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 25px 50px rgba(225, 29, 72, 0.5);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dasharray 0.4s ease-in-out;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            transform: translateY(30px);
+            opacity: 0;
+            animation: slideUp 1s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .floating-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(15px);
+            background: linear-gradient(135deg, var(--primary-gray) 0%, var(--primary-blue) 100%);
+            border-bottom: 3px solid var(--accent-gray);
+        }
+
+        .result-page {
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
             min-height: 100vh;
         }
 
-        .copyright-footer {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            padding: 5px 10px;
-            background-color: #f1f1f1;
+        .question-number {
+            color: #1F2937;
         }
 
-        .copyright-footer p {
-            margin: 0;
-            font-size: 14px;
+        .question-title {
+            background: linear-gradient(135deg, var(--primary-amber) 0%, var(--secondary-amber) 100%);
+            color: #1F2937;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 20px;
         }
 
-        @media (max-width: 600px) {
-            .copyright-footer p {
-                font-size: 12px;
-            }
-        }
-
-        .container {
-            background: white;
+        .answer-section {
+            background: linear-gradient(135deg, #d0ece7 0%, #73c6b6 100%);
+            border: 2px solid #4B5563;
+            border-radius: 16px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            opacity: 0.9;
-            box-sizing: border-box;
+            margin-top: 16px;
         }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+
+        .steps-section {
+            background: linear-gradient(135deg, #d4e6f1 0%, #7fb3d5 100%);
+            border: 2px solid #4B5563;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+            color: #1F2937;
         }
-        #generatorSelector {
-            margin-bottom: 20px;
-        }
-        label {
-            font-size: 18px;
-            color: #333;
-            display: block;
-            margin-bottom: 5px;
-        }
-        select {
-            padding: 5px;
+
+        textarea, input[type="text"] {
+            min-height: 150px !important;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            line-height: 1.6;
         }
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-            margin-bottom: 15px;
-            box-sizing: border-box;
+
+        #targetPassage {
+            min-height: 300px !important;
         }
-        input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            margin-left: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .reference-qa textarea {
+            min-height: 180px !important;
         }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: block;
+
+        .question-type-container {
+            max-width: 600px;
             margin: 0 auto;
         }
-        button:hover {
-            background-color: #45a049;
+
+        .text-library-selector {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+
+        .text-library-selector:hover {
+            border-color: #a9cce3;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        #loading {
-            font-size: 18px;
-            color: #333;
-            margin-top: 15px;
-            display: none;
-            text-align: center;
-        }
-        #output {
-            margin-top: 15px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 300px;
+
+        .text-library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            max-height: 400px;
             overflow-y: auto;
         }
-        .outputSection {
-            margin-bottom: 5px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            word-wrap: break-word;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .outputSection h3 {
-            margin: 0 0 2px 0;
-            font-size: 18px;
-            color: #333;
-        }
-        .outputSection p {
-            margin: 0;
-            font-size: 16px;
-            color: #333;
-        }
-        .inputSection {
-            margin-bottom: 20px;
-        }
-        .inputGroup {
-            margin-bottom: 15px;
-        }
-        .referenceQA {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .sequence {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        .controlButtons {
-            text-align: center;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        .addReferenceBtn, .removeReferenceBtn, .clearReferenceBtn {
-            display: inline-block;
-            background-color: #5d6d7e;
-            color: white;
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            line-height: 30px;
-            text-align: center;
-            padding: 0;
-            border: none;
-            border-radius: 50%;
+
+        .text-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            margin: 0 5px;
+            transition: all 0.3s ease;
         }
-        .addReferenceBtn:hover, .removeReferenceBtn:hover {
-            background-color: #4a5a6b;
+
+        .text-item:hover {
+            border-color: #a9cce3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
-        .clearReferenceBtn {
-            background-color: #dc3545;
+
+       .text-item.selected {
+    border-color: #3498db; /* 藍色邊框 */
+    background: linear-gradient(135deg, #ebf5fb 0%, #d6eaf8 50%); /* 淺藍色漸變背景 */
+}
+
+        .text-item-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1F2937;
+            margin-bottom: 8px;
         }
-        .clearReferenceBtn:hover {
-            background-color: #c82333;
-        }
-        .outputGroup {
-            margin-bottom: 20px;
+
+        .text-item-info {
+            font-size: 14px;
+            color: #6B7280;
             display: flex;
-            align-items: flex-start;
+            justify-content: space-between;
+            align-items: center;
         }
-        .outputGroup .sequence {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 24px;
-            }
-            label {
-                font-size: 16px;
-            }
-            button {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
-            #output {
-                max-height: 200px;
-            }
+
+        .text-category {
+            background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>DSE中文 AI擬題</h1>
-        <div id="generatorSelector" class="inputGroup">
-            <label for="generatorType">選擇擬題範疇：</label>
-            <select id="generatorType">
-                <option value="reading">閱讀</option>
-                <option value="essay">長文</option>
-                <option value="practical">實用文</option>
-            </select>
-        </div>
-        <div id="essayInputs" class="inputSection" style="display: none;">
-            <div class="inputGroup">
-                <label for="mimicQuestion">請輸入參考題目：</label>
-                <textarea id="mimicQuestion" placeholder="在此輸入或貼上參考題目內容"></textarea>
+<body class="min-h-screen">
+    <!-- 主要配置區域 -->
+    <div id="mainContainer" class="min-h-screen">
+        <!-- Header -->
+        <header class="floating-header text-white py-10 shadow-2xl">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4">
+                        <i class="fas fa-graduation-cap mr-4"></i>DSE中文 AI擬題系統
+                    </h1>
+                </div>
             </div>
-            <div class="inputGroup">
-                <label for="quantity">生成題目數量：</label>
-                <input type="number" id="quantity" min="1" value="3">
-            </div>
-        </div>
-        <div id="practicalInputs" class="inputSection" style="display: none;">
-            <div class="inputGroup">
-                <label for="topicSelect">選擇主題：</label>
-                <select id="topicSelect">
-                    <option value="random">隨機</option>
-                    <option value="custom">自訂</option>
-                    <option value="運動">運動</option>
-                    <option value="生涯規劃">生涯規劃</option>
-                    <option value="責任">責任</option>
-                    <option value="教育">教育</option>
-                    <option value="文化">文化</option>
-                    <option value="社會">社會</option>
-                    <option value="歷史">歷史</option>
-                    <option value="地理">地理</option>
-                    <option value="藝術">藝術</option>
-                    <option value="體育">體育</option>
-                    <option value="法律">法律</option>
-                    <option value="健康">健康</option>
-                    <option value="心理">心理</option>
-                    <option value="家庭">家庭</option>
-                    <option value="友誼">友誼</option>
-                    <option value="愛情">愛情</option>
-                    <option value="就業">就業</option>
-                    <option value="經濟">經濟</option>
-                    <option value="生態">生態</option>
-                    <option value="能源">能源</option>
-                    <option value="資源">資源</option>
-                    <option value="安全">安全</option>
-                    <option value="網路">網路</option>
-                    <option value="媒體">媒體</option>
-                    <option value="資訊">資訊</option>
-                    <option value="道德">道德</option>
-                    <option value="誠信">誠信</option>
-                    <option value="公平">公平</option>
-                    <option value="自由">自由</option>
-                    <option value="權利">權利</option>
-                    <option value="義務">義務</option>
-                    <option value="隱私">隱私</option>
-                    <option value="禮儀">禮儀</option>
-                    <option value="榜樣">榜樣</option>
-                    <option value="創新">創新</option>
-                    <option value="創業">創業</option>
-                    <option value="消費">消費</option>
-                    <option value="儲蓄">儲蓄</option>
-                    <option value="民族">民族</option>
-                    <option value="語言">語言</option>
-                    <option value="宗教">宗教</option>
-                    <option value="傳統">傳統</option>
-                    <option value="現代">現代</option>
-                    <option value="城鄉">城鄉</option>
-                    <option value="社區">社區</option>
-                    <option value="公益">公益</option>
-                    <option value="慈善">慈善</option>
-                    <option value="災害">災害</option>
-                    <option value="醫療">醫療</option>
-                    <option value="疾病">疾病</option>
-                    <option value="飲食">飲食</option>
-                    <option value="旅遊">旅遊</option>
-                    <option value="建築">建築</option>
-                    <option value="娛樂">娛樂</option>
-                    <option value="音樂">音樂</option>
-                    <option value="電影">電影</option>
-                    <option value="文學">文學</option>
-                    <option value="人口">人口</option>
-                    <option value="性別">性別</option>
-                    <option value="年齡">年齡</option>
-                    <option value="職業">職業</option>
-                    <option value="學業">學業</option>
-                    <option value="考試">考試</option>
-                    <option value="升學">升學</option>
-                    <option value="校園">校園</option>
-                    <option value="師生">師生</option>
-                    <option value="同學">同學</option>
-                    <option value="課外">課外</option>
-                    <option value="社團">社團</option>
-                    <option value="競賽">競賽</option>
-                    <option value="志願">志願</option>
-                    <option value="壓力">壓力</option>
-                    <option value="自律">自律</option>
-                    <option value="時間">時間</option>
-                    <option value="興趣">興趣</option>
-                    <option value="習慣">習慣</option>
-                    <option value="遊戲">遊戲</option>
-                    <option value="睡眠">睡眠</option>
-                    <option value="氣候">氣候</option>
-                    <option value="汙染">汙染</option>
-                    <option value="閱讀">閱讀</option>
-                </select>
-            </div>
-            <div id="customTopicGroup" class="inputGroup" style="display: none;">
-                <label for="customTopic">請輸入自訂主題：</label>
-                <input type="text" id="customTopic" placeholder="請輸入自訂主題">
-            </div>
-            <div class="inputGroup">
-                <label for="refQuestion">參考題目：</label>
-                <textarea id="refQuestion" placeholder="在此輸入參考題目"></textarea>
-            </div>
-            <div class="inputGroup">
-                <label for="refMaterial1">參考資料一：</label>
-                <textarea id="refMaterial1" placeholder="在此輸入參考資料一"></textarea>
-            </div>
-            <div class="inputGroup">
-                <label for="refMaterial2">參考資料二：</label>
-                <textarea id="refMaterial2" placeholder="在此輸入參考資料二"></textarea>
-            </div>
-        </div>
-        <div id="readingInputs" class="inputSection">
-            <div id="referenceQAContainer" class="inputGroup">
-                <label>參考題目與答案：</label>
-                <div id="referenceQAList">
-                    <div class="referenceQA">
-                        <span class="sequence">1.</span>
-                        <textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>
+        </header>
+
+        <!-- 主體內容區域 -->
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-10 min-h-screen">
+                
+                <!-- 左側配置面板 -->
+                <div class="xl:col-span-1">
+                    <div class="sidebar-card p-10 mb-10 fade-in sticky top-32">
+                        <h2 class="text-3xl font-bold mb-10 text-gray-800 flex items-center">
+                            <i class="fas fa-sliders-h mr-4 text-teal-700"></i>配置選項
+                        </h2>
+
+                        <!-- 擬題範疇選擇 -->
+                        <div class="mb-10">
+                            <label class="block text-xl font-semibold text-gray-700 mb-6">
+                                <i class="fas fa-list-alt mr-3"></i>選擇擬題範疇
+                            </label>
+                            <div class="space-y-4">
+                                <div class="relative">
+                                    <input type="radio" id="reading" name="generatorType" value="reading" class="sr-only" checked>
+                                    <label for="reading" class="type-selector-btn block p-6 cursor-pointer text-center">
+                                        <i class="fas fa-book-open text-4xl text-teal-600 mb-4 block"></i>
+                                        <div class="font-bold text-xl text-gray-700">閱讀理解</div>
+                                        <div class="text-base text-gray-500 mt-2">多元化題型設計</div>
+                                    </label>
+                                </div>
+                                <div class="relative">
+                                    <input type="radio" id="essay" name="generatorType" value="essay" class="sr-only">
+                                    <label for="essay" class="type-selector-btn block p-6 cursor-pointer text-center">
+                                        <i class="fas fa-pen-fancy text-4xl text-blue-600 mb-4 block"></i>
+                                        <div class="font-bold text-xl text-gray-700">長文寫作</div>
+                                        <div class="text-base text-gray-500 mt-2">創意思維訓練</div>
+                                    </label>
+                                </div>
+                                <div class="relative">
+                                    <input type="radio" id="practical" name="generatorType" value="practical" class="sr-only">
+                                    <label for="practical" class="type-selector-btn block p-6 cursor-pointer text-center">
+                                        <i class="fas fa-file-alt text-4xl text-green-600 mb-4 block"></i>
+                                        <div class="font-bold text-xl text-gray-700">實用文體</div>
+                                        <div class="text-base text-gray-500 mt-2">應用能力培養</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="controlButtons">
-                    <button class="addReferenceBtn" onclick="addReferenceQA()">+</button>
-                    <button class="removeReferenceBtn" onclick="removeReferenceQA()">-</button>
-                    <button class="clearReferenceBtn" onclick="clearReferenceQA()" title="清空">✖</button>
-                </div>
+
+                <!-- 右側主要配置區域 -->
+                <div class="xl:col-span-2">
+                    
+                    <!-- 動態配置區域 -->
+                    <div id="configContainer" class="space-y-10">
+                        
+                        <!-- 閱讀配置 -->
+                        <div id="readingConfig" class="config-panel">
+                            <div class="glass-card p-10 slide-up">
+                                <h3 class="text-3xl font-bold mb-8 text-gray-800 flex items-center">
+                                    <i class="fas fa-book mr-4 text-teal-600"></i>閱讀理解配置
+                                </h3>
+
+                                <!-- 題型選擇和數量設定 -->
+                                <div class="mb-10">
+                                    <label class="block text-xl font-semibold text-gray-700 mb-6">
+                                        <i class="fas fa-tasks mr-3"></i>題型選擇及數量設定
+                                    </label>
+                                    <div class="question-type-container">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            
+<!-- 選擇題型 -->
+<div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="選擇">
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center">
+            <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '選擇')">
+                <div class="toggle-slider"></div>
             </div>
-            <div class="inputGroup">
-                <label for="targetPassage">擬題篇章：</label>
-                <textarea id="targetPassage" placeholder="在此輸入擬題篇章"></textarea>
+            <div>
+                <i class="fas fa-check-square text-orange-500 text-2xl mr-3"></i>
+                <span class="font-bold text-lg">選擇</span>
             </div>
         </div>
-        <button id="generateBtn">生成</button>
-        <div id="loading">AI正在思考，請稍候...</div>
-        <div id="output"></div>
+    </div>
+    <div class="quantity-control mt-4" style="display: none;">
+        <button type="button" class="quantity-btn" onclick="adjustQuantity('選擇', -1)">
+            <i class="fas fa-minus"></i>
+        </button>
+        <input type="number" id="quantity-選擇" min="1" max="10" value="1" class="quantity-input" readonly>
+        <button type="button" class="quantity-btn" onclick="adjustQuantity('選擇', 1)">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</div>
+
+
+                                            <!-- 複述題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="複述">
+                                                <div class="flex items-center justify-between mb-4">
+
+
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '複述')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-quote-left text-blue-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">複述</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('複述', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-複述" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('複述', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 分析題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="分析">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '分析')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-search text-green-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">分析</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('分析', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-分析" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('分析', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 印證題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="印證">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '印證')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-check-circle text-purple-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">印證</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('印證', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-印證" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('印證', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 闡明題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="闡明">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '闡明')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-lightbulb text-yellow-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">闡明</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('闡明', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-闡明" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('闡明', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 意見題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="意見">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '意見')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-comment text-red-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">意見</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('意見', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-意見" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('意見', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 比較題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="比較">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center">
+                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '比較')">
+                                                            <div class="toggle-slider"></div>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fas fa-balance-scale text-indigo-500 text-2xl mr-3"></i>
+                                                            <span class="font-bold text-lg">比較</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="quantity-control mt-4" style="display: none;">
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('比較', -1)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="quantity-比較" min="1" max="10" value="1" class="quantity-input" readonly>
+                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('比較', 1)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 自訂題型 -->
+                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300 col-span-full" data-type="自訂">
+                                                <div class="flex items-center justify-center">
+                                                    <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '自訂')">
+                                                        <div class="toggle-slider"></div>
+                                                    </div>
+                                                    <div>
+                                                        <i class="fas fa-edit text-gray-500 text-2xl mr-3"></i>
+                                                        <span class="font-bold text-lg">自訂</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 自訂模式的配置 -->
+                                <div id="customReadingConfig" class="hidden">
+                                    <div class="divider"></div>
+                                    <div>
+                                        <label class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-clipboard-list mr-3"></i>參考題目與答案設定
+                                        </label>
+                                        <div id="referenceQAList" class="space-y-6">
+                                            <div class="reference-qa">
+                                                <div class="flex items-start space-x-4 bg-white p-8 rounded-2xl border-3 border-teal-200">
+                                                    <span class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg question-number">1</span>
+                                                    <textarea class="flex-1 p-6 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical" placeholder="在此輸入參考題目與答案"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-center space-x-6 mt-8">
+                                            <button onclick="addReferenceQA()" class="w-14 h-14 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-full flex items-center justify-center transition-all duration-300 text-xl">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button onclick="removeReferenceQA()" class="w-14 h-14 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-full flex items-center justify-center transition-all duration-300 text-xl">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <button onclick="clearReferenceQA()" class="w-14 h-14 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-full flex items-center justify-center transition-all duration-300 text-xl">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 擬題篇章選擇 -->
+                                <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
+                                <div>
+                                    <label class="block text-xl font-semibold text-gray-700 mb-6">
+                                        <i class="fas fa-scroll mr-3"></i>擬題篇章選擇
+                                    </label>
+                                    
+                                   <div class="text-library-selector mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+            <i class="fas fa-book-open mr-3 text-blue-600"></i>範文庫選擇
+        </h4>
+    </div>
+    
+    <div id="textLibraryGrid" class="text-library-grid">
+        <!-- 範文庫內容將通過 JavaScript 生成 -->
+    </div>
+</div>
+                                        
+                                        <div id="textLibraryGrid" class="text-library-grid hidden">
+                                            <!-- 範文庫內容將通過 JavaScript 生成 -->
+                                        </div>
+                                    </div>
+
+                                    <!-- 自訂篇章輸入 -->
+                                    <div>
+                                        <label for="targetPassage" class="block text-lg font-semibold text-gray-700 mb-4">
+                                            <i class="fas fa-edit mr-3"></i>自訂篇章內容
+                                        </label>
+                                        <textarea id="targetPassage" class="w-full p-8 border-3 border-teal-200 rounded-2xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入擬題篇章內容，或從上方範文庫選擇"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 長文配置 -->
+                        <div id="essayConfig" class="config-panel hidden">
+                            <div class="glass-card p-10 slide-up">
+                                <h3 class="text-3xl font-bold mb-8 text-gray-800 flex items-center">
+                                    <i class="fas fa-pen-fancy mr-4 text-blue-600"></i>長文寫作配置
+                                </h3>
+                                
+                                <div class="space-y-10">
+                                    <div>
+                                        <label for="mimicQuestion" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-quote-left mr-3"></i>參考題目設定
+                                        </label>
+                                        <textarea id="mimicQuestion" class="w-full p-8 border-3 border-blue-200 rounded-2xl focus:border-blue-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入或貼上參考題目內容"></textarea>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="quantity" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-hashtag mr-3"></i>生成題目數量
+                                        </label>
+                                        <div class="flex items-center space-x-8 bg-white p-8 rounded-2xl border-3 border-blue-200">
+                                            <input type="range" id="quantityRange" min="1" max="10" value="3" class="flex-1" style="accent-color: var(--primary-teal);">
+                                            <div class="quantity-control">
+                                                <button type="button" class="quantity-btn" onclick="adjustEssayQuantity(-1)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" id="quantity" min="1" max="10" value="3" class="quantity-input" readonly>
+                                                <button type="button" class="quantity-btn" onclick="adjustEssayQuantity(1)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 實用文配置 -->
+                        <div id="practicalConfig" class="config-panel hidden">
+                            <div class="glass-card p-10 slide-up">
+                                <h3 class="text-3xl font-bold mb-8 text-gray-800 flex items-center">
+                                    <i class="fas fa-file-alt mr-4 text-green-600"></i>實用文體配置
+                                </h3>
+                                
+                                <div class="space-y-10">
+                                    <div>
+                                        <label for="topicSelect" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-tag mr-3"></i>主題選擇
+                                        </label>
+                                        <select id="topicSelect" class="w-full p-6 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 bg-white text-lg">
+                                            <option value="random">隨機主題</option>
+                                            <option value="custom">自訂主題</option>
+                                            <option value="運動">運動</option>
+                                            <option value="生涯規劃">生涯規劃</option>
+                                            <option value="責任">責任</option>
+                                            <option value="教育">教育</option>
+                                            <option value="文化">文化</option>
+                                            <option value="社會">社會</option>
+                                            <option value="歷史">歷史</option>
+                                            <option value="地理">地理</option>
+                                            <option value="藝術">藝術</option>
+                                            <option value="體育">體育</option>
+                                            <option value="法律">法律</option>
+                                            <option value="健康">健康</option>
+                                            <option value="心理">心理</option>
+                                            <option value="家庭">家庭</option>
+                                            <option value="友誼">友誼</option>
+                                            <option value="愛情">愛情</option>
+                                            <option value="就業">就業</option>
+                                            <option value="經濟">經濟</option>
+                                            <option value="生態">生態</option>
+                                            <option value="能源">能源</option>
+                                            <option value="資源">資源</option>
+                                            <option value="安全">安全</option>
+                                            <option value="網路">網路</option>
+                                            <option value="媒體">媒體</option>
+                                            <option value="資訊">資訊</option>
+                                            <option value="道德">道德</option>
+                                            <option value="誠信">誠信</option>
+                                            <option value="公平">公平</option>
+                                            <option value="自由">自由</option>
+                                            <option value="權利">權利</option>
+                                            <option value="義務">義務</option>
+                                            <option value="隱私">隱私</option>
+                                            <option value="禮儀">禮儀</option>
+                                            <option value="榜樣">榜樣</option>
+                                            <option value="創新">創新</option>
+                                            <option value="創業">創業</option>
+                                            <option value="消費">消費</option>
+                                            <option value="儲蓄">儲蓄</option>
+                                            <option value="民族">民族</option>
+                                            <option value="語言">語言</option>
+                                            <option value="宗教">宗教</option>
+                                            <option value="傳統">傳統</option>
+                                            <option value="現代">現代</option>
+                                            <option value="城鄉">城鄉</option>
+                                            <option value="社區">社區</option>
+                                            <option value="公益">公益</option>
+                                            <option value="慈善">慈善</option>
+                                            <option value="災害">災害</option>
+                                            <option value="醫療">醫療</option>
+                                            <option value="疾病">疾病</option>
+                                            <option value="飲食">飲食</option>
+                                            <option value="旅遊">旅遊</option>
+                                            <option value="建築">建築</option>
+                                            <option value="娛樂">娛樂</option>
+                                            <option value="音樂">音樂</option>
+                                            <option value="電影">電影</option>
+                                            <option value="文學">文學</option>
+                                            <option value="人口">人口</option>
+                                            <option value="性別">性別</option>
+                                            <option value="年齡">年齡</option>
+                                            <option value="職業">職業</option>
+                                            <option value="學業">學業</option>
+                                            <option value="考試">考試</option>
+                                            <option value="升學">升學</option>
+                                            <option value="校園">校園</option>
+                                            <option value="師生">師生</option>
+                                            <option value="同學">同學</option>
+                                            <option value="課外">課外</option>
+                                            <option value="社團">社團</option>
+                                            <option value="競賽">競賽</option>
+                                            <option value="志願">志願</option>
+                                            <option value="壓力">壓力</option>
+                                            <option value="自律">自律</option>
+                                            <option value="時間">時間</option>
+                                            <option value="興趣">興趣</option>
+                                            <option value="習慣">習慣</option>
+                                            <option value="遊戲">遊戲</option>
+                                            <option value="睡眠">睡眠</option>
+                                            <option value="氣候">氣候</option>
+                                            <option value="汙染">汙染</option>
+                                            <option value="閱讀">閱讀</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="customTopicGroup" class="hidden">
+                                        <label for="customTopic" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-edit mr-3"></i>自訂主題內容
+                                        </label>
+                                        <input type="text" id="customTopic" class="w-full p-6 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 bg-white text-lg" placeholder="請輸入自訂主題">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="refQuestion" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-question-circle mr-3"></i>參考題目
+                                        </label>
+                                        <textarea id="refQuestion" class="w-full p-8 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入參考題目"></textarea>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="refMaterial1" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-file-text mr-3"></i>參考資料一
+                                        </label>
+                                        <textarea id="refMaterial1" class="w-full p-8 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入參考資料一"></textarea>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="refMaterial2" class="block text-xl font-semibold text-gray-700 mb-6">
+                                            <i class="fas fa-file-text mr-3"></i>參考資料二
+                                        </label>
+                                        <textarea id="refMaterial2" class="w-full p-8 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入參考資料二"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
+    <!-- 浮動生成按鈕 -->
+    <button id="generateBtn" class="floating-generate-btn" title="開始智能生成">
+        <i class="fas fa-rocket"></i>
+    </button>
 
-        function filledCell(cell) {
-            return cell !== '' && cell != null;
-        }
+    <!-- 進度顯示區域 -->
+    <div id="progressModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
+        <div class="glass-card p-12 max-w-2xl w-full mx-6 text-center fade-in">
+            <div class="mb-10">
+                <div class="relative w-32 h-32 mx-auto mb-8">
+                    <svg class="progress-ring w-32 h-32" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="8"/>
+                        <circle id="progressCircle" cx="60" cy="60" r="54" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-linecap="round" class="progress-ring-circle" stroke-dasharray="0 339"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#76d7c4"/>
+                                <stop offset="100%" style="stop-color:#45b39d"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span id="progressPercent" class="text-4xl font-bold" style="color: var(--primary-teal);">0%</span>
+                    </div>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">AI擬題中......</h3>
+            </div>
+            <div class="text-center">
+                <div id="timeRemaining" class="text-3xl font-bold" style="color: var(--primary-blue);">--</div>
+                <div class="text-gray-500 mt-2 font-semibold">剩餘時間</div>
+            </div>
+        </div>
+    </div>
 
-        function loadFileData(filename) {
-            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-                try {
-                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                    var firstSheetName = workbook.SheetNames[0];
-                    var worksheet = workbook.Sheets[firstSheetName];
+    <!-- 結果顯示頁面 -->
+    <div id="resultContainer" class="hidden result-page">
+        <div class="min-h-screen py-12">
+            <div class="container mx-auto px-6">
+                <!-- 操作按鈕 -->
+                <div class="text-center mb-12 slide-up">
+                    <button onclick="goBack()" class="btn-secondary px-12 py-5 rounded-2xl font-bold mr-8 text-xl transform hover:-translate-y-2 transition-all duration-300">
+                        <i class="fas fa-arrow-left mr-4"></i>返回配置
+                    </button>
+                    <button onclick="regenerate()" class="btn-primary px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300">
+                        <i class="fas fa-redo mr-4"></i>重新生成
+                    </button>
+                </div>
 
-                    // Convert sheet to JSON to filter blank rows
-                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                    // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                <!-- 題目內容 -->
+                <div id="questionsDisplay" class="space-y-10 max-w-6xl mx-auto">
+                    <!-- 題目會在這裡動態生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                    var headerRowIndex = filteredData.findIndex((row, index) =>
-                      row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                    );
-                    // Fallback
-                    if (headerRowIndex === -1 || headerRowIndex > 25) {
-                      headerRowIndex = 0;
+    <!-- Copyright Footer -->
+    <div class="fixed bottom-8 left-8 sidebar-card px-6 py-3 shadow-xl z-40">
+        <p class="text-base text-gray-700 font-semibold">Copyright © 2025 陳. All rights reserved.</p>
+    </div>
+
+    <script>
+        // 範文庫資料
+        const textLibrary = {
+            "version": "1.0",
+            "created_date": "2025-01-12",
+            "description": "DSE中文範文庫",
+            "texts": [
+                {
+                    "id": 1,
+                    "title": "廉頗藺相如列傳",
+                    "author": "司馬遷",
+                    "category": "文言文",
+                    "type": "史傳",
+                    "length": "長篇",
+                    "content": `　　廉頗者，趙之良將也。趙惠文王十六年 ，廉頗為趙將伐齊 ，大破之，取陽晉，拜為上卿 ，以勇氣聞於諸侯。藺相如者，趙人也，為趙宦者令繆賢舍人 。
+
+　　趙惠文王時，得楚和氏璧 。秦昭王聞之，使人遺 趙王書，願以十五城請易璧。趙王與大將軍廉頗諸大臣謀：欲予秦，秦城恐不可得，徒見欺 ；欲勿予，即患秦兵之來。計未定，求人可使報秦者 ，未得。
+
+　　宦者令繆賢曰：「臣舍人藺相如可使 。」王問：「何以知之？」對曰：「臣嘗有罪，竊計欲亡走燕 ，臣舍人相如止臣，曰：『君何以知燕王？』臣語 曰：『臣嘗從大王與燕王會境上 ，燕王私握臣手，曰「願結友。」以此知之，故欲往。』相如謂臣曰：『夫趙彊而燕弱，而君幸於趙王 ，故燕王欲結於君。今君乃亡趙走燕，燕畏趙，其勢必不敢留君，而束君歸趙矣 。君不如肉袒伏斧質請罪 ，則幸得脫矣。』臣從其計，大王亦幸赦臣。臣竊以為其人勇士，有智謀，宜可使。」
+
+　　於是王召見，問藺相如曰：「秦王以十五城請易寡人之璧，可予不 ？」相如曰：「秦彊而趙弱，不可不許。」王曰：「取吾璧，不予我城，奈何？」相如曰：「秦以城求璧而趙不許，曲 在趙；趙予璧而秦不予趙城，曲在秦。均之二策 ，寧許以負秦曲 。」王曰：「誰可使者？」相如曰：「王必無人 ，臣願奉璧往使 。城入趙而璧留秦；城不入，臣請完璧歸趙 。」趙王於是遂遣相如奉璧西入秦。
+
+　　秦王坐章台見相如 ，相如奉璧奏秦王 。秦王大喜，傳以示美人及左右 ，左右皆呼萬歲。相如視秦王無意償趙城，乃前曰：「璧有瑕 ，請指示王。」王授璧，相如因持璧，卻立 ，倚柱，怒髮上衝冠 ，謂秦王曰：「大王欲得璧，使人發書至趙王，趙王悉召羣臣議，皆曰：『秦貪，負其彊 ，以空言求璧，償城恐不可得』。議不欲予秦璧。臣以為布衣之交尚不相欺 ，況大國乎！且以一璧之故逆彊秦之驩 ，不可。於是趙王乃齋戒 五日，使臣奉璧，拜送書於庭 。何者？嚴大國之威以修敬也 。今臣至，大王見臣列觀 ，禮節甚倨 ；得璧，傳之美人，以戲弄臣。臣觀大王無意償趙王城邑，故臣復取璧。大王必欲急 臣，臣頭今與璧俱碎於柱矣！」
+
+　　相如持其璧睨 柱，欲以擊柱。秦王恐其破璧，乃辭謝固請 ，召有司案圖 ，指從此以往十五都予趙 。
+
+　　相如度秦王特以詐佯為予趙城 ，實不可得，乃謂秦王曰：「和氏璧，天下所共傳寶也 。趙王恐，不敢不獻。趙王送璧時，齋戒五日，今大王亦宜齋戒五日，設九賓於廷 ，臣乃敢上璧。」秦王度之，終不可彊奪 ，遂許齋五日，舍相如廣成傳 。
+
+　　相如度秦王雖齋，決負約不償城，乃使其從者衣褐 ，懷其璧，從徑道 亡 ，歸璧於趙。
+
+　　秦王齋五日後，乃設九賓禮於廷，引趙使者藺相如。相如至，謂秦王曰：「秦自繆公 以來二十餘君，未嘗有堅明約束者也 。臣誠恐見欺於王而負趙，故令人持璧歸，間至趙矣 。且秦彊而趙弱，大王遣一介 之使至趙，趙立奉璧來；今以秦之彊而先割十五都予趙，趙豈敢留璧而得罪於大王乎？臣知欺大王之罪當誅，臣請就湯鑊 。唯大王與羣臣孰計議之 ！」
+
+　　秦王與羣臣相視而嘻 。左右或欲引相如去 ，秦王因 曰：「今殺相如，終不能得璧也，而絕秦趙之驩，不如因而厚遇之 ，使歸趙，趙王豈以一璧之故欺秦邪 ！」卒廷見相如 ，畢禮而歸之。
+
+　　相如既歸，趙王以為賢大夫，使不辱於諸侯 ，拜相如為上大夫 。
+
+　　秦亦不以城予趙，趙亦終不予秦璧。
+
+　　其後秦伐趙，拔石城。明年，復攻趙，殺二萬人。
+
+　　秦王使使者告趙王，欲與王為好會於西河外澠池 。趙王畏秦，欲毋行 。廉頗、藺相如計曰：「王不行，示趙弱且怯也。」趙王遂行，相如從。廉頗送至境，與王訣曰 ：「王行，度道里會遇之禮畢 ，還，不過三十日。三十日不還，則請立太子為王，以絕秦望。」王許之，遂與秦王會澠池。
+
+　　秦王飲酒酣 ，曰：「寡人竊聞趙王好音，請奏瑟 。」趙王鼓瑟。秦御史前書曰 ：「某年月日，秦王與趙王會飲，令趙王鼓瑟。」藺相如前曰：「趙王竊聞秦王善為秦聲，請奏盆缻秦王 ，以相娛樂。」秦王怒，不許。於是相如前進缻，因跪請秦王。秦王不肯擊缻。相如曰：「五步之內，相如請得以頸血濺大王矣 ！」左右欲刃相如 ，相如張目叱之，左右皆靡 。於是秦王不懌 ，為一擊缻。相如顧 召趙御史書曰：「某年月日，秦王為趙王擊缻。」秦之羣臣曰：「請以趙十五城為秦王壽 。」藺相如亦曰：「請以秦之咸陽 為趙王壽。」
+
+　　秦王竟酒 ，終不能加勝於趙。趙亦盛設兵以待秦，秦不敢動。
+
+　　既罷歸國，以相如功大，拜為上卿，位在廉頗之右。
+
+　　廉頗曰：「我為趙將，有攻城野戰之大功，而藺相如徒以口舌為勞 ，而位居我上，且相如素賤人 ，吾羞，不忍為之下 。」宣言曰：「我見相如，必辱之。」相如聞，不肯與會。相如每朝時，常稱病，不欲與廉頗爭列 。已而 相如出，望見廉頗，相如引車避匿 。
+
+　　於是舍人相與諫曰：「臣所以去親戚而事君者 ，徒慕君之高義也 。今君與廉頗同列，廉君宣惡言而君畏匿之，恐懼殊甚，且庸人尚羞之，況於將相乎！臣等不肖 ，請辭去。」藺相如固止之，曰：「公之視廉將軍孰與秦王 ？」曰：「不若也 。」相如曰：「夫以秦王之威，而相如廷叱之，辱其羣臣，相如雖駑 ，獨畏廉將軍哉？顧 吾念之，彊秦之所以不敢加兵於趙者，徒以吾兩人在也。今兩虎共鬥，其勢不俱生 。吾所以為此者，以先國家之急而後私讎也 。」
+
+　　廉頗聞之，肉袒 負荊 ，因賓客至藺相如門謝罪 。曰：「鄙賤之人，不知將軍寬之至此也 。」
+
+　　卒相與驩，為刎頸之交 。`
+                },
+                {
+                    "id": 2,
+                    "title": "山居秋暝",
+                    "author": "王維",
+                    "category": "詩歌",
+                    "type": "五言律詩",
+                    "length": "短篇",
+                    "content": `空山新雨後 ，天氣晚來秋。
+明月松間照，清泉石上流。
+竹喧歸浣女，蓮動下漁舟。 
+隨意春芳歇 ，王孫自可留 。`
+                },
+                {
+                    "id": 3,
+                    "title": "月下獨酌",
+                    "author": "李白",
+                    "category": "詩歌",
+                    "type": "五言古詩",
+                    "length": "短篇",
+                    "content": `花間一壺酒，獨酌無相親 。 
+舉杯邀明月，對影成三人 。
+月既不解 飲，影徒 隨我身。
+暫伴月將 影，行樂須及春 。 
+我歌月徘徊 ，我舞影零亂 。 
+醒時同交歡 ，醉後各分散 。
+永結無情遊 ，相期邈雲漢 。`
+                },
+                {
+                    "id": 4,
+                    "title": "登樓",
+                    "author": "杜甫",
+                    "category": "詩歌",
+                    "type": "七言律詩",
+                    "length": "短篇",
+                    "content": `花近高樓傷客心， 萬方多難此登臨。 
+錦江春色來天地， 玉壘浮雲變古今。 
+北極朝廷終不改， 西山寇盜莫相侵。 
+可憐後主還祠廟， 日暮聊為〈梁甫吟〉。`
+                },
+                {
+                    "id": 5,
+                    "title": "師說",
+                    "author": "韓愈",
+                    "category": "文言文",
+                    "type": "論說文",
+                    "length": "中篇",
+                    "content": `　　古之學者必有師。師者，所以傳道  、受業 、解惑也。人非生而知之者 ，孰能無惑？惑而不從師，其為惑也終不解矣。
+
+　　生乎吾前，其聞道 也固 先乎吾，吾從而師之；生乎吾後，其聞道也亦先乎吾，吾從而師之。吾師道也，夫庸知 其年之先後生於吾乎？是故無貴無賤，無長無少，道之所存，師之所存也。
+
+　　嗟乎！師道之不傳也久矣！欲人之無惑也難矣！古之聖人，其出人也遠矣，猶且從師而問焉；今之眾人，其下聖人也亦遠矣，而恥學於師；是故聖益聖，愚益愚，聖人之所以為聖，愚人之所以為愚，其 皆出於此乎？
+
+　　愛其子，擇師而教之，於其身也，則恥師焉，惑矣！彼童子之師，授之書而習其句讀 者也，非吾所謂傳其道，解其惑者也。句讀之不知，惑之不解，或師焉，或不焉，小學而大遺，吾未見其明也。
+
+　　巫醫 、樂師，百工之人，不恥相師；士大夫之族，曰師、曰弟子云者，則群聚而笑之，問之，則曰：「彼與彼年相若也，道相似也。位卑則足羞，官盛則近諛 。」嗚呼！師道之不復可知矣。巫、醫、樂師、百工之人，君子 不齒 ，今其智乃反不能及，其可怪也歟！
+
+　　聖人無常師 ，孔子師郯子 、萇弘 、師襄 、老聃 。郯子之徒，其賢不及孔子。孔子曰：「三人行，則必有我師。」 是故弟子不必不如師，師不必賢於弟子，聞道有先後，術業有專攻，如是而已。
+
+　　李氏子蟠 ，年十七，好古文，六藝 經傳，皆通習之；不拘於時，學於余，余嘉其能行古道，作〈師說〉以貽 之。`
+                },
+                {
+                    "id": 6,
+                    "title": "岳陽樓記",
+                    "author": "范仲淹",
+                    "category": "文言文",
+                    "type": "記敘文",
+                    "length": "中篇",
+                    "content": `　　慶曆四年春 ，滕子京 謫守巴陵郡 。越 明年，政通人和，百廢具 興。乃重修岳陽樓，增其舊制，刻唐賢、今人詩賦於其上；屬 予作文以記之。
+
+　　予觀夫巴陵勝狀 ，在洞庭一湖。銜遠山，吞長江，浩浩湯湯 ，橫無際涯；朝暉夕陰，氣象萬千。此則岳陽樓之大觀也，前人之述備 矣。然則北通巫峽 ，南極瀟湘 ，遷客騷人 ，多會於此，覽物之情，得無異乎？
+
+　　若夫霪雨霏霏 ，連月不開；陰風怒號 ，濁浪排空；日星隱耀，山岳潛形；商旅不行，檣傾楫摧 ；薄暮冥冥 ，虎嘯猿啼。登斯樓也，則有去國 懷鄉，憂讒畏譏，滿目蕭然 ，感極而悲者矣。
+
+　　至若春和景明 ，波瀾不驚 ，上下天光，一碧萬頃；沙鷗翔集 ，錦鱗游泳，岸芷汀蘭 ，郁郁青青 。而或長煙一空 ，皓月千里，浮光躍金 ，靜影沉璧 ；漁歌互答，此樂何極！登斯樓也，則有心曠神怡 ，寵辱 皆忘，把酒臨風 ，其喜洋洋 者矣。
+
+　　嗟夫！予嘗求古仁人之心，或異二者之為 。何哉？不以物喜，不以己悲 。居廟堂之高 ，則憂其民；處江湖之遠 ，則憂其君。是進亦憂，退亦憂，然則何時而樂耶？其必曰：「先天下之憂而憂，後天下之樂而樂」歟！噫！微斯人 ，吾誰與歸 ！`
+                },
+                {
+                    "id": 7,
+                    "title": "始得西山宴遊記",
+                    "author": "柳宗元",
+                    "category": "文言文",
+                    "type": "記敘文",
+                    "length": "中篇",
+                    "content": `　　自余為僇人 ，居是州，恒惴慄 。其隙也 ，則施施 而行，漫漫 而遊。日與其徒 上高山，入深林，窮迴溪 ，幽泉 怪石，無遠不到。到則披草 而坐，傾壺而醉。醉則更相枕 以臥，臥而夢。意有所極 ，夢亦同趣 。覺 而起，起而歸。以為凡是州之山有異態者，皆我有也，而未始知西山之怪特。
+
+　　今年九月二十八日，因坐法華西亭 ，望西山，始指異之 。遂命僕過湘江 ，緣染溪 ，斫榛莽 。焚茅茷 ，窮 山之高而止。
+
+　　攀援而登，箕踞而遨 ，則凡數州之土壤 ，皆在衽席 之下。其高下之勢，岈然窪然 ，若垤 若穴，尺寸千里 ，攢蹙累積 ，莫得遯隱 。縈青繚白 ，外與天際 ，四望如一。然後知是山之特出，不與培塿 為類。悠悠乎與顥氣 俱，而莫得其涯；洋洋 乎與造物者遊 ，而不知其所窮。
+
+　　引 觴滿酌，頹然 就醉，不知日之入。蒼然暮色 ，自遠而至，至無所見，而猶不欲歸。心凝形釋 ，與萬化冥合 。然後知吾嚮 之未始 遊，遊於是乎始，故為之文以志 。是歲元和四年 也。`
+                },
+                {
+                    "id": 8,
+                    "title": "念奴嬌‧赤壁懷古",
+                    "author": "蘇軾",
+                    "category": "詞",
+                    "type": "豪放詞",
+                    "length": "短篇",
+                    "content": `大江東去，浪淘盡、千古風流人物。故壘 西邊，人道是、三國周郎 赤壁。亂石穿空，驚濤拍岸，捲起千堆雪。江山如畫，一時多少豪傑！
+
+遙想公瑾當年，小喬 初嫁了，雄姿英發。羽扇綸巾 ，談笑間、檣櫓 灰飛煙滅。故國 神遊，多情應笑我，早生華髮 。人間如夢，一尊 還酹 江月。`
+                },
+                {
+                    "id": 9,
+                    "title": "青玉案",
+                    "author": "辛棄疾",
+                    "category": "詞",
+                    "type": "婉約詞",
+                    "length": "短篇",
+                    "content": `東風夜放花千樹，  更吹落，星如雨。  寶馬雕車香滿路。  鳳簫聲動，  玉壺光轉，  一夜魚龍舞。 
+
+蛾兒雪柳黃金縷，  笑語盈盈暗香去。  眾裏尋他千百度；  驀然迴首，  那人卻在，燈火闌珊處。`
+                },
+                {
+                    "id": 10,
+                    "title": "聲聲慢",
+                    "author": "李清照",
+                    "category": "詞",
+                    "type": "婉約詞",
+                    "length": "短篇",
+                    "content": `尋尋覓覓，冷冷清清，悽悽慘慘戚戚。乍暖還寒時候， 最難將息。 三杯兩盞淡酒，怎敵他，  晚來風急？  雁過也，正傷心，卻是舊時相識。
+
+滿地黃花堆積， 憔悴損，  如今有誰堪摘？  守著窗兒，獨自怎生得黑！  梧桐更兼細雨，到黃昏、點點滴滴。這次第，  怎一箇愁字了得！`
+                },
+                {
+                    "id": 11,
+                    "title": "逍遙遊",
+                    "author": "莊子",
+                    "category": "文言文",
+                    "type": "哲理文",
+                    "length": "中篇",
+                    "content": `　　惠子 謂莊子曰：「魏王貽我大瓠之種 ，我樹之成而實五石 。以盛水漿，其堅不能自舉也 。剖之以為瓢 ，則瓠落無所容 。非不呺然 大也，吾為其無用而掊之 。」莊子曰：「夫子固拙於 用大矣！宋人有善為不龜手之藥者 ，世世以洴澼絖為事 。客聞之，請買其方百金。聚族而謀曰：『我世世為洴澼絖，不過數金；今一朝而鬻技百金 ，請與之。』客得之，以說 吳王。越有難 ，吳王使之將 ，冬與越人水戰，大敗越人，裂地 而封之。能不龜手一也 ；或以封，或不免於洴澼絖，則所用之異也 。今子有五石之瓠，何不慮以為大樽而浮於江湖 ，而憂其瓠落無所容，則夫子猶有蓬之心也夫 ！」
+
+　　惠子謂莊子曰：「吾有大樹，人謂之樗 ；其大本擁腫而不中繩墨 ，其小枝卷曲而不中規矩 。立之塗 ，匠者不顧。今子之言，大而無用，衆所同去也 。」莊子曰：「子獨不見狸狌乎 ？卑身而伏，以候敖者 ；東西跳梁，不辟高下 ，中於機辟，死於罔罟 。今夫斄牛，其大若垂天之雲 ；此能為大矣，而不能執鼠 。今子有大樹，患其無用，何不樹之於無何有之鄉 ，廣莫之野 ，彷徨乎無為其側，逍遙乎寢臥其下 ；不夭斤斧，物無害者 。無所可用，安所困苦哉 ？」`
+                },
+                {
+                    "id": 12,
+                    "title": "出師表",
+                    "author": "諸葛亮",
+                    "category": "文言文",
+                    "type": "表文",
+                    "length": "長篇",
+                    "content": `　　先帝創業未半 ，而中道崩殂 ；今天下三分 ，益州疲弊 ，此誠危急存亡之秋也﹗然侍衞之臣，不懈於內；忠志之士，忘身於外者 ，蓋追先帝之殊遇，欲報之於陛下也 。誠宜開張聖聽 ，以光先帝遺德 ，恢弘志士之氣 ﹔不宜妄自菲薄 ，引喻失義 ，以塞忠諫之路也 。
+
+　　宮中、府中，俱為一體 ；陟罰臧否 ，不宜異同。若有作姦、犯科，及為忠善者 ，宜付有司，論其刑賞 ，以昭陛下平明之治 ；不宜偏私，使內外異法也 。
+
+　　侍中、侍郎郭攸之、費禕、董允等 ，此皆良實，志慮忠純 ，是以先帝簡拔以遺陛下 。愚以為宮中之事，事無大小，悉以咨之 ，然後施行，必能裨補闕漏，有所廣益 。
+
+　　將軍向寵，性行淑均 ，曉暢軍事，試用於昔日，先帝稱之曰「能」，是以眾議舉寵為督 。愚以為營中之事，悉以咨之，必能使行陣和睦，優劣得所 。
+
+　　親賢臣，遠小人 ，此先漢所以興隆也﹔親小人，遠賢臣，此後漢所以傾頹也。先帝在時，每與臣論此事，未嘗不歎息痛恨於桓、靈也 ！侍中、尚書、長史、參軍 ，此悉貞良死節之臣，願陛下親之、信之，則漢室之隆，可計日而待也。
+
+　　臣本布衣，躬耕於南陽 ，苟全性命於亂世，不求聞達於諸侯 。先帝不以臣卑鄙，猥自枉屈 ，三顧臣於草廬之中，諮臣以當世之事；由是感激，遂許先帝以驅馳 。後值傾覆 ，受任於敗軍之際，奉命於危難之間，爾來二十有一年矣 。先帝知臣謹慎，故臨崩寄臣以大事也 。受命以來，夙夜憂歎，恐託付不效，以傷先帝之明 。故五月渡瀘，深入不毛 。今南方已定，兵甲已足，當獎率三軍，北定中原，庶竭駑鈍，攘除姦凶 ，興復漢室，還於舊都 。此臣所以報先帝而忠陛下之職分也。至於斟酌損益，進盡忠言，則攸之、禕、允之任也 。
+
+　　願陛下託臣以討賊興復之效；不效，則治臣之罪，以告先帝之靈。若無興德之言，則責攸之、禕、允等之慢，以彰其咎 。陛下亦宜自謀，以諮諏善道，察納雅言 ，深追先帝遺詔。臣不勝受恩感激。今當遠離，臨表涕零 ，不知所言 ！`
+                },
+                {
+                    "id": 13,
+                    "title": "六國論",
+                    "author": "蘇洵",
+                    "category": "文言文",
+                    "type": "論說文",
+                    "length": "中篇",
+                    "content": `　　六國破滅 ，非兵不利 ，戰不善 ，弊在賂秦 。賂秦而力虧 ，破滅之道 也。或曰：「六國互喪 ，率 賂秦耶？」曰：「不賂者以賂者喪。」蓋失強援 ，不能獨完 ，故曰「弊在賂秦」也。
+
+　　秦以攻取 之外，小則獲邑 ，大則得城，較秦之所得 與戰勝而得者，其實百倍；諸侯之所亡 與戰敗而亡者，其實亦百倍。則秦之所大欲，諸侯之所大患，固不在戰矣。思厥先祖父 ，暴霜露，斬荊棘 ，以有尺寸之地 。子孫視之不甚惜，舉以予人 ，如棄草芥 。今日割五城，明日割十城，然後得一夕安寢；起視四境，而秦兵又至矣。然則諸侯之地有限，暴秦之欲無厭 ，奉之彌 繁，侵之愈急，故不戰而強弱勝負已判 矣。至於顛覆 ，理固宜然。古人 云：「以地事秦，猶抱薪救火，薪不盡，火不滅。」 此言得之。 
+
+　　齊人未嘗賂秦，終繼五國遷滅 ，何哉？與嬴 而不助五國也。五國既喪，齊亦不免矣。燕趙之君，始有遠略 ，能守其土，義不賂秦 。是故燕雖小國而後亡，斯用兵之效 也。至丹以荊卿為計 ，始速禍 焉。趙嘗五戰于秦 ，二敗而三勝 ；後秦擊趙者再，李牧 連卻 之；洎牧以讒誅 ，邯鄲為郡 ，惜其用武而不終 也。
+
+　　且燕趙處秦革滅 殆盡之際，可謂智力孤危 ，戰敗而亡，誠不得已。向使三國各愛其地 ，齊人勿附於秦，刺客不行 ，良將 猶在，則勝負之數 ，存亡之理，當 與秦相較，或未易量 。
+
+　　嗚呼！以賂秦之地，封天下之謀臣；以事秦之心，禮 天下之奇才；幷力西嚮 ，則吾恐秦人食之不得下嚥 也。悲夫！有如此之勢，而為秦人積威 之所劫，日削月割，以趨於亡！為國者無使為積威之所劫哉！
+
+　　夫六國與秦皆諸侯，其勢弱於秦，而猶有可以不賂而勝之之勢；茍以天下之大，而從六國破亡之故事 ，是又在六國下矣！`
+                },
+                {
+                    "id": 14,
+                    "title": "勸學",
+                    "author": "荀子",
+                    "category": "文言文",
+                    "type": "論說文",
+                    "length": "中篇",
+                    "content": `　　君子曰：學不可以已 。青，取之於藍 ，而青於藍 ；冰，水為之，而寒於水。木直中繩 ，輮 以為輪，其曲中規 ；雖有槁暴 、不復挺 者，輮使之然也。故木受繩則直 ，金就礪 則利，君子博學而日參省 乎己，則知 明而行 無過矣。
+
+　　吾嘗終日而思矣，不如須臾 之所學也；吾嘗跂 而望矣，不如登高之博見也。登高而招，臂非加長也，而見者遠。順風而呼，聲非加疾 也，而聞者彰 。假輿馬者 ，非利足 也，而致 千里；假舟楫 者，非能水 也，而絕江河 。君子生非異 也，善假於物 也。
+
+　　積土成山，風雨興焉；積水成淵 ，蛟龍 生焉；積善成德，而神明 自得，聖心 備焉。故不積跬步 ，無以至千里；不積小流，無以成江海。騏驥 一躍，不能十步；駑馬十駕 ，功在不舍 。鍥 而舍之，朽木不折；鍥而不舍，金石可鏤 。螾 無爪牙之利，筋骨之強，上食埃土 ，下飲黃泉，用心一也。蟹六跪而二螯 ，非蛇蟺 之穴無可寄託者，用心躁 也。`
+                },
+                {
+                    "id": 15,
+                    "title": "論仁、論孝、論君子",
+                    "author": "孔子",
+                    "category": "文言文",
+                    "type": "語錄",
+                    "length": "中篇",
+                    "content": `論仁
+(1)子曰：「不仁者，不可以久處約 ，不可以長處樂。仁者安仁，知者利仁 。」（《里仁》第四）
+(2)子曰：「富與貴，是人之所欲也；不以其道得之，不處也 。貧與賤，是人之所惡也；不以其道得之 ，不去 也。君子去仁，惡乎成名 ？君子無終食之間違仁 ，造次必於是 ，顛沛必於是。」（《里仁》第四）
+(3)顏淵問仁。
+子曰：「克己復禮為仁 。一日克己復禮，天下歸仁焉。為仁由己，而由人乎哉 ？」
+顏淵曰：「請問其目 。」子曰：「非禮勿視，非禮勿聽，非禮勿言，非禮勿動 。」
+顏淵曰：「回雖不敏，請事斯語矣 。」（《顏淵》第十二）
+(4)子曰：「志士仁人，無求生以害仁，有殺身以成仁 。」（《衛靈公》第十五）
+
+論孝
+(5)孟懿子 問孝。子曰：「無違 。」
+樊遲御 ，子告之曰：「孟孫問孝於我，我對曰，無違。」
+樊遲曰：「何謂也？」子曰：「生事之以禮 ；死葬之以禮，祭之以禮 。」（《為政》第二）
+(6)子游 問孝。子曰：「今之孝者，是謂能養 。至於犬馬，皆能有養 ；不敬，何以別乎 ！」（《為政》第二）
+
+(7)子曰：「事父母幾諫 ，見志不從，又敬不違，勞而不怨 。」（《里仁》第四）
+(8)子曰：「父母之年，不可不知也。一則以喜，一則以懼 。」（《里仁》第四）
+
+論君子
+(9)子曰：「君子不重則不威 ；學則不固 。主忠信 。無友不如己者 。過則勿憚改 。」（《學而》第一）
+(10)子曰：「君子坦蕩蕩，小人長戚戚 。」（《述而》第七）
+(11)司馬牛 問君子。子曰：「君子不憂不懼。」曰：「不憂不懼，斯謂之君子已乎 ？」子曰：「內省不疚，夫何憂何懼 ？」（《顏淵》第十二）
+(12)子曰：「君子成人之美，不成人之惡 。小人反是 。」（《顏淵》第十二）
+(13)子曰：「君子恥其言而過其行 。」（《憲問》第十四）
+(14)子曰：「君子義以為質 ，禮以行之，孫以出之，信以成之 。君子哉！」（《衛靈公》第十五）
+(15)子曰：「君子病無能焉，不病人之不己知也 。」（《衛靈公》第十五）
+(16)子曰：「君子求諸己，小人求諸人 。」（《衛靈公》第十五）`
+                },
+                {
+                    "id": 16,
+                    "title": "魚我所欲也",
+                    "author": "孟子",
+                    "category": "文言文",
+                    "type": "論說文",
+                    "length": "中篇",
+                    "content": `　　孟子曰：「魚，我所欲也，熊掌，亦我所欲也；二者不可得兼，舍魚而取熊掌 者也。生亦我所欲也，義亦我所欲也；二者不可得兼，舍生而取義者也。
+
+　　「生亦我所欲，所欲有甚於生者，故不為苟得 也；死亦我所惡 ，所惡有甚於死者，故患有所不辟 也。如使人之所欲莫甚於生，則凡可以得生者，何不用也？使人之所惡莫甚於死者，則凡可以辟患者，何不為也？由是則生而有不用也，由是則可以辟患而有不為也，是故所欲有甚於生者，所惡有甚於死者。非獨賢者有是心也，人皆有之，賢者能勿喪耳 。
+
+　　一簞食 ，一豆羹 ，得之則生，弗 得則死。嘑爾而與之 ，行道之人弗受 ；蹴爾而與之 ，乞人不屑也 ；萬鍾 則不辯 禮義而受之。萬鍾於我何加 焉？為宮室之美、妻妾之奉 、所識窮乏者得我與 ？鄉 為身死而不受，今為宮室之美為之；鄉為身死而不受，今為妻妾之奉為之；鄉為身死而不受，今為所識窮乏者得我而為之，是亦不可以已 乎？此之謂失其本心 。」`
+                }
+            ]
+        };
+
+ // 試題庫資料
+        const questionBank = {
+            "version": "1.0",
+            "created_date": "2025-01-12",
+            "description": "DSE中文問答題六大題型試題庫",
+            "question_types": {
+
+ "選擇": {
+                "description": "選擇題型，要求考生從多個選項中選擇正確答案。",
+                "examples": [
+                    {
+                        "question": "試根據〈論仁、論孝、論君子〉，判斷以下陳述。\n(1) 孔子認為當父母犯錯時，子女應直接地指出他們的過錯。\n(2) 孔子認為子女供養父母時，不存恭敬的心，便應感到羞恥。",
+                        "options": [
+                            "(1) A正確 (2) A正確",
+                            "(1) A正確 (2) B錯誤", 
+                            "(1) B錯誤 (2) A正確",
+                            "(1) B錯誤 (2) B錯誤"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "(1) B錯誤 (2) A正確",
+                        "steps": "根據〈論仁、論孝、論君子〉的內容判斷：(1) 孔子主張子女應『幾諫』，即委婉規勸，而非直接指出，故為錯誤；(2) 孔子強調『不敬，何以別乎』，認為無敬意與犬馬之養無異，故為正確。"
+                    },
+                    {
+                        "question": "「克己復禮為仁」一句中，「克己復禮」是甚麼意思？",
+                        "options": [
+                            "生活節儉，便能合於禮",
+                            "克服自身的弱點，使言行都合於禮", 
+                            "克制私慾，使言行都合於禮",
+                            "不合禮法者，一概不看、不聽、不說、不做"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "克制私慾，使言行都合於禮",
+                        "steps": "分析『克己復禮』的含義：『克己』指克制自己的私慾，『復禮』指使行為符合禮法，C選項最準確地概括此意。"
+                    },
+                    {
+                        "question": "綜合全篇，以下哪些對仁者的描述是正確的？\n(1) 仁者能長期處於窮困或安樂的環境之中。\n(2) 仁者明白實行仁德的好處，於是實行仁德。\n(3) 仁者能時刻堅持仁德。\n(4) 仁者能克制私欲。",
+                        "options": [
+                            "(1)、(2)",
+                            "(1)、(3)、(4)",
+                            "(2)、(3)、(4)",
+                            "以上皆是"
+                        ],
+                        "year": "2025",
+                        "answer": "D",
+                        "answer_text": "以上皆是",
+                        "steps": "根據文本：(1) 『不可以久處約，不可以長處樂』反向理解，仁者能適應環境；(2) 『知者利仁』表明仁者知仁之益；(3) 『無終食之間違仁』顯示堅持仁德；(4) 『克己復禮』指克制私慾，故全對。"
+                    },
+                    {
+                        "question": "作者以狸狌比喻哪一類人？",
+                        "options": [
+                            "善於用大的人",
+                            "自作聰明，好表現自己的人",
+                            "不能明辨是非黑白的人",
+                            "懷才不遇的人"
+                        ],
+                        "year": "2025",
+                        "answer": "B",
+                        "answer_text": "自作聰明，好表現自己的人",
+                        "steps": "根據《逍遙遊》，狸狌『東西跳梁』，最終『死於罔罟』，象徵自以為聰明卻自陷困境的人，B最貼切。"
+                    },
+                    {
+                        "question": "以下引文中運用了甚麼修辭手法？\n「今夫斄牛，其大若垂天之雲；此能為大矣，而不能執鼠。」\n(1) 對偶 (2) 比喻 (3) 誇張 (4) 對比",
+                        "options": [
+                            "(1)、(4)",
+                            "(2)、(3)",
+                            "(1)、(2)、(4)",
+                            "(2)、(3)、(4)"
+                        ],
+                        "year": "2025",
+                        "answer": "B",
+                        "answer_text": "(2)、(3)",
+                        "steps": "分析引文：『其大若垂天之雲』用比喻和誇張形容斄牛之大，無對偶或對比，故選B。"
+                    },
+                    {
+                        "question": "作者記敘『宋人有善為不龜手之藥』的故事，有甚麼作用？",
+                        "options": [
+                            "凸顯宋人的形象",
+                            "諷刺宋人以漂洗棉絮為業",
+                            "帶出世人拙於用大",
+                            "說明善於用大的重要"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "帶出世人拙於用大",
+                        "steps": "故事展示藥方從小用轉為大用，與惠子『無用而掊之』對比，突顯世人不懂大用之弊，選C。"
+                    },
+                    {
+                        "question": "莊子論及『無用之用』，其意思是甚麼？",
+                        "options": [
+                            "雖似無所可用，卻因其無用而免遭禍害。",
+                            "沒有用途的東西，假以時日亦有其用處。",
+                            "雖似有所可用，卻因其有用而遭受禍害。",
+                            "沒有用途的東西，經過磨練亦有其用處。"
+                        ],
+                        "year": "2025",
+                        "answer": "A",
+                        "answer_text": "雖似無所可用，卻因其無用而免遭禍害。",
+                        "steps": "根據《逍遙遊》，『樗』因無用而不被砍伐，得享天年，A最符合此意。"
+                    },
+                    {
+                        "question": "莊子認為『樗』有何用途？\n(1) 可供人休憩 (2) 可種在廣漠曠野 (3) 可讓其他生物侵蝕 (4) 可被人砍伐",
+                        "options": [
+                            "(1)、(2)",
+                            "(1)、(3)",
+                            "(1)、(2)、(4)",
+                            "(2)、(3)、(4)"
+                        ],
+                        "year": "2025",
+                        "answer": "A",
+                        "answer_text": "(1)、(2)",
+                        "steps": "文本指『樗』可『逍遙乎寢臥其下』及種於『廣莫之野』，(1)(2)正確，(3)(4)無據。"
+                    },
+                    {
+                        "question": "以下哪些是荀子提倡的學習態度？\n(1) 不斷累積 (2) 不恥下問 (3) 持之以恆 (4) 專心一致",
+                        "options": [
+                            "(2)、(4)",
+                            "(1)、(2)、(3)",
+                            "(1)、(3)、(4)",
+                            "以上皆是"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "(1)、(3)、(4)",
+                        "steps": "根據《勸學》：(1) 『積土成山』強調累積；(2) 無明確提及；(3) 『鍥而不舍』指持之以恆；(4) 『用心一也』指專心，選C。"
+                    },
+                    {
+                        "question": "以下哪一項不符合本文的文意？",
+                        "options": [
+                            "以『木受繩則直，金就礪則利』為喻，論證學習可以使人變得聰明，行為不會有過錯。",
+                            "以『登高而招』、『順風而呼』為喻，論證學習要憑藉有利的條件。",
+                            "以『積土成山』、『積水成淵』為喻，論證學習要善於積累。",
+                            "以『騏驥一躍』、『駑馬十駕』為喻，論證學習必須專一。"
+                        ],
+                        "year": "2025",
+                        "answer": "D",
+                        "answer_text": "以『騏驥一躍』、『駑馬十駕』為喻，論證學習必須專一。",
+                        "steps": "文本用此喻強調堅持而非專一，D不符合文意，其他選項均正確。"
+                    },
+                    {
+                        "question": "荀子以青和冰為喻，旨在說明甚麼道理？",
+                        "options": [
+                            "君子天生便是才德兼備，普通人無可比擬。",
+                            "君子天生就比普通人突出，再加上學習便成為有才華的人。",
+                            "君子本來亦無突出之處，只是經過學習才可發揮其才華。",
+                            "君子本來亦無突出之處，只是經過別人的提醒才可發揮其才華。"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "君子本來亦無突出之處，只是經過學習才可發揮其才華。",
+                        "steps": "『青出於藍』、『冰寒於水』指學習提升本質，C最符合。"
+                    },
+                    {
+                        "question": "文中段二不是用了以下哪項比喻來論述學習比天賦重要？",
+                        "options": [
+                            "登高而招",
+                            "順風而呼",
+                            "假輿馬",
+                            "跂而望"
+                        ],
+                        "year": "2025",
+                        "answer": "D",
+                        "answer_text": "跂而望",
+                        "steps": "D用以比喻思考不如學習，其他比喻強調借助外物，D不符主題。"
+                    },
+                    {
+                        "question": "以下哪一項不是文中提及的治學態度和方法？",
+                        "options": [
+                            "學習應按個人的興趣與專長",
+                            "學習需要不斷累積知識",
+                            "學習需要專心一致",
+                            "學習需要努力不懈"
+                        ],
+                        "year": "2025",
+                        "answer": "A",
+                        "answer_text": "學習應按個人的興趣與專長",
+                        "steps": "《勸學》未提興趣與專長，其他均有提及，選A。"
+                    },
+                    {
+                        "question": "作者在文中『金就礪則利』與下列哪一項的意思相近？",
+                        "options": [
+                            "真金不怕洪爐火",
+                            "三人行必有我師",
+                            "玉不琢不成器",
+                            "遇強越強"
+                        ],
+                        "year": "2025",
+                        "answer": "C",
+                        "answer_text": "玉不琢不成器",
+                        "steps": "『金就礪則利』指磨礪提升，與C『琢而成器』相近。"
                     }
+                ]
+            },
 
-                    // Convert filtered JSON back to CSV
-                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                    return csv;
-                } catch (e) {
-                    console.error(e);
-                    return "";
+                "複述": {
+      "description": "按題目要求結合文本內容作出忠實重述或語譯",
+      "examples": [
+        {
+          "question": "4. 《魚我所欲也》一文，孟子從正反兩方面論述「義」比「生」更為重要。試加以說明。（3分）",
+          "year": "2022範文",
+          "answer": "孟子從人的「好」和「惡」正反論證「義」比「生」重要。他指出如果「生」是最重要的，人會為了生存而無所不為，但人們卻會為了「義」而有所不為；而如果「死」是人們最厭惡的事情，那麼為了避免死亡，人便會無所不為，但是人們卻會為了「義」而不辭死，可見「義」比「生」更為重要。",
+          "steps": "指出孟子以哪兩方面構成正反論證，並複述與正反論證相關的文本。"
+        },
+        {
+          "question": "20. 在白公作亂一事，申鳴面對什麼困境？（2分）",
+          "year": "2021文言",
+          "answer": "忠孝兩難全，白公以申鳴父親作人質威脅申鳴叛國，若救父而叛國，則屬於不忠；若不遵從，父親卻會因此喪命，如此就是「不孝」。",
+          "steps": "先概括地指出其困境，再引文本，交代當時的情況，繼而分析申鳴有哪兩點難處。"
+        },
+        {
+          "question": "21. 承上題，申鳴面對困境又如何取捨？（2分）附：20. 在白公作亂一事，申鳴面對什麼困境？（2分）",
+          "year": "2021文言",
+          "answer": "他選擇了忠，而捨棄了孝。即為了不背叛國家，而放棄父親。",
+          "steps": "先指出其選擇，再具體地解釋其選擇意味著甚麼。"
+        },
+        {
+          "question": "21. 承上題，就「賢士君子」的遭遇，作者提出什麼建議？試以自己的文句略加說明。（2分）",
+          "year": "2020文言",
+          "answer": "努力做好自己能勝任的工作，然後等待別人任用自己。",
+          "steps": "文本語譯相關部份的文本"
+        },
+        {
+          "question": "3.(iii) 孔子會怎樣回應以上批評？試就有關章節或研習所得略加說明。（3分）附：3.(ii) 孔子說要做到「無違」和「不違」才是孝，但是有人批評在實踐時可能會有矛盾。試指出在什麼情況下兩者可能會有矛盾。（2分）",
+          "year": "2019範文",
+          "answer": "孔子會認為兩者實踐時沒有矛盾。「不違」父母的意願，乃是重孝的表現，而「無違」禮，乃是重義的表現。假如父母所為不合禮法，為人子女能委婉地規勸父母，且「勞而不怨」，要恭敬有禮，父母不遵從時，也不會埋怨。如此則可既不直接違反父母意願，又合乎禮法。",
+          "steps": "先指出孔子會怎樣回應，再引用孔子的說話，分析他就這個矛盾的想法。"
+        },
+        {
+          "question": "5. 就《始得西山宴遊記》一文所述，作者在西山之巔所見的景物有何特別之處？試以自己的文句指出一項。（2分） 為什麼有關景物可使他從「恆惴慄」的心情中釋放出來？試略加說明。（3分）景物特別之處：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿說明：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2019範文",
+          "answer": "西山四周的高山和盤地都變得十分渺小，就恍如蟻丘和小土窪一樣。因為作者從該些景物中得到體悟。作者本來在被貶官之後，時常憂讒畏譏，因而深感懼憚和不安；可是遊西山之後，他看見西山高崇巍然，特立不群，不與培塿山丘為類，故此他了解到若重視一己之得失，不過是世俗的境念，其胸懷和思想的卑微，如四周的小山一樣渺小。由此，作者體悟到執著於個人得失的不智，明白只有體悟大道，才能豁然開朗。",
+          "steps": "直接語譯文本內容，解釋其景物的特別之處，再指出作者的心情得以釋放的原因，再作鋪墊，指出作者本來因何而「恆惴慄」，以及作者在西山看到甚麼景物，繼而解釋作者之所見為他帶來了甚麼新體悟，而該些體悟與作者的心情我以釋放又有何關係。"
+        },
+        {
+          "question": "20. 巷燕因為哪一件事才想起海鷗的話？試以自己的文句略加說明。（3分）",
+          "year": "2019文言",
+          "answer": "巷燕弄髒了巷人的熱湯，巷人為此感到憤怒，於是趕走燕子。",
+          "steps": "文本語譯相關部份的文本"
+        },
+        {
+          "question": "3. 在《勸學》一文中，作者說「學不可以已」。試以自己的文句說明不斷學習的好處。（2分）",
+          "year": "2018範文",
+          "answer": "學習能提高自己的修養和品格，並使心智澄明，行為不會有過失。",
+          "steps": "文本語譯相關部份的文本"
+        },
+        {
+          "question": "5. 在《出師表》一文中，諸葛亮認為重用郭攸之、向寵等人，會為「宮中」和「營中」帶來什麼好處？試以自己的文句分別說明。（4分）宮中：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿營中：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2018範文",
+          "answer": "宮中：若宮中大小事務都咨詢他們，定能補其缺失，令政策更為完善。營中：能使軍隊上下和睦，優劣的人才也可以各得其所，並各展所長。",
+          "steps": "文本語譯相關部份的文本"
+        },
+        {
+          "question": "22. 有些人不相信命運，他們有什麼理據？試以自己的文句說明。（2分）",
+          "year": "2018文言",
+          "answer": "他們認為能否富貴的關鍵取決於自身，它全憑個人的才幹和智慧，與命運沒有關係。",
+          "steps": "文本語譯相關部份的文本"
+        },
+        {
+          "question": "16. 孔子被困於陳蔡之間，他有何表現？試舉一例說明。（3分）",
+          "year": "2014文言",
+          "answer": "孔子泰然自若，繼續講誦詩書和彈琴唱歌。",
+          "steps": "文本語譯相關部份的文本"
+        }
+      ]
+    },
+                 "分析": {
+      "description": "分析原因、關係、主題、道理、人際互動、情感等，解釋背後邏輯",
+      "examples": [
+        {
+          "question": "6.(iii) 作者（《聲聲慢》作者李清照）看到鴻雁後勾起甚麼愁緒？為甚麼？試加以說明。（4分）",
+          "year": "2022範文",
+          "answer": "勾起了詞人故國之思及身世飄零之嘆。首先，中原為外族所攻陷，清照流落南方，無法返回故鄉。而北雁南飛，仿佛是清照舊時相識，因此鴻雁使作者憶想故國往日美好的時光，徒添悲傷和悵然。其次，又勾起了詞人思念之愁緒。鴻雁本用於傳送書信，但清照與丈夫陰陽相隔，他永遠都不能收到書信，故使詞人思念丈夫，悲慟不已。",
+          "steps": "先指出勾起的情緒，再以詞人當時身處的背景作鋪墊，分析「看到鴻雁」與其情緒有何關係。回應＋鋪墊＋解釋先指出勾起的情緒，再指出鴻雁的功用，然後分析「看到鴻雁」與其情緒有何關係。"
+        },
+        {
+          "question": "10. 就第4段，為什麼作者說讀好書、沉思、欣賞藝術等活動可以喚醒「精神性的自我」？試就個人的體會說明。（4分）",
+          "year": "2022白話",
+          "answer": "因為藝術能令人脫離現實和功利性思維。在現實生活中，人需要經常面對現實的問題，例如養家活兒，因此會變得功利，會考慮事情的結果和效益。這個時候，「精神性的自我」是沉睡的。不過，藝術的本質是美，不帶現實和功利的考慮，例如讀杜甫的《北征》能感受到其憂國憂民的高尚情操，讀李白的《夢遊天姥吟留別》能欣賞其恣肆浪漫，馳騁想像，這些都能使人對生命有更深刻的精神體會，這便是精神自我的醒覺。",
+          "steps": "先指出藝術的功能，再指出「精神性的自我」在現實生活中為何是沉睡的，其後再舉出藝術的例子，分析該些例子有何「美」【解釋（第1步）】，繼而解釋該些「美」如何喚醒精神性的自我。【解釋（第2步）】"
+        },
+        {
+          "question": "20. 文言第一則，楚王遺失了弓，卻對下屬說不需要找回來，為什麼孔子仍說楚王不夠大公無私呢？試加以說明。(2分)",
+          "year": "2022文言",
+          "answer": "因為楚人未能一視同仁，仍會以國籍劃分他人。",
+          "steps": "指出「不夠大公無私」的原因，再輔以具體的解釋。"
+        },
+        {
+          "question": "23. 有論者說「藏天下於天下」與「魚相忘於江湖」的寓意有相通之處。試就此說明，莊子為何認為只有「藏天下於天下」才不會遺失東西。（4分）",
+          "year": "2022文言",
+          "answer": "二者寓意相通之處在於應打破一切相對概念，以道為體。「藏天下於天下」指人應視萬物為道之一體，不以他物為己有，破除物我劃分，而「魚相忘於江湖」則指人應跳出自身的固有思維，不受當前窒息的困境影響通盤的思考，才能脫困並逍遙自由。可見，二者都旨在強調「我」執對人的思維的限制。而莊子認為只有「藏天下於天下」才不會遺失東西，是因為將天下藏於己是不可能的，無論我們將東西如何收藏穩固，亦經不起自然的力量，一場地震足以令我們遺失所有。反之，「遺失」是與「擁有」相對的概念，假如人能破除一切相對概念，不曾視天下為一己所「擁有」，便不可能「遺失」。",
+          "steps": "先指出兩者寓意相通之處，再解釋「藏天下於天下」的寓意，以及解釋「魚相忘於江湖」的寓意，突出二者的同處。鋪墊＋鋪墊＋解釋先指出做不到「藏天下於天下」為何必然會「遺失」，再指出「藏天下於天下」背後破除概對概念的思想，其後藉此解釋如此才不會遺失東西的原因。"
+        },
+        {
+          "question": "22. 作者聽到友人的話後「愧乎其言」。你認為作者「愧」的原因何在？試抒己見。（4分）",
+          "year": "2020文言",
+          "answer": "首先，作者因自己分析問題時見小不見大而「愧」。作者只見友人不惜好筆，用於紀錄錢貨買賣等小事，為筆感不幸，卻未有留意「賢士君子」同樣被君子糟蹋。筆易得，而賢士君子難得；筆於國於民無所用，賢士君子卻能經邦治國。作者只見小事而蔽於大事，故「愧」。此外，作者為自己無力改變現象而愧。所謂「不在其位，不謀其政」，賢士君子不為世所用，而遭中傷或拋棄，只有君主才有能改改變現象，而作者只是一介文人，斷無用人之權，故他因痛惜感歎自己無力改變現象而愧。",
+          "steps": "先指出作者慚愧的第一個原因，再引用文本，解釋作者如何見小而蔽於大。其後，再指出作者慚愧的第二個原因，並引用文本，指出賢士君子所面的困境，最後解釋作者如何因無力改變現象而愧。"
+        },
+        {
+          "question": "6. 就《始得西山宴遊記》一文所述，作者在西山之巔所見的景物有何特別之處？試以自己的文句指出一項。（2分） 為什麼有關景物可使他從「恆惴慄」的心情中釋放出來？試略加說明。（3分）景物特別之處：＿＿＿＿＿＿＿＿＿＿＿＿＿＿說明：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2019範文",
+          "answer": "西山四周的高山和盤地都變得十分渺小，就恍如蟻丘和小土窪一樣。因為作者從該些景物中得到體悟。作者本來在被貶官之後，時常憂讒畏譏，因而深感懼憚和不安；可是遊西山之後，他看見西山高崇巍然，特立不群，不與培塿山丘為類，故此他了解到若重視一己之得失，不過是世俗的境念，其胸懷和思想的卑微，如四周的小山一樣渺小。由此，作者體悟到執著於個人得失的不智，明白只有體悟大道，才能豁然開朗。",
+          "steps": "回應直接語譯文本內容，解釋其景物的特別之處，再指出作者的心情得以釋放的原因，然後作鋪墊，指出作者本來因何而「恆惴慄」，以及作者在西山看到甚麼景物，繼而解釋作者之所見為他帶來了甚麼新體悟，而該些體悟與作者的心情我以釋放又有何關係。"
+        },
+        {
+          "question": "13. 在第4段，為什麼作者說上帝要懲罰人類，有時候會產生一個道德家？試分析說明。（4分）",
+          "year": "2019白話",
+          "answer": "原因在於，道德家驕傲自大，以真理自居，因此他們往往會過份自我中心，為了完成其心目中的「偉大的理想」，甚至會以殘忍和罪惡的手段迫使他人服從，所以道德家的誕生和出現，會為人類帶來嚴重程度不亞瘟疫或戰爭的禍害，故作者說上帝懲罰人類，往往會產生一個道德家。",
+          "steps": "先作鋪墊，指出道德家的特點，然後再解釋基於以上特點，他們會作出甚麼行為，最後則指出該些行為會帶來甚麼後果，藉此論述產生道德家與懲罰人類之間的關係。"
+        },
+        {
+          "question": "7. 「表」為臣下向君主進言的文體，內容多為事理的陳述和分析，惟《出師表》一文帶有明顯的個人感情。諸葛亮為什麼這樣寫？試舉一例說明。（4分）",
+          "year": "2018範文",
+          "answer": "其原因在於，感激先帝知遇之恩。諸葛亮敘述先帝當年三顧草廬，不嫌自己出身卑賤，請自己出山相助，甚至與自己商討國家大事，託付復興重責。所謂「士為知己者死」，諸葛亮出征前憶及前塵往事，因而在表中流露了真情。其次，諸葛亮目的在於明志。後主生性多疑，故容易受小人擺弄，誤會諸葛亮北征實有異心。故此，諸葛亮表述個人心志，謂自己本不求聞達，出仕只是為報答劉備知遇之因，且說明北伐中原，復興漢室，不過是奉先帝之遺詔，能令後主有感於先帝恩情，並體諒其志向，因而釋除疑慮，令北伐無後顧之憂。",
+          "steps": "先指出諸葛亮為何要在《出師表》一文帶有明顯的個人感情，再引用有關文本，分析原因。"
+        },
+        {
+          "question": "13. 承上題，對「他」而言，為什麼「回家的路雖長總不比人生路漫長」？試就「他」孤單落寞的心情分析說明。（4分）",
+          "year": "2018白話",
+          "answer": "因為人生路比回家路更寂寞。「他」沒有出席婚禮，南下乘火車折返，雖然寂寞，但「回家的路」始終也有盡頭，旅程中的孤獨只在當下；反之，「他」的弟妹長大成家，老伴求去，其兒子亦結婚了，他把自己留在了自己的孤獨世界，因此他面對的人生路是無盡漫長的孤獨和寂寞，是無計可消除的。可見，回家的路不比人生路的漫長的原因在於，前者的孤寂可消除，而後者不可消除。",
+          "steps": "先指出「回家的路雖長總不比人生路漫長」的原因，再引例分析回家的路為何長，然後再引例分析人生的路為何比回家的路更漫長。"
+        },
+        {
+          "question": "15. 在散步將要回程的時候，「他」對路人說「這是我的媳婦」。「他」說話的時候為什麼神情靦腆？試綜合全文分析說明。（4分）",
+          "year": "2018白話",
+          "answer": "因為他性格外冷內熱，不擅長表達自己的感受。「他」答應與媳婦散步，嘗試改變，打破自己與親人的隔膜，但由於過往對媳婦表現較冷漠，「他」不懂得開口表明自己重視媳婦，故借路人坦露心跡，然而開口後又不知道對方會怎麼想，因此感到難為情，所以說話時神情靦腆。",
+          "steps": "先作鋪墊，指出「他」的性格，然後再敘述他的行為，並分析其行為背後的原因，最後指出該「他」做完該行為後的尷尬及憂慮。"
+        },
+        {
+          "question": "19. 本篇名為《孤獨的理由》，除了「孤獨是人生的宿命和基調」之外，「他」之所以孤獨，最主要的理由是什麼？試綜合全文分析說明。（4分）",
+          "year": "2018白話",
+          "answer": "「他」之所以孤獨，主要是因為失落了人生角色。年輕時，他為弟妹而放棄了自己的前途，為了家人，可以犧牲自己，家人的將來就是他人生中最明確的目標；到了不需要照顧家人的時候，他將人生的重點放在事業上，奈何以失敗告終。此外，又由於多年來與親人的關係較疏離，因此又無法融入兒子所建立的家庭，在新家庭中找不到自己的定位。由此可見，他在事業和新家庭中都找不到自己的方向，缺少了與外界連繫和溝通的角色，因此他將自己孤立起來，而孤獨就在分秒中累積，他人不能進入他的世界，了解他的心境，導致他活在孤獨之中。",
+          "steps": "先指出其孤獨的主要理由，然後再引用文本，敘述「他」如何失落了人生的角色，最後解釋他失落角色與孤獨的關係。"
+        },
+        {
+          "question": "8.(ii) 承上題，按泥土的象徵意義，試說明「（我們）有了失去泥土的悲哀」的原因。（4分）",
+          "year": "2016白話",
+          "answer": "「失去泥土」象徵著「失去孕育故鄉情懷的條件」，作者之所以「失去泥土」，原因有兩個：其一，作者住在城市的大廈裡，已經遠離了故鄉的泥土，故難以植根；其二，作者生活在中國最富裕的年代，從來沒有經歷過戰爭，所以即使人在他鄉，亦難以建立對故鄉濃厚的情意。",
+          "steps": "先指出「失去泥土」象徵甚麼，再指出作者「失去孕育故鄉情懷的條件」的原因。"
+        },
+        {
+          "question": "9. 你認為作者的父親期望兒子在家中種植番薯的原因是什麼？試綜合全文，加以說明。（4分）",
+          "year": "2016白話",
+          "answer": "作者的父親希望兒子能夠藉著種植番薯，銘記自己的鄉土。其父親在南洋作戰時，番薯的香氣使他憶想起故鄉，並因此覺得受到激勵，努力地生存。而戰後重返家鄉，又在家種了許多番薯。可見，在作者父親心目中，番薯是故鄉的象徵。而父親期望兒子在家中種植番薯，是因為他想將這份故鄉情懷一代又一代延續下去，使下一代不忘自己的故土。",
+          "steps": "先指出其父親希望兒子在家中種植番薯的原因，再引述相關的文本，指出父親、故鄉及番薯之間的關係，最後分析期望兒子種植番薯與故鄉情懷有何連繫。"
+        },
+        {
+          "question": "4. 第3段寫大師聽到徒弟的話後「不禁微微一笑」，作者認為這可見名心之難除。為什麼？試略加說明。（3分）",
+          "year": "2015白話",
+          "answer": "大師為得道和尚，理應看破紅塵，不為名利心所縈繞，然而他卻因徒弟奉承而感到沾沾自喜，可見即使是大和尚，也有「好名」的念頭，修道的大和尚，猶且免不了好名，一般人更難做到，故名心之難除由此可見一斑。",
+          "steps": "先作鋪墊，指出大師本應如何，然後分析其受到奉承之後實際的心情和反應，解釋由此如何得見名心之難除。"
+        },
+        {
+          "question": "6. 在第7段，作者引用第四年級某生同時讀「掮客術」及「宗教」一例，有何作用？（3分）又作者寫到「實在妙」，你認為「妙」的原因是什麼？試略加說明。（3分）   例子的作用：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   「妙」的原因：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2015白話",
+          "answer": "其作用在於突顯計時計分治學的弊病，乃在於使學生只知填滿時數、獲取學分，而不以真正問學為目標，故此不容易感受到讀書的樂趣及學有所成。認為「妙」的原因在於反諷。「掮客術」旨在教導他人取得最大的經濟效益，而「宗教」則導人向善，教人安身立命，兩門學問可謂大相徑庭。「妙」本是褒義詞，似乎在讚賞他，但作者卻褒詞貶用，藉此諷刺他違背真正的求學精神，即不以追求學問和修養為目標，只為充塞修課時數，而隨意選讀旨趣風馬牛不相及的學科。",
+          "steps": "先指出其作用，然後具體解釋其作用何在。回應＋鋪墊＋鋪墊＋解釋先指出認為「妙」的原因何在，再作鋪墊，分別指出「掮客術」及「宗教」兩門學科的宗旨，其後再作一層鋪墊，指出「妙」字為褒詞貶用，最後透過解釋如何用「妙」作諷刺。"
+        },
+        {
+          "question": "19. 文末作者引翟公之言「一死一生，乃知交情」抒發對世情的感慨。試綜合全文，說明作者為何有此感慨。（6分）",
+          "year": "2015白話",
+          "answer": "作者有此感慨，原因在於讚歎杜一元和常允恭的友誼能跨越生死。所謂「一死一生，乃知交情」，是指人生在世，與心意相合的朋友生死相許不困難；然而死後，情誼淡薄，普通朋友往往未能顧念生前情誼，故人死後，才能盡見真交情。例如譚敬先本與常允恭交好，但在常氏去世後，即不顧念昔日情誼，不願意照顧常母。可見，「一死」能驗證其昔日「一生」交情之淺。反之，杜環的父親杜一元與常母之子常允恭雖然交好，但常母往杜家時，兩位兒子已逝世，情誼理應斷絕，但杜環卻因父親與允恭有交情，便一意奉養常母，即便家境貧困，亦在所不辭。由此得見，「一死」能驗證其昔日「一生」交情之深。藉此，作者生出「一死一生，乃知交情」的感慨，原因在於慨嘆世人多如譚敬先，並稱頌杜一元和常允恭的情誼實屬難能可貴。",
+          "steps": "先指出作者感慨的原因，然後作鋪墊，指出「一死一生，乃知交情」的定義，繼而分別引譚敬先及杜環為例，藉此解釋作者之所以感慨的原因。"
+        },
+        {
+          "question": "11. 「健樂園」結業與曾先生的離去有很大關係，及後作者跟父親說起重遇曾先生一事，從曾先生的回應可見父親對曾先生的態度是怎樣的？試說明父親態度如此的原因。（6分）",
+          "year": "2014白話",
+          "answer": "父親態度淡然，原因之一是他已經預料到曾先生的下場。作者父親知道曾先生染有惡嗜賭的惡習，已預料到像他這類人，並不會有好下場。因此，曾先生風光不再，離開健樂園，生活潦倒，一切都在父親的意料之內，故此他得知健樂園及曾先生的下場，只覺平淡，而不覺詫異。",
+          "steps": "先指出父親的態度，再引述文本內容，指出父親對曾先生的看法，然後分析該些看法與後來重遇曾先生後的態度有何關係。"
+        },
+        {
+          "question": "7. 作者為什麼不同意「今天，是你生命餘年中的第一日。」這句格言？試加以說明。（6分）",
+          "year": "2013白話",
+          "answer": "因為作者認為自己沒有足夠的時間去珍惜兒子。若說「今天，是你生命餘年中的第一天」，則旨在強調只要珍惜時間，每一日都是一個新的開始。然而，作者作為一個母親，心裡充滿著焦慮，想要愛護兒子，若說所有日子都可以是生命中的「第一天」，則不能突顯其對兒子愛之深。反之，若說「最後一天」，則能突顯作者作為人母的不安和沉重。由此可見，「第一天」一語過於樂觀，未能強調作者對兒子的愛意，故她並不同意。",
+          "steps": "先指出作者不同意的原因，然後作鋪墊，解釋該句格言的含義，繼而分析作者想表達的感情，最後解釋「最後一日」如何切合及「第一日」如何不切合其想表達的感情。"
+        },
+        {
+          "question": "18. 承上兩題，晏子為什麼會有這兩種心情？試分別說明。（6分）  道別後：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   回來後：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2013白話",
+          "answer": "道別後：晏子感到失望，是因為晏子曾經濟北郭騷奉母之急，但他在落泊出走時向北郭騷道別，北郭騷卻表現冷淡，晏子認為他表現如此與自己失勢有關，故他覺得北郭騷忘恩負義，對他的人格卑下感到失望。回來後：晏子感到自責，是因為他得悉北郭騷為了替他洗白冤情而犧牲了自己的性命，因此他怪責自己沒有信任願意為他赴湯蹈火的北郭騷，早前反而將北郭騷看待成趨炎附勢之徒。",
+          "steps": "引用文本，交代晏子曾為北郭騷做過甚麼，繼而指出北郭騷的表現，藉此解釋晏子為何因該表現而感到失望。引用文本，交代晏子得悉真相，繼而分析此事與他感到自責的關係。"
+        },
+        {
+          "question": "9. 第11段記述呂進文跨過羅湖橋進入祖國大地時，哭了，也笑了。為什麼他有「這哭笑之間的感情」？試略加說明。（6分）",
+          "year": "2012白話",
+          "answer": "首先，他哭的原因在於感慨。因為中國的動亂，他過往被迫遷到香港，飄泊異鄉，並做著一些底層工作，重投祖國大地的懷抱時，他興許憶想起自己多年來鬱鬱寡歡，未能實踐自己的理想，故為自己的志向未酬而落淚；而他笑的原因，則在於感動。如今他將信念付諸行動，重踏熟悉的祖國大地，並終於有機會實現自己的夢想，因此他憧憬著將來，為自己能向理想踏出重要的一步而感到高興，因而笑。",
+          "steps": "先指出哭的原因，再引用文本，敘述他的經歷，然後分析該些經歷與他落淚的關係何在。回應＋文本＋解釋先指出笑的原因，再引用文本，敘述他的經歷，然後分析該些經歷與他笑的關係何在。"
+        },
+        {
+          "question": "10. 作者為什麼以「橋」為篇名？試從橋樑的象徵意義略加說明。（6分）",
+          "year": "2012白話",
+          "answer": "因為以「橋」命名能帶出本文的中心思想。首先，「橋」能連接和聯繫兩地，而本文的中心思想在於突顯作者和呂進文與祖國民族有不可分離的情感。文中不少篇幅都呈現了以上感情，例如作者敘述自己對平橋的念念不忘，又敘述了呂進文飄泊香港，卻無時無刻都有著「重歸之念」。「橋」有強烈的象徵意義，能象徵著人與祖國的聯繫，即使離鄉別井，但仍然心繫祖國，透過橋，可溝通民族不可分離的情感，故可以小見大，隱含出本文的中心主題，因此作者以此為篇名。",
+          "steps": "先指出以「橋」命名的原因，再作鋪墊，指出橋的象徵意義，然後引用文本，交代本文的內容如何呈現中心思想和感情，最後則解釋從上述例子與以「橋」命名的關係何在。"
+        },
+        {
+          "question": "10.(ii) 綜合第4段內容，「我」對人生有何看法？試根據報紙報道的內容說明。（3分）",
+          "year": "2021白話",
+          "answer": "「我」認為人生是瑣碎無聊的。報道離不開夫婦新婚、瀆職和訃聞，等，這些都不離不開結婚、工作和死亡，可謂千篇一律。作者認為這些新聞都無法解悶，可見他覺得人生是庸俗且無聊的。",
+          "steps": "先指出「我」對人生的態度，其後再引用報道內容，解釋從這些新聞如何得見作者的態度。"
+        },
+        {
+          "question": "14. 作者從愛蜜莉·狄瑾蓀的詩歌領悟到怎樣把個人心中的驕傲、孤獨與自戀放下。試根據詩歌的內容說明。（4分）",
+          "year": "2021白話",
+          "answer": "首先，作者從詩歌中露珠，領會到生命是渺小的。露珠之易晞，一如人生匆促，由此作者體悟到驕傲、孤獨和自戀都是沒有意義的，因為生命一旦結束，這些執著都將化為烏有。此外，作者又從露珠領悟到我執並無意義。詩歌中的露珠雖渺小，卻能滋潤一葉小草，圓滿和無私地映照大千世界，這使作者明白關懷世界的人事有何價值，因而能放下個人的我執，包括驕傲、孤獨和自戀。",
+          "steps": "先作鋪墊，交代露珠為作者帶來甚麼體悟，再引用文本，具體說明露珠的特點，並解釋該特點引發的體悟如何令作者放下驕傲、孤獨和自戀。"
+        },
+        {
+          "question": "8. 承上題，綜合上述經歷，作者對於競奔爭勝有什麼體悟？試略加說明。（4分）",
+          "year": "2017白話",
+          "answer": "首先，作者體悟到安於自己步伐的重要。作者提及跑步時要不受旁人的快慢節奏影響，要安於自己的速度。由此，作者明白到不必與其他人爭勝，向著自己的目標進發即可。其次，作者又體悟到超越勝敗的重要。他敘及幾個男孩從他身邊呼嘯而過，但人與人的力量和目標都不相同，勝負不容易論定。由此，作者明白於競奔中，爭勝並不是最重要的，重要的是怡然自得，好好享受當中的過程。",
+          "steps": "先指出作者有何體悟，再引用與體悟相關的文本，具體解釋它如何導致作者有所體悟。"
+        },
+        {
+          "question": "5. 曾先生嗜辣，從中悟出什麼處世態度？（2分）曾先生的行事如何體現這種處世態度？試舉一例說明。（3分）  處世態度：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   舉例說明：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2014白話",
+          "answer": "他悟出自重的處世態度。例如餐廳雖然有酒，但曾先生從不貪婪，他不會似趙胖子他們時常白喝餐廳的酒，反而只會喝自己帶來的酒，可見他從不與他人同流合污，對自己的道德有所要求。",
+          "steps": "回應指出其處世態度文本複述相關文本"
+        },
+        {
+          "question": "10. 在第6段，作者強調自己感到「遺憾」。承第9.(ii)題，試說明父親的「姿態」跟作者感到遺憾的關係。(4分)",
+          "year": "2020白話",
+          "answer": "首先，父親本身沉默寡言，導致做子女害怕親近他，對他有所畏懼，不敢有所發問，造成了兩代的隔閡。由於作者對父親的感情並不了解，所以沒有將他思念姥姥的一席話放在心上，即使父親逝世後他開始理解，亦為時已晚；其次，父親倏忽離世，沒有留下任何遺言，即使是在夢中出現都父親，都仍然緘默不語，所以連最後理解父親的機會都失去了，令錯失再也無法彌補，因此作者感到遺憾。",
+          "steps": "先作鋪墊，指出父親的性格，然後再分析他的性格導致自己有何心態，最後解釋自己的心態與遺憾如何構成關係。鋪墊＋解釋先作鋪墊，指出父親離世後沒有留下遺言，以及在夢中亦沒有留下片言隻語，然後再解釋以上兩點與構成遺憾的關係。"
+        },
+        {
+          "question": "16. 本篇題為「夢中的父親」，卻在最後一段寫到母親種種，這是否偏離主題？試說明你的看法。（4分）",
+          "year": "2020白話",
+          "answer": "這並沒有偏離主題。本文的主題在於，敘述作者沒有好好關懷和了解父親，因而感到後悔，帶出及時盡孝的重要。而作者在最後一後寫及母親開始變得蒼老，既有父親在世的經歷作為前車之鑑，所以這次作者不希望自己再重蹈覆轍，要好好孝順母親。可見，雖然作者寫到母親，與「夢中的父親」關係不直接，但本段卻呼應了文章的主題，起強調的作用，使及時盡孝的主題更為突出，故此並沒有偏離主題。",
+          "steps": "先指出這種寫法沒有偏離主題，再作鋪墊，指出本文的主題是甚麼，然後引用文本，概述複述作者在末段敘述了哪些關於母親的內容，然後解釋這些內容如何與主題產生關係。"
+        },
+        {
+          "question": "5.(ii) 作者（《六國論》作者蘇洵）以「抱薪救火」說明什麼道理？試以自己的文句說明。（3分）",
+          "year": "2020範文",
+          "answer": "作者以「抱薪救火」喻「以地事秦」的弊害。若抱著柴去救火，柴木未燒盡時，火亦不會熄滅，以此比喻六國若以事秦，只會無限助長秦國的野心。只要土地未全部割讓出去，秦國的野心便不會消滅，最後只會自取滅亡。",
+          "steps": "先指出所說明的道理，然後再引用文本，交代作者以何為喻，最後則引用文本，指出作者藉上述比喻說明了甚麼。"
+        },
+        {
+          "question": "7. 承上題，君子的「不憂」與古仁人的「憂」對象各有不同，試任擇其一，說明對你的啟發。（3分）",
+          "year": "2020範文",
+          "answer": "孔子說君子不憂，其對象是指自己。君子內省不疚，會經常三思吾身，反省自己在行事上有沒有過失，一旦發現過錯，亦不會畏憚改正，努力向善，因此不會憂慮。這啟發了我，使我明白了釋除憂慮的方法。在日常生活中，有許多事情都是我們無法控制的，例如努力溫習後，成績卻不如預期等。但是，孔子說君子「不憂」，使我明白人可以為自己努力，所謂「我欲仁斯仁至矣」，為仁履義，是我們想實行便能實行的事情。因此，若我們將重點放在行善上，則不愧於天地，不會再受結果和其他人的批評影響，而感到憂慮和不快。",
+          "steps": "先作鋪墊，解釋何謂君子不憂，然後再回應，直接指出對自己的啟發，再引用日常生活例子，解釋該句話如何啟發自己。"
+        },
+        {
+          "question": "21. 這則故事有何寓意？試以自己的文句略加說明。（3分）",
+          "year": "2019文言",
+          "answer": "這則故事提及海鷗無待於外物，不受人的愛憎所影響，能遠離人事，寓意為破除一切相對的觀念，才可在精神上逍遙自在。",
+          "steps": "先作鋪墊，指出這則故事交代了甚麼內容，再藉此指出其寓意所在。"
+        },
+        {
+          "question": "19. 鏡神以「秦皇焚書」一例，說明什麼道理？試略加說明（4分）",
+          "year": "2017文言",
+          "answer": "秦始皇焚書，然而天下之書燒而不盡，根本是徒勞無勞。鏡神藉此說明，無心公毀鏡就像秦皇焚書，並沒有任何意義，因為天下間能夠反映形相容貌的事物殊多，即使毀掉鏡子，無心公的蓬頭垢面仍然會被映照出來。",
+          "steps": "先作鋪堆，指出秦始皇焚書是沒有任何此義的，再作回應，直接指出鏡神引例想說明的道理，然後再透過比對毀鏡與焚書的相似，解釋其道理。"
+        },
+        {
+          "question": "9. 在第3段，作者列舉「石片」、「星星」、「地球」、「魚」和「鳥」五種事物，說明什麼道理？（3分） 試另擬一個可說明這道理的例子，並略加解釋。（3分）   道理：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   例子：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2015白話",
+          "answer": "事物各有自身的本性，只有在合適或特定的環境才能呈現其本色。例如一位擅長彈鋼琴但不擅長讀書的孩子，若在重視學術成績的家庭環境，他就將失去自信，無法發揮自己的音樂才能；反之，若置之在尊重個性的家庭環境，他就能發揮所長，透過鋼琴演奏發光發亮。",
+          "steps": "回應指出其道理所在。例子（近於文本）＋解釋＋解釋先舉出一個例子，再解釋若將孩子放在不合適的環境有何後果，再解釋若將孩子放在合適的環境又有何後果。"
+        },
+        {
+          "question": "10. 綜合全文，聰明人有何聰明之處？（4分）作者對他又有何批評？（4分）試分析說明。聰明之處：_____________________________作者的批評：____________________________",
+          "year": "2019白話",
+          "answer": "(i) 其聰明之處在於圓滑機巧。當奴才向他訴苦時，他深明奴才的本性不會有勇氣反抗，對不合理的政權只是逆來順受，因此他只作空泛的安慰，對奴才表示同情，但卻沒有實質的濟助。同時，他亦不會對統治者有任何批評，只是靜觀時局變化。由此可見，其聰明之處在於，懂得運用語言技巧，達到明哲保身和置身事外的目的。既不開罪奴才，亦不得罪統治者，無論事件發展如何，他都不會惹禍上身。(ii) 作者認為聰明人是冷漠無情的。綜觀全文，雖然作者對聰明人沒有直接批評，但讀畢故事後，讀者卻能感受到作者刻意將聰明人刻劃成形象不討好的角色，當奴才向他訴苦時，他總是虛偽地表現自己似乎要掉淚，及以「你總會好起來」作空泛的回應，這些都反映了聰明人對奴才的遭遇是漠不關心的，他只考慮個人利益。這些負面的形象是作者著力刻劃的，因此從其致力刻劃其態度冷淡，可見作者認為聰明人是冷漠無情的人。",
+          "steps": "先指出其聰明之處在於圓滑，再引用文本，陳述他如何安慰奴才，然後又引用文本，陳述他不批評統治者，最後解釋為何這種取態是一種聰明的做法。回應＋鋪墊＋文本＋解釋先指出作者對聰明人的批評是甚麼，然後作鋪墊，交代作者刻劃人物的方式與批評的關係，其後再引用文本，具體解釋這些形象的刻劃與反映了甚麼批評。"
+        },
+        {
+          "question": "8.(ii) 作者（《青玉案》作者辛棄疾）抒述了什麼情懷？他又怎樣抒述這種情懷？試綜合全文分析說明。（4分）",
+          "year": "2018範文",
+          "answer": "作者寓寫了自己的心境和抱負，不慕世俗的名利。作者在詞中寫及元宵燈市熱鬧的景象，有耀眼的煙花，亦有達官貴人的寶馬香女，仕女佩帶華麗的頭飾，笑語盈盈。在這一片昇平繁華的景象，作者卻不為所動，在燈火闌珊處，回首凝望心上人。藉此，作者抒述了自己絕不同流合污，孤芳自賞的情懷。",
+          "steps": "先指出作者抒述的情懷是甚麼，然後再引用文本，指出作者在詞中描寫了甚麼景象及自己的行動，由此再帶出作者如何透過以上景象抒述自己的情懷。"
+        },
+        {
+          "question": "2.(ii) 作者「拋在腦後」一詞加上引號，有什麼作用？試根據文意略加說明。 （3分）",
+          "year": "2017白話",
+          "answer": "加上引號之後，能引起雙關的作用。一方面，它表示跑步時，風將頭髮吹到腦後，另一方面，亦可表示跑步能使人暫時忘卻煩惱，拋在腦後不去思想。",
+          "steps": "先指出其作用，再解釋其表面的意義，以及其隱含的意義。"
+        },
+        {
+          "question": "",
+          "year": "2016白話",
+          "answer": "作者敘及自己在一片蔓生的葦芒花中難以察覺父親的身影，能突顯出葦芒花與父親的頭髮一樣灰白，從而抒發出自己未能察覺父親衰老的愧疚之情。",
+          "steps": "作鋪墊，交代作者在葦芒花辨別不到父親的身影，再解釋由此可以突顯甚麼，從而指出藉此可以抒發甚麼感情。"
+        },
+        {
+          "question": "6. 在第7段，作者引用第四年級某生同時讀「掮客術」及「宗教」一例，有何作用？（3分）又作者寫到「實在妙」，你認為「妙」的原來是什麼？試略加說明。（3分）   例子的作用：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   「妙」的原因：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2015白話",
+          "answer": "其作用在於突顯計時計分治學的弊病，乃在於使學生只知填滿時數、獲取學分，而不以真正問學為目標，故此不容易感受到讀書的樂趣及學有所成。認為「妙」的原因在於反諷。「掮客術」旨在教導他人取得最大的經濟效益，而「宗教」則導人向善，教人安身立命，兩門學問可謂大相徑庭。「妙」本是褒義詞，似乎在讚賞他，但作者卻褒詞貶用，藉此諷刺他違背真正的求學精神，即不以追求學問和修養為目標，只為充塞修課時數，而隨意選讀旨趣風馬牛不相及的學科。",
+          "steps": "先指出其作用，然後具體解釋其作用何在。回應＋鋪墊＋鋪墊＋解釋先指出認為「妙」的原因何在，再作鋪墊，分別指出「掮客術」及「宗教」兩門學科的宗旨，其後再作一層鋪墊，指出「妙」字為褒詞貶用，最後透過解釋如何用「妙」作諷刺。"
+        },
+        {
+          "question": "18. 承上題，作者記敘常伯章的行為，對於刻畫杜環的形象有什麼作用？試略加說明。（4分）",
+          "year": "2015白話",
+          "answer": "起了反襯作用。文中敘述了常母是常伯章的生母，血肉相連，但常伯章在得知生母消息之後，卻反應冷淡，甚至在常母年老時拋棄他，置之不顧；反之，杜環與常母非親非故，只因父親曾結交其長子，卻照顧她至死。作者藉刻劃常伯章的無情和冷漠，反襯了杜環重情義之難能可貴。",
+          "steps": "先指出其作用，再作鋪墊，指出文中敘述了常伯章的哪些行為，然後再作一層鋪墊，再指出文中敘述了杜環的哪些行為，最後解釋以上兩者如何構成反襯。"
+        },
+        {
+          "question": "8. 第7段末句「倚欄望遠，頗有『我欲乘風歸去』之慨。」在結構上起了什麼作用？試略加說明。（3分）",
+          "year": "2012白話",
+          "answer": "起了承上啟下的作用。「倚欄遠望」呼應上文描寫香港大海的景物，指自己遠望上面所寫之景，可謂承上；而「頗有『我欲乘風歸去』之慨」一句，則暗示自己有重回祖國發展的理想，故謂啟下。",
+          "steps": "先指出其結構作用，再融入文本，解釋它如何承上；然後再融入文本，解釋它如何啟下。"
+        },
+        {
+          "question": "2. 在文章開首，作者通過語言描寫，刻畫了父親因作者住在「無土」的房子而生的失望。除了語言描寫外，作者還通過哪方面的描寫刻畫父親的失望？試舉一例略加說明。（1分，2分）__________描寫（答案須是兩個字）例子：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2016白話",
+          "answer": "神態描寫例如作者寫父親走的時候「落寞的說」，且刻劃了父親說話時的表情，突顯他的失望。",
+          "steps": "回應直接指出是何種描寫手法文本概述與該種描寫手法的相關文本內容"
+        },
+        {
+          "question": "4. 作者以趙胖子突顯曾先生與別不同，這是什麼描寫手法？（2分）作者如何運用這種手法以趙胖子突顯曾先生與別不同？試舉一例說明。（3分）  描寫手法：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   舉例說明：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2014白話",
+          "answer": "描寫手法：反襯舉例說明：趙胖子白喝餐廳的酒而不付錢，貪小便宜；反之，曾先生只喝自己帶的酒，從不喝餐廳的酒，由此可以突顯曾先生的不貪心和自重。",
+          "steps": "回應直接回應是哪種手法文本＋解釋引用文本，複述其他人與曾先生的行為，並分析如何反襯。"
+        },
+        {
+          "question": "10. 承上題，試說明作者怎樣運用這種寫作手法作扣連。（4分）",
+          "year": "2013白話",
+          "answer": "作者從方向盤聯想到《離騷》中馬車的玉駄。政客信誓旦旦，言之鑿鑿，以壯語許下諾言後，又改變了立場，不兌現先前的諾言，轉變之急就扭轉方向盤。作者從方向盤，聯想到《離騷》中千乘萬騎、並駕齊驅的玉駄。二者的相似之處在於激昂，政客違反誓言的急促與理直氣壯，在形象上與浩蕩轉彎的玉駄相似，故令作者產生聯想，扣連兩者。",
+          "steps": "回應＋文本＋文本＋解釋先指出作者如何聯想，再引用文本，分別概述與第一個物象相關的內容以及與第二個物相關的內容，然後分析兩者相似的地方何在。"
+        },
+        {
+          "question": "12. 試說明《說誓》一文的主旨。（5分）",
+          "year": "2013白話",
+          "answer": "作者引用了古今中外的事例，諷刺現代人輕易立誓又輕易違反誓言，並給予忠告，勸告人們不要輕易相信誓言，且應該謹言慎行，不應隨便發誓。",
+          "steps": "（不適用）"
+        },
+        {
+          "question": "7. 作者著意描寫香港的天橋，除了可具體突顯香港是個繁華的都市外，還有什麼目的？試略加說明。（3分）",
+          "year": "2012白話",
+          "answer": "目的在於借香港的繁華和文明，對比家鄉的純樸自然，暗示異鄉雖然物質豐盛和建設完善，但仍不及故鄉有情。",
+          "steps": "先作鋪墊，指出這樣描寫如何構成對比，再指出該對比的作用。"
+        },
+        {
+          "question": "",
+          "year": "2016白話",
+          "answer": "在南洋參戰：番薯的香味牽起父親對故鄉的情思，它寄託了父親對故鄉的思念，這種情懷是支撐著參戰的父親繼續努力生存下去的動力。戰後在家鄉：父親在家種滿了番薯，一方面為預防戰爭時逃難而準備，另一方面則寄託了父親心繫故鄉，不忘鄉土。",
+          "steps": "先作鋪墊，交代文本陳述了父親與番薯哪些內容，再解釋該些內容呈現了甚麼意義。"
+        }
+      ]
+    },
+         "印證": {
+      "description": "結合文本／實例驗證觀點，或以故事、現實現象說明理論價值或意義",
+      "examples": [
+        {
+          "question": "5.(ii) 現今社會過於重視利益而引發不少問題，孟子提倡保育「本心」，重視人的「價值」，對現今社會有何提醒？試舉一個與教育相關的現象為例說明。（4分）",
+          "year": "2022範文",
+          "answer": "孟子提倡保育本心，提醒了人們教育應該「求其放心」，而不應導人功利。現今社會的學生以追求成績為讀書的唯一目標，不少家長和學校亦視成績比道德更重要。但在缺乏道德培養之下，學生容易在意個人的得失，為了達到目標，或會不擇手段，損人利己。而孟子提倡要保育「本心」，提醒了我們學習和教育的初衷，是提高人的道德修養，使更多人能夠成為君子，去關心社會，去修身立德。所謂「行有餘力，則以學文」，孟子提醒了人們不應過份重視利益，應重拾「本心」，透過教育使學生反省自身的行為及人生的意義。",
+          "steps": "先指出孟子對現今社會有何提醒，然後作鋪墊，指出現今社會的教育有何問題，繼而解釋孟子提倡保育「本心」與解決現今社會教育問題有何關係。"
+        },
+        {
+          "question": "17. 第二篇末段，「揚棄」一詞兼具「發揚優點」和「拋棄缺點」的意思。就此說明第一篇中，「你」如何揚棄「我」和「他」，而成就更高的自我。（4分）",
+          "year": "2022白話",
+          "answer": "「你」能夠用超脫及體貼的眼光，去理解「我」在人生更本質的需要及關切、鼓勵我，因為「你」能夠使「我」在面對困境時對自己有自信，而這種自信能使人在做事前不會畏首畏尾，專注於自己所長，故能發揚「我」的優點；此外，「你」比「我」站得更高和看得更遠，它是更高的自我，因此它能節制「我」的本性，使「我」能夠能冷靜和客觀處事及反省自己，故能使「我」揚棄自己的缺點。",
+          "steps": "先作鋪墊，指出與「你」能發揚「我」優點相關的文本內容，再根據其特點分析「你」如何能發揚「我」的優點；然後再引與「你」能使「我」拋棄缺點相關的文本內容，再根據其特點分析「你」如何能使我拋棄缺點。"
+        },
+        {
+          "question": "6. 《逍遙遊》（節錄）一文，莊子如何以樗樹為喻抒發對人生的感悟？試綜合有關內容說明。（4分）",
+          "year": "2021範文",
+          "answer": "《逍遙遊》一文中，樗樹的樹幹粗大，不合繩墨，而且樹枝彎曲，不中規矩。因此，本匠認為它「無用」而不砍伐它。不過莊子卻認為正因為它「無用」，才沒有人去砍伐它，使它得夠得享天年，這才是真正的「有用」。藉此，莊子想帶出我們不應受固有的世俗觀念影響，反而應該破除一切相對的概念，這樣才能活得逍遙自在。",
+          "steps": "先作鋪墊，具體引出《逍遙遊》中與樗樹相關的文本內容，然後再解釋莊子想藉此抒發甚麼人生的感悟。"
+        },
+        {
+          "question": "7.(i) 作者（《念奴嬌》作者蘇軾）藉「大江東去」抒發對人生的感慨。試就江水的意象說明。(3分)",
+          "year": "2021範文",
+          "answer": "作者在赤壁遠眺滾滾東逝的江水，江水能比喻永恆的時間，縱然周瑜曾經在赤壁大破曹軍，一時意氣風發，建不世之事業，但如今都不見任何痕跡，惟有江水流動不息。藉此，作者以江水的永恆長久，對比人生的虛幻短暫，抒述了功名之不可恃及人生如夢的感慨。",
+          "steps": "先作鋪墊，闡明江水一喻有何含義，再解釋作者眺望江水的所思所想，然後指出作者藉「大江東去」抒發了甚麼感情。"
+        },
+        {
+          "question": "7.(ii) 作者（《念奴嬌》作者蘇軾）在詞的末句藉「江月」抒發對人生的感悟。試就月亮的意象說明。（3分）",
+          "year": "2021範文",
+          "answer": "作者從「江月」聯想到世事雖然如白雲蒼狗，變幻不定，但「江月」卻是永恆長存，即使時盈時虧，但終究照亮世間。由此，作者抒述人生在世不應執著成敗得失，反應以道心觀照世界，以人世之「變」為「不變」，如此才能活得逍遙自在。",
+          "steps": "解釋作者看到江月的所思所想，然後指出作者藉江月抒發了甚麼感情。"
+        },
+        {
+          "question": "11.(ii) 承上題，文章又如何透過對比突顯上述批評？試加以說明。(4分)附：10.(ii) 綜合第4段內容，「我」對人生有何看法？試根據報紙報道的內容說明。（3分）悲觀、冷漠、傲慢",
+          "year": "2021白話",
+          "answer": "作者以小姑娘的重情對比「我」的冷漠和無情。文中，小姑娘打開車窗拋出橘子，反映了姑娘雖然年紀小小，便要離鄉別井，但心中仍然惦記著來送行的弟弟，可見她重情義；反之，作者卻因姑娘外貌的俗氣和服裝的邋遢歧視她，更在她打不開車窗時幸災樂禍。可見，文中以小姑娘的重情義，與作者自身的冷漠構成了對比，藉此突顯出自己的不仁，加強了自我批評的力度。",
+          "steps": "先指出作者以哪者與作者的冷漠構成對比，再引用與姑娘重情相關的文本及與作者冷漠相關的文本，解釋透過這個對比如何突顯出上述批評。"
+        },
+        {
+          "question": "19. 申鳴以孝聞名於楚國。試在首段中舉出一例，並說明為什麼從這件事可見他重孝。（3分）",
+          "year": "2021文言",
+          "answer": "申鳴本來無意於入仕，只是一心留在父親身邊，希望侍奉他。但由於父親希望申鳴當官，能讓自己生活無憂，於是申鳴決定出任楚相。由這件事可以看出，申鳴願意放棄了自己的想法，做決定時以父親的意願和福祉為先，故可見其孝義。",
+          "steps": "直接舉出一個能突顯申鳴孝義的例子，以回應題目；再從以上例子分析這件事情與如何體現出他重孝的形象。"
+        },
+        {
+          "question": "3.(ii) 孔子說要做到「無違」和「不違」才是孝，但是有人批評在實踐時可能會有矛盾。試指出在什麼情況下兩者可能會有矛盾。（2分）",
+          "year": "2019範文",
+          "answer": "假如父母的意願不合禮法，使子女陷於說謊或為公廢私的兩難，便有可能構成矛盾。",
+          "steps": "指出該情況，再分析該情況如何構成矛盾。"
+        },
+        {
+          "question": "26.(ii) 《命解》一文說處事須「循其方，由其道」。若根據這個原則，應怎樣評價孫叔敖的行為？試分析說明。(4分)",
+          "year": "2018文言",
+          "answer": "根據《命解》的原則，應對孫叔敖的行為予以贊同。所謂「循其方，由其道」是指只要行為符合道德，不必在意命運的有或無。孫叔敖看見兩頭蛇，以為自己將死，可是他仍然擔心有人受害，於是殺掉兩頭蛇。由此可見，孫叔敖雖然相信命運，但沒有過於以命運為行事標準，反而貫徹和依遵道義，為別人的安危感到擔憂，從而殺死兩頭蛇。可見，他所為符合《命解》「循其方，由其道」的原則，故據上述原則，應對他的行為予以認同。",
+          "steps": "先指出應作如何評價，再作鋪墊，指出「循其方，由其道」的意義，再作鋪墊，引述孫叔敖的行為，從而分析他的行為與題目所述的原則如何契合。"
+        },
+        {
+          "question": "11. 在第14段，作者寫到「這就是跑道：繁榮中有一種孤獨」。試綜合全文，說明句中的「繁榮」和「孤獨」分別指什麼。（6分）繁榮：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿孤獨：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2017白話",
+          "answer": "繁榮：繁榮是指場上氛圍的熱鬧。在跑道場上有不少競爭者，例如有一家大小以及較力的男孩子，他們甚至會彼此鼓勵，讚賞陌生的跑手的耐力，或為其打氣及互相扶持。「繁榮」正指人數之多、氣氛之喧鬧及人情的濃厚。孤獨：孤獨是指跑道上無可依附。作者提及在跑道上，跑手看似是競爭者，但其實目標都不盡相同，能打敗或超越的只有自己，又指出跑道外的旁觀者插不上手，不能替跑手完成旅程。由此可見，跑道是孤獨的，跑手只能向著自己的目標進發，他人一概不可能干涉。",
+          "steps": "先指出繁榮是指甚麼，再引用相關文本，交代在跑道上跑步的特點，再解釋該些特點如何見出繁榮。回應＋文本＋解釋先指出孤獨是指甚麼，再引用相關文本，交代在跑道上跑步的特點，再解釋該些特點如何見出孤獨。"
+        },
+        {
+          "question": "19. 季子禮的行事如何體現「人各以得行其志為適」？試舉一例加以說明。 （4分）",
+          "year": "2016文言",
+          "answer": "首先，「人各以行其志為適」是指各人按照自己的性情和志趣來行事，於是感到適意和舒暢。文中記敘季子禮於陡峭的山中建廬，雖然其他人認為此廬只足以遮風擋雨，根本不值得舉債而修飾，但季子禮卻稱之為「真吾廬」，視之為安身之所。可見，季子禮不受其他人的意見動搖，只依從自己內心的喜好行事，他因此感到自足，亦體現了「人各以行我其志為適」一句的含義。",
+          "steps": "先指出「人各以行其志為適」的意義，然後再引述文本，敘述季子禮的行為及他人的看法，接著解釋為何以上事例能體現「人各以得行其志為適」。"
+        },
+        {
+          "question": "9. 在第3段，作者列舉「石片」、「星星」、「地球」、「魚」和「鳥」五種事物，說明什麼道理？（3分） 試另擬一個可說明這道理的例子，並略加解釋。（3分）   道理：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿   例子：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2015白話",
+          "answer": "事物各有自身的本性，只有在合適或特定的環境才能呈現其本色。例如一位擅長彈鋼琴但不擅長讀書的孩子，若在重視學術成績的家庭環境，他就將失去自信，無法發揮自己的音樂才能；反之，若置之在尊重個性的家庭環境，他就能發揮所長，透過鋼琴演奏發光發亮。",
+          "steps": "回應指出其道理所在。例子（近於文本）＋解釋＋解釋先舉出一個例子，再解釋若將孩子放在不合適的環境有何後果，再解釋若將孩子放在合適的環境又有何後果。"
+        },
+        {
+          "question": "15. 試從文中舉一個事例說明北郭騷「於利不苟取」。（3分）",
+          "year": "2013白話",
+          "answer": "北郭騷以奉養母親的原因求助於晏子，但由於無功不受祿，他只願意接受糧食，而謝絕了金錢，可見北郭騷沒有見利忘義，不貪婪，不苟取利益。",
+          "steps": "引述與「於利不苟取」相關的文本，然後解釋以上例子如何契合「於利不苟取」。"
+        }
+      ]
+    },
+    "闡明": {
+      "description": "闡明詩句／語句／結尾句等內在、深層意義，綜合全文提煉內核思想",
+      "examples": [
+        {
+          "question": "14. 在第4段，詩歌的末句說「半人半神走了，神就來了」，這句詩有何寓意？試綜合詩歌的內容說明。（4分）",
+          "year": "2022白話",
+          "answer": "「半人半神」中的「半神」是指能為愛情而放下名利，「半人」則指對愛情仍然存有執著，以為愛情是可以被擁有的。至於「神」，則指思想和人格上完全獨立自主，亦尊重對方的獨立自主，故能放下我執，即使愛人另結新歡，亦不去束縛對方。綜以上所得，這句詩的寓意在於勸告人們追求更高的境界，放下對身外人事的執著，才能成就精神層次更高的自己。",
+          "steps": "先作鋪墊，指出「半神」及「半人」的含義，再作鋪墊，指出「神」的含義，然後綜合以上所得，解釋該句詩的深層寓意。"
+        },
+        {
+          "question": "16. 第二篇與第一篇內容的扣連十分緊密，第二篇的作者以下列文字收結全文，有何深意？試加以說明。(4分)我想，如果是幼稚的我站在一個命運必經的轉彎路口、列車隆隆駛過，我又該用什麼情懷，去接住姊姊從她的故事裏拋來的蜜柑呢？",
+          "year": "2021白話",
+          "answer": "其深意在於深化讀者對文章的體悟。首先，作者在這段文字上面轉述了與露珠相關的詩歌，由此，作者體悟到事物雖然渺小，但卻蘊藏著複雜的情感與價值，這一點使讀者放下了我執。而作者以上述文字收結，能進一步深化這種體悟。上述文字對自己發起疑問，想像自己若是那些送行的弟弟，接過感受姊姊竭力打開車窗拋來的橘子會有何感受，這可以引導讀者設身處地，一同思考和感受，藉此可牽起讀者對窮鄉姊弟的同情，從而呼應了上文的體悟，即再平凡渺小的人事，也會令人體會到複雜的感情和價值，領略人性的美善。可見，以上述文字收結，能夠呼應第二篇文章的主題和中心思想，使讀者從設想中，親身體悟到作者所帶出的道理。",
+          "steps": "先指出作者有何深意，再作鋪墊，指出作者在上述文字前面帶出了甚麼體悟，然後又作鋪墊，指出上述文字提出了甚麼疑問。接著，需要解釋上述文字與第二篇的體悟有何關係，最後解釋這樣的呼應有何效果。"
+        },
+        {
+          "question": "12. 「第九味」指的是什麼？試綜合全文加以析述。（6分）",
+          "year": "2014白話",
+          "answer": "所謂「第九味」，是指一種無味之味。曾先生曾經貴為餐廳的大廚，地位尊崇，但後來卻淪落為小店廚子，生活潦倒，作者在第十段中，提及父親因為曾先生的起伏際遇，因而感慨平凡人自有平凡的樂趣，自有其甘醇的香味。由此可見，第九味是指嚐盡世間的甜酸苦辣之後，那種甘於淡泊和尋常的真味，亦即無味自有其味。除此之外，在第十二段中，作者又複述過曾先生的說話，指出真正入味之人，不在乎吃，大和尚能從一杯水中喝出大道理。由此亦可見，第九味並不是一種切實具體的味道，我們可理解為從平淡中體會人生真趣和道理的境界，亦即從無味中尋出味。",
+          "steps": "先直接指出第九味所指的是無味之味，然後引用相關的文本，解釋該些文本內容如何證明第九味就是無味之味。接著，再引用一項文本內容，解釋該些內容如何證明第九味是無味之味。"
+        }
+      ]
+    },
+    "意見": {
+      "description": "表達個人意見、探討文章立場值不值得欣賞、類比自身體會",
+      "examples": [
+        {
+          "question": "22. 有論者認為「盡孝論心不論行」，不應只憑結果判斷，故此申鳴未有違反孝的精神。你同意該論者的看法嗎？試加以說明。（4分）",
+          "year": "2021文言",
+          "answer": "我同意。首先，「盡孝論心不論行」是指考慮孝心多於行為所引致的結果，而申鳴其實只是為勢所迫，如救父則對國家君主不忠，置社稷安危於不顧，為一己之私而致使生靈塗炭，其實亦是陷父親於不義，若以結果判斷，亦屬不孝。可見，申鳴只是兩害取其輕，因此不當以結果論斷申鳴是否孝義。。再者，申鳴在放棄父親之後，亦感到愧疚而自盡，亦已見其孝義之心。孔子亦謂不敬之孝無別於犬馬之養，可見心中是否存有孝敬，才是判別之關鍵，而申鳴愧疚自盡，已足證明他心存孝義之心，故未有違反孝義精神。",
+          "steps": "先表明立意，再作鋪墊，指出「盡孝論心不論行」的意思，然後解釋不應以結果論斷的原因，再引用文本，指出申鳴的愧疚與沒有違反孝精神的關係。"
+        },
+        {
+          "question": "16. 就諷刺文章而言，你較欣賞第一篇還是第二篇？試綜合全文，並就該篇的特點分析說明。（6分）",
+          "year": "2019白話",
+          "answer": "我較欣賞第一篇。首先，它諷刺的對象具有普遍性。面對不公平的剝削，一般人有三種取態：一是像「聰明人」，明哲保身，漠不關心；二是像「奴才」，選擇服從和不反抗；三是像「傻子」，選擇反抗，但卻被世人認為是愚蠢的，更見荒謬。一篇文章，一個故事，但同時能夠諷刺兩種不同形象的的對象，起一石二鳥之效，可見作者筆力之利害。其次，這篇文章以寓言形式書寫，能引起讀者深思。故事取材自日常生活，敘述奴才遭統治者剝削，這是許多人在生活中都會遇到的境況。面對熟悉的背景，讀者能夠代入其中，思考自己會作哪一種選擇。可見，文章能引起讀者反思面對不公平時冷漠無情和不反抗兩種取態的問題所在，大大深化了諷刺效果。",
+          "steps": "先表明立場，然後解釋自己選該立場的原因，再引用文本，解釋從該些內容如何得見該文章在諷刺上的優點。然後再解釋自己選該立場的另一原因，再引用文本，解釋從該些內容如何得見該文章在諷刺上的優點。"
+        },
+        {
+          "question": "13. 本文以「跑道」為題，體悟卻不局限於跑道上。根據文中「跑道」的特點，就你個人對本文的體會，「跑道」可以比喻什麼？試說明你的看法。（4分）",
+          "year": "2017白話",
+          "answer": "「跑道」可比喻為人生的歷程。首先，作者指出跑手在跑場上會感受到「繁榮中有一種孤獨」，其實人生亦然。在人生中，我們會結識到朋友，他們會鼓勵和關懷我們，這就等如跑道上的繁榮。但同時，我們在人生中的孤獨的，正如畢業之後，同學們便會各奔前程，大家都有自己的將來及目標，每一個人都只能走自己的路，去砥礪自己，為自己的人生負責；此外，跑道的另一特點在於沒有規定的起點和終點，有些跑手的目標在一百米，有些可能在十公里。這一點亦與人生相像，人生的目標亦不必隨眾隨俗，每個人都有自己的性情和趣向，都有自己要努力的目標，或許有人想建立一個溫馨的家庭，或許有人想在事業上闖出一番成就。由此可見，跑道與人生都一樣，是繁榮中有一種孤獨，是沒有一致的目標，可見跑道可以比喻作人生。",
+          "steps": "指出「跑道」可以比喻甚麼，然後作鋪墊，指出跑道的第一個特點，再分析它與人生歷程有何相似之處；然後再作鋪墊，指出跑道的第二個特點，再分析它與人生歷程有何相似之處。"
+        },
+        {
+          "question": "20. 作者認為「人各以得行其志為適」，你同意嗎？試舉生活例子，說明你的看法。（4分）",
+          "year": "2016文言",
+          "answer": "我同意這句說話。「人各以行其志為適」是指各人按照自己的性情和志趣來行事，於是感到適意和舒暢。例如孩子的興趣在於彈奏鋼琴，而不在讀書，若能讓孩子專注於發展音樂事業，他亦會感到自己的優點得以發揮，會努力向目標進發；反之，若不能「行其志」，要求他必須向學術方面發展，則會使他自信心受挫，亦會認為生活沒有意義。由此可見，每個人都有自己的優點、目標和理想，若能「行其志」，能做自己喜歡的事情，即使最後沒有成就，他們亦能在過程中感到愉悅；反之，他們便會因不能「行其志」而鬱鬱寡歡。",
+          "steps": "先作鋪墊，指出「人各以行其志為適」的意思，然後舉出生活例子，從正反兩方面解釋「行其志」與「適」的關係。"
+        },
+        {
+          "question": "19. 「魯有父子訟者，康子曰：「殺之！」孔子曰：「未可殺也。夫民不知子父訟之不善者久矣，是則上過也；上有道，是人亡矣。」康子曰：「夫治民以孝為本，今殺一人以戮不孝，不亦可乎？」孔子曰：「不孝而誅之，是虐殺不辜也。三軍大敗，不可誅也；獄訟不治，不可刑也；上陳之教而先服之，則百姓從風矣，躬行不從而後俟之以刑，則民知罪矣。」承上第2與第3問。就學校教育學生而言，孔子和韓非子的看法何者較為理想？試略加說明。（6分）",
+          "year": "2012文言",
+          "answer": "我認為孔子的看法較為理想，因為它能令學生真正明白守法的本質。韓非子認為刑罰能夠管束人民，令他們因為畏懼受罰而不敢犯法。不過，法律有管束不到之處，亦有灰色地帶，人民若非自願守法，則會觸碰法律邊緣，在「守法」的前提下損害其他人的利益；反之，孔子主張教化，並以身作則，親身躬行。教化能夠使人民明辨是非，即使刑法管束不到，他們仍然會因為道義而是其是、非其非，而親身躬行則以德服人，能令他們心服口服，心甘情願守法。由此可見，孔子的想法較理想，因為他能使人民真正明白守法的意義所在。",
+          "steps": "先指出何者的看法較理想，再解釋其原因，然後作鋪墊，引述韓非子的想法，再分析他的看法有何弊病；接著作鋪墊，引述孔子的想法，再分析他的看法有何優點。"
+        }
+      ]
+    },
+    "比較": {
+      "description": "比較兩人、兩物、兩思想、兩作品異同，或將現象與現象作比對說明",
+      "examples": [
+        {
+          "question": "11. 在第2段，作者就「職業」是公認的人生依托，有些人卻稱之為「事業」。「職業」和「事業」有何不同？試以醫生為例說明兩者的分別。（3分）",
+          "year": "2022白話",
+          "answer": "「職業」是指循規蹈矩，將工作視為謀生工具，並以完成工作的基本職責和任務為目標。以醫生為例，即每日按時就診，為病人開藥，以賺取薪金或酬金生活；而「事業」是指在工作有遠大的志向，為實踐理想，能夠付上無限的熱誠。以醫生為例，即以救急扶危為己任，不論金錢的多少，注重拯救生命，甚或照顧病人的心理感受，有醫者的使命感。金",
+          "steps": "先作鋪墊，指出「職業」的意義，再以醫生為例，解釋若醫生視工作為職業會有何表現；然後再作鋪墊，指出「事業」的意義，再以醫生為例，解釋若醫生視工作為事業又會有何表現。"
+        },
+        {
+          "question": "21. 文言第二則，為什麼作者說孔子還及不上老子，老子才是最大公無私的呢？試就孔子和老子的說話加以說明。（3分）",
+          "year": "2022文言",
+          "answer": "因為孔子所打破的只是人與人的界限，而老子打破的卻是人與物的界限，範圍更為廣大。孔子說要把楚人說話中的「荊」字刪去，表明了國籍不是重要的考量，對甚麼國家的人得弓，他並不在乎，可見他對所有人均一視同仁，但孔子仍然會區分人與物；而老子則說要將「人」字刪去，可見其天地萬物齊一的思想，不但打破了人和人之界限，更打破了物我界限，可見其大公無私的範疇更廣，境界更高。",
+          "steps": "先透過比對二者的差異，指出其原因所在，再引文本中孔子的看法，分析其如何大公無私，然後引文本中老子的看法，透過分析與孔子看法的差異，指出其大公無私之境界如何高於孔子。"
+        },
+        {
+          "question": "11.(ii) 父親和作者的「疼」雖有不同原因，但卻有相同感覺，試略加說明。（4分）原因不同：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿感覺相同：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2020白話",
+          "answer": "原因不同：父親因為生離而「疼」，而作者因為死別而「疼」。感覺相同：兩種「疼」都是不斷折磨人，令人無法喘息。",
+          "steps": "回應指出原因不同之處回應指出感覺不同之處"
+        },
+        {
+          "question": "17.(ii) 《夢中的父親》中「那些和父親一樣的遊子」與王鼎鈞對故鄉的看法有沒有矛盾？試分析說明。（4分）",
+          "year": "2020白話",
+          "answer": "二者的看法有矛盾。那些遊子認為故鄉有固定之所，而王鼎鈞則認為故鄉並無固定之所。首先，《夢中的父親》那些遊子認為故鄉即指出生地，是一個具體的地點位置，只有唯一一個地方才能稱上是故鄉；而王鼎鈞則認為故鄉不是指涉一個特定的地點，因為久居異鄉即吾鄉，心所安處，異鄉亦可視作故鄉。其次，那些遊子認為故鄉是人生終點站，而王鼎鈞則不以為然。那些遊子覺得所有人都應該落葉歸根，在死後歸葬故鄉；但王鼎鈞則認為故鄉只是祖先流浪的最後一站，它是由異鄉演變而來的，所謂「此心安處即吾鄉」，因此故鄉未必是必須歸葬之所。",
+          "steps": "先表明立場，再解釋有矛盾的原因，然後引述文本，解釋其看法，再引述另一文本，解釋其看法之差異；接著解釋有矛盾的另一原因，然後引述文本，解釋其看法，再引述另一文本，解釋其看法之差異。"
+        },
+        {
+          "question": "22. 《海鷗》一文寓意深遠，有論者指與孔子說「君子求諸己」或莊子「無用之用」的思想相通。試任擇其一，略述與本文是否有相通之處。（4分）",
+          "year": "2019文言",
+          "answer": "《海鷗》一文與莊子「無用之用」的思想相通處在於，打破一切相對的概念，才能逍遙自在。莊子提出「無用之用」，指出樗樹臃腫彎曲，不為木匠所取用，表面上無用，卻因此能全養天年，藉此指出「有用」和「無用」只是相對，「有用」是一種成見；而《海鷗》一文中，敘述燕子依人而處，人愛之，則保護燕子免受風雨侵擾；人憎之，則怒逐燕子。藉此帶出了愛憎亦是相對，會隨時間、環境和際遇等因素變化。可見，二文思想的相通之處，在於指出世間事物都是相對，只有超越相對主義的規限，像看通樗樹之有用，像海鷗無憎無愛，才能逍遙自在。",
+          "steps": "指出二文相通之處，再引用《海鷗》的文本，分析它與破除相對概念的關係；然後再引用與莊子「無用之用」相關的文本，解釋它與破除相對概念的關係。最後，歸結二者的相通之處。"
+        },
+        {
+          "question": "3. 在第2段，作者以什麼事物比喻跑步的節奏？(1分)又這事物與跑步的節奏有什麼相似之處？試略加說明。（3分）比喻跑步節奏的事物是：＿＿＿（答案須是三個字）兩者相似之處：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2018白話",
+          "answer": "",
+          "steps": ""
+        },
+        {
+          "question": "9. 假若把以下句子中的「繞出」改為「領略」，你認為表達效果會否更佳？試略加說明。（4分）心中充溢著對人事的不滿、對現世的埋怨時，我會從一圈圈的跑道中繞出屬於我的寧靜。（第11段）",
+          "year": "2017白話",
+          "answer": "不會。「繞出」比「領略」更為精煉。首先，用「繞出」屬於自己寧靜，已隱含了「領略」的意思。此外，「繞出」有圍著轉的意思，能夠與跑道的特點緊密扣連，更生動和更形象地刻劃出作者「繞」著跑道一圈圈奔跑時，變得寧願並梳理思緒的過程。若改為「領略」，則較為平鋪直敘，未能與「跑道」一題遙相呼應，失去了畫面感。",
+          "steps": "先表明立場，再點出「不會更佳」的原因，然後解釋第一個原因，再作鋪墊，指出「繞出」的詞義，再根據其詞義分析「繞出」能夠產生甚麼表達效果。"
+        },
+        {
+          "question": "21. 鏡之工列十鏡於賈奩，發奩而視，其一皎如，其九霧如。或曰：「良苦之不侔甚矣。」工解頤謝曰：「非不能盡良也，蓋賈之意，唯售是念，今來市者，必歷鑒周睞，求與己宜。彼皎者不能隱芒杪之瑕，非美容不合，是用什一其數也。」予感之，作《昏鏡詞》。    引文中的鏡匠為符合買鏡者的心意，所製造的鏡子九塊朦朧而只有一塊清晰。引文及《全鏡文》均藉與鏡子有關的故事作諷刺，兩文所諷刺的人是否有共通之處？試略加說明。（4分）",
+          "year": "2017文言",
+          "answer": "二文所諷刺的對象有共通之處，兩者都是藉鏡子諷刺那些不能接受自己的缺點而自欺欺人的人。例如《昏鏡詞引》的買鏡者選擇朦朧的鏡子，是因為它可以掩蓋人的容貌的瑕疵；而《全鏡文》的無心公因從照鏡時發現自己容貌醜陋，於是遷怒於鏡子，而要毀鏡。其實，二人的問題都出於自身，與鏡子無關，因此他們所為都不過是掩耳盜鈴、自欺欺人的表現。",
+          "steps": "先表明立場，再指出兩者諷刺的對象有何共通之處，然後引《昏鏡詞引》及《全鏡文》為例，分析二個人物如何自欺欺人，藉此帶出二文諷刺對象有相通之處。"
+        },
+        {
+          "question": "11. 作者以番薯喻人，也比喻父親。試綜合全文，指出番薯與父親的一個共同特點，並以父親的經歷或行事為例，加以說明。（4分）",
+          "year": "2016白話",
+          "answer": "二者共同的特點在於生命力強。番薯是一種粗生的植物，文中提及它即使在乾瘠的石頭地，都無需要下肥料和農藥，便可堅強和茁壯地生長，可見番茄的生命力頑強，粗生粗養；而其父親亦然，作者的父親到南洋打過幾年仗，只抱著三兩個番薯，便能在防空壕聽著戰爭的聲響，熬過艱苦的日子，並平安歸來。可見，作者父親能適應外在環境的變化，抵受艱苦，亦有頑強的生命力。",
+          "steps": "先指出二者共同的特點，再引文本，解釋番薯如何具有頑強的生命力；然後再引另一文章的內容，解釋作者的父親又如何具有頑強的生命力。"
+        },
+        {
+          "question": "10. 作者在篇末寫到「女兒笑之，我亦笑之。」你認為兩人「笑」的原因有什麼不同？試略加說明。（3分）",
+          "year": "2015白話",
+          "answer": "女兒為石片重現光采而笑，而作者則為事物各適其適而笑。在文章中提及作者的女兒重回河灘，看到石片又再燦然亮麗，故以為沙礫重新活起來而笑；而作者則由石片明白到事物有自己的本性，只有將它們放在合適的環境，才能重現光采和活力，故為自己明白到重要的道理而笑。",
+          "steps": "先指出二人的原因有何差別，再引用文本，解釋女兒緣何而笑；其後，再引用文本，解釋作者緣何而笑。"
+        },
+        {
+          "question": "11. 賈平凹《觀沙礫記》談及發揮才能的條件，林語堂《論趣》提出對教育方式的看法，你認為他們的看法有何相通之處？試略加說明。（6分）",
+          "year": "2015白話",
+          "answer": "二人相通之處在於要尊重人在性情趣向的差異，要順其性而行。例如賈平凹《觀沙礫記》提及石片停在河灘才有光采，就似魚不能不在水中，鳥不能不在雲際。可見，作者認為物各有性，只有放在合適的環境，才能使他們發揮自己的優點；而林語堂《論趣》則指出讀書必然要知趣，而人生必有癡，一定對趣有所偏好和癖嗜，由此得出讀書亦要考慮自己的性情興趣。可見，二文的作者的共通之處，在於尊重人的個性和趣向，不贊同機械和統一的教育模式。",
+          "steps": "指出二者相通之處，再引文本，解釋其中一文的看法，然後再引文本，解釋另一篇文章的看法，最後歸納二者的相通處。"
+        },
+        {
+          "question": "",
+          "year": "2014白話",
+          "answer": "平常人鹹味尋常，就像平常人一樣普遍，到處皆可遇見。淡泊名利的人苦味較少人喜歡，不可兼日，就如淡泊名利，不是一般人所能承受。",
+          "steps": "回應直接回應與甚麼人物相似解釋＋解釋先指出鹹味的特點，再指出這種特點與平常人有何相似。回應直接指出與甚麼人物相似解釋＋解釋先指出苦味的特點，再指出這種特點與平常人有何相似。"
+        },
+        {
+          "question": "20. 試根據孔子和弟子的對話，說明顏回較子路、子貢優勝之處。（6分）  顏回較子路優勝之處：＿＿＿＿＿＿＿＿＿＿＿＿   顏回較子貢優勝之處：＿＿＿＿＿＿＿＿＿＿＿",
+          "year": "2014文言",
+          "answer": "顏回較子路優勝之處：顏回對世情和大道的認識較為深刻，他早料到世俗不能容納夫子之道，因為其道宏大，自然非一般人能接受；而子路對世情和大道的認識則不夠深刻，他受世情影響判斷，懷疑堅持大道的方向是否正確。顏回較子貢優勝之處：顏回對夫子之道深信不疑，他認為孔子的主張不為君主所容納，不應視為夫子的恥辱，反而應視為治國者的恥辱；而子貢則信心不足，他認為夫子理想過於宏大，應降低自身的標準以迎合世俗。",
+          "steps": "先指出顏回較子路的優勝之處，再解釋其想法；然後則指出子路不及顏回之處，再解釋其想法。回應＋解釋＋回應＋解釋先指出顏回較子貢的優勝之處，再解釋其想法；然後則指出子路不及顏回之處，再解釋其想法。"
+        },
+        {
+          "question": "4. 假若把第6段的末句改寫為下句以收結該段，對段旨的表達而言，是否更為理想？試略加說明。（6分）   「今天早晨，我向你交出我可愛的小男孩，而你們將還我一個怎樣的呢？」",
+          "year": "2013白話",
+          "answer": "不會較理想。原句更能突顯出段旨的重點。首先，本段旨在抒發作者對兒子成長的擔憂，而原句以「我，一個母親」強調自己是一個母親，作者以母親的身分向子女的未來提出質問，比改寫後的句子更能突顯出母親對孩子成長的擔憂，呼應了段旨。此外，原句以感歎號為結，加強了對社會教育制度的質問和責難，從而突顯出自己的憂慮。假如以問號為結，則似乎只是提出一個較冷靜的疑問，情感不及原句強烈，故未能呼應段旨，突顯出作者憂慮之情的沉重。",
+          "steps": "先表明立場，再解釋不會更為理想的原因，然後作鋪墊，帶出段旨所在，接著解釋原句「我，一個母親」的句式對表達段旨有何幫助及改寫後的句子為何達不到其效果。然後，再作鋪墊，指出原句與改寫後的句子另一個相異處，再解釋為何原句對表達段旨更理想。"
+        },
+        {
+          "question": "19. 甲  戰國初,嚴仲子與韓相俠累有隙,仲子尋勇士刺俠累以報讎,聞聶政重信義,勇武過人,因殺人避禍,攜母隱於齊。遂赴齊拜訪,並備黃金百鎰為禮。政辭不受,暗許仲子為知己,惟老母在堂,故未敢以身報效。後,母辭世,始赴仲子處問其原委,遂孤身赴韓,刺俠累於相府。事成,自屠出腸而死。乙  儒家重「義」,簡言之,「義」即指超越個人的利害得失,以正當的方式去實踐仁。北郭騷和聶政均為他人捨棄生命，兩人的行事何者較合乎儒家的「義」？試比較說明。( 6分)",
+          "year": "2013白話",
+          "answer": "我認為北郭騷更符合儒家的「義」。首先，符合「義」的條件有二：一，超越自身的利害得失。北郭騷符合這條件，而聶政不符合。北郭騷為了齊國存亡而自盡，可謂以公忘私，為了實踐仁，置個人的生死和利害於不顧；反之，聶政雖然亦願意犧牲性命，但究其動機，不過是為報答嚴仲子，即出於一己私情，與仁無關。可見，北郭騷較符合「義」。二，以正當方式履仁。北郭騷符合這條件，而聶政不符合。北郭騷在捨生取義時，沒有傷及仕何無辜；反之，聶政與俠累本無積怨，他殺害無辜之舉並不能算「正當」。可見，北郭騷較符合「義」。",
+          "steps": "表明立場，回應題目，再作鋪墊，指出符合「義」的條件，然後分析北郭騷如何符合「義」以及聶政如何不符合「義」；再作鋪墊，指出符合「義」的另一條件，然後分析北郭騷如何符合「義」以及聶政如何不符合「義」。"
+        },
+        {
+          "question": "6. 以下兩段文字分別描寫作者故鄉的平橋和香港的天橋，兩段文字描寫的手法有什麼不同？試略加說明。（4分）「我對橋有一種特別感情，這是童年時代培養起來的。家鄉是一個偏僻的小鎮，鎮郊有一個平橋塘，一潭碧水，橫架一座小木橋，每逢夏天，那兒就是我游泳嬉戲的地方。站在橋上，雙臂高舉，「撲通」一聲，跳入碧潭之中，常常游個半天，讓酷炙的太陽把潭水曬得燙了，才盡興地和小伴們跳躍地歸去。」（第1段）「香港有六十一條天橋，建築工程是浩大的，耗資港幣達七億元。天橋群貫通南北，為城市交通開闢了新的途徑。車如流水，行人如鯽，蔚為壯觀。我對橋有感情，因此常常偷閒去天橋漫步。我喜歡山道天橋，其中干諾道西一條天橋有支柱二十三條，長度達二萬多米。踏上工地一看。海港風光歷歷在目。另有一條在中環，長廊逶迤，寬闊而整潔，最堪留戀的是它面向大海，海風拂面，令人心曠神恰。海上有艨艟巨艦，有點點風帆；在浪濤飛濺、捲起千堆雪的遠處，則有海鷗飛翔，構成特有的海景。倚欄望遠，頗有「我欲乘風歸去」之慨。」（第7段）",
+          "year": "2012白話",
+          "answer": "前者為側面描寫，而後者為正面描寫。第一段沒有從正面下筆，寫家鄉的橋的形態和材質等，反而從側面下筆，敘寫作者自己與橋之間的回憶片段，以對往事的懷緬，側面烘托出橋的形象的美好；而後者則從正面下筆，分別交代橋的長度、結構和貫通方向等，都使讀者從文字直接了解橋的形象。",
+          "steps": "先指出二者相異之處，再作鋪墊，指出作者沒有作正面描寫，然後引用文本，解釋作者如何側面描寫橋的形象，繼而再引文本，解釋作者如何正面描寫橋的形象。"
+                        }
+                    ]
                 }
             }
-            return gk_fileData[filename] || "";
-        }
+        };
 
-        // 過濾思考過程標籤的函數
-        function removeThinkingTags(content) {
-            if (typeof content !== 'string') {
-                return content;
-            }
-            // 移除<think></think>標籤及其內容
-            return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-        }
+        // 全局變量
+        var selectedQuestionTypes = new Set();
+        var selectedTextId = null;
 
+        // API 配置
         const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
         const MODEL = "DeepSeek-R1-0528";
         const API_KEY = "sk-O6GT79mshyCgqyaTaq60FA";
 
-        const generatorTypeSelect = document.getElementById('generatorType');
-        const essayInputs = document.getElementById('essayInputs');
-        const practicalInputs = document.getElementById('practicalInputs');
-        const readingInputs = document.getElementById('readingInputs');
+        // DOM 元素
+        const generatorTypeRadios = document.querySelectorAll('input[name="generatorType"]');
         const generateBtn = document.getElementById('generateBtn');
-        const loadingDiv = document.getElementById('loading');
-        const outputDiv = document.getElementById('output');
-        const topicSelect = document.getElementById('topicSelect');
-        const customTopicGroup = document.getElementById('customTopicGroup');
-        const customTopicInput = document.getElementById('customTopic');
+        const progressModal = document.getElementById('progressModal');
+        const resultContainer = document.getElementById('resultContainer');
+        const mainContainer = document.getElementById('mainContainer');
 
-        generatorTypeSelect.addEventListener('change', () => {
-            const type = generatorTypeSelect.value;
-            essayInputs.style.display = type === 'essay' ? 'block' : 'none';
-            practicalInputs.style.display = type === 'practical' ? 'block' : 'none';
-            readingInputs.style.display = type === 'reading' ? 'block' : 'none';
+        // 進度追踪變量
+        let progressTimer = null;
+        let startTime = null;
+        let currentProgress = 0;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            updateConfigPanel();
+            setupQuantityControls();
+            generateTextLibrary();
         });
 
-        topicSelect.addEventListener('change', () => {
-            customTopicGroup.style.display = topicSelect.value === 'custom' ? 'block' : 'none';
-        });
+        function parseFormatting(text) {
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            text = text.replace(/(?:^|\n)\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+            text = text.replace(/(?:^|\n)\s*\d+\.\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)+/g, '<ol>$&</ol>');
+            text = text.replace(/(?:^|\n)>\s*(.*?)(?=\n|$)/g, '<div class="indent">$1</div>');
+            text = text.replace(/(?:^|\n)>>\s*(.*?)(?=\n|$)/g, '<blockquote>$1</blockquote>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
 
-        generateBtn.addEventListener('click', () => {
-            const generatorType = generatorTypeSelect.value;
-            if (generatorType === 'essay') {
-                generateEssayQuestions();
-            } else if (generatorType === 'practical') {
-                generatePracticalQuestions();
-            } else if (generatorType === 'reading') {
-                generateReadingQuestions();
+        function initializeEventListeners() {
+            // 範疇選擇事件
+            generatorTypeRadios.forEach(radio => {
+                radio.addEventListener('change', updateConfigPanel);
+            });
+
+            // 主題選擇事件
+            const topicSelect = document.getElementById('topicSelect');
+            if (topicSelect) {
+                topicSelect.addEventListener('change', () => {
+                    const customTopicGroup = document.getElementById('customTopicGroup');
+                    if (topicSelect.value === 'custom') {
+                        customTopicGroup.classList.remove('hidden');
+                    } else {
+                        customTopicGroup.classList.add('hidden');
+                    }
+                });
             }
-        });
 
+            // 數量滑桿同步
+            const quantityRange = document.getElementById('quantityRange');
+            const quantityInput = document.getElementById('quantity');
+            if (quantityRange && quantityInput) {
+                quantityRange.addEventListener('input', () => {
+                    quantityInput.value = quantityRange.value;
+                });
+            }
+
+            // 生成按鈕事件
+            generateBtn.addEventListener('click', handleGenerate);
+        }
+
+        function setupQuantityControls() {
+            // 設定所有數量控制
+            const questionTypes = ['複述', '分析', '印證', '闡明', '意見', '比較'];
+            questionTypes.forEach(type => {
+                const input = document.getElementById(`quantity-${type}`);
+                if (input) {
+                    input.addEventListener('change', () => {
+                        if (parseInt(input.value) < 1) input.value = 1;
+                        if (parseInt(input.value) > 10) input.value = 10;
+                    });
+                }
+            });
+        }
+
+        function generateTextLibrary() {
+            const grid = document.getElementById('textLibraryGrid');
+            grid.innerHTML = '';
+
+            textLibrary.texts.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'text-item';
+                item.onclick = () => selectText(text.id, item);
+                
+                item.innerHTML = `
+                    <div class="text-item-title">${text.title}</div>
+                    <div class="text-item-info">
+                        <span>${text.author} · ${text.length}</span>
+                        <span class="text-category">${text.category}</span>
+                    </div>
+                `;
+                
+                grid.appendChild(item);
+            });
+        }
+
+     
+
+        function selectText(textId, element) {
+    if (selectedTextId === textId) {
+        // 如果點擊已選中的範文，取消選擇
+        element.classList.remove('selected');
+        selectedTextId = null;
+        document.getElementById('targetPassage').value = '';
+    } else {
+        // 清除之前的選中狀態
+        document.querySelectorAll('.text-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        // 選中新的範文
+        element.classList.add('selected');
+        selectedTextId = textId;
+        const selectedText = textLibrary.texts.find(text => text.id === textId);
+        if (selectedText) {
+            document.getElementById('targetPassage').value = selectedText.content;
+        }
+    }
+}
+
+        function toggleQuestionType(toggleElement, questionType) {
+            const isActive = toggleElement.classList.contains('active');
+            const quantityControl = toggleElement.closest('.question-type-selection').querySelector('.quantity-control');
+            
+            if (isActive) {
+                // 取消選中
+                toggleElement.classList.remove('active');
+                selectedQuestionTypes.delete(questionType);
+                if (quantityControl) {
+                    quantityControl.style.display = 'none';
+                }
+                
+                // 隱藏自訂配置
+                if (questionType === '自訂') {
+                    document.getElementById('customReadingConfig').classList.add('hidden');
+                }
+            } else {
+                // 選中
+                toggleElement.classList.add('active');
+                selectedQuestionTypes.add(questionType);
+                if (quantityControl) {
+                    quantityControl.style.display = 'flex';
+                }
+                
+                // 顯示自訂配置
+                if (questionType === '自訂') {
+                    document.getElementById('customReadingConfig').classList.remove('hidden');
+                }
+            }
+        }
+
+        function adjustQuantity(questionType, delta) {
+            const input = document.getElementById(`quantity-${questionType}`);
+            if (input) {
+                let currentValue = parseInt(input.value) || 1;
+                currentValue += delta;
+                if (currentValue < 1) currentValue = 1;
+                if (currentValue > 10) currentValue = 10;
+                input.value = currentValue;
+            }
+        }
+
+        function adjustEssayQuantity(delta) {
+            const input = document.getElementById('quantity');
+            const slider = document.getElementById('quantityRange');
+            if (input && slider) {
+                let currentValue = parseInt(input.value) || 3;
+                currentValue += delta;
+                if (currentValue < 1) currentValue = 1;
+                if (currentValue > 10) currentValue = 10;
+                input.value = currentValue;
+                slider.value = currentValue;
+            }
+        }
+
+        function updateConfigPanel() {
+            const selectedType = document.querySelector('input[name="generatorType"]:checked').value;
+            
+            // 隱藏所有配置面板
+            document.getElementById('readingConfig').classList.add('hidden');
+            document.getElementById('essayConfig').classList.add('hidden');
+            document.getElementById('practicalConfig').classList.add('hidden');
+            
+            // 顯示對應的配置面板
+            document.getElementById(selectedType + 'Config').classList.remove('hidden');
+
+            // 更新選中狀態的視覺效果
+            document.querySelectorAll('input[name="generatorType"]').forEach(radio => {
+                const label = radio.nextElementSibling;
+                if (radio.checked) {
+                    label.classList.add('selected');
+                } else {
+                    label.classList.remove('selected');
+                }
+            });
+        }
+
+        // 參考題目相關函數
         function addReferenceQA() {
             const list = document.getElementById('referenceQAList');
-            const currentCount = list.querySelectorAll('.referenceQA').length;
+            const currentCount = list.querySelectorAll('.reference-qa').length;
             const newQA = document.createElement('div');
-            newQA.className = 'referenceQA';
-            newQA.innerHTML = `<span class="sequence">${currentCount + 1}.</span><textarea class="refQuestionAnswer" placeholder="在此輸入參考題目與答案"></textarea>`;
+            newQA.className = 'reference-qa fade-in';
+            newQA.innerHTML = `
+                <div class="flex items-start space-x-4 bg-white p-8 rounded-2xl border-3 border-teal-200">
+                    <span class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg question-number">${currentCount + 1}</span>
+                    <textarea class="flex-1 p-6 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical" placeholder="在此輸入參考題目與答案"></textarea>
+                </div>
+            `;
             list.appendChild(newQA);
-            updateControlButtons();
+            updateReferenceNumbers();
         }
 
         function removeReferenceQA() {
             const list = document.getElementById('referenceQAList');
-            const currentCount = list.querySelectorAll('.referenceQA').length;
-            if (currentCount > 1) {
-                list.removeChild(list.lastElementChild);
-                updateControlButtons();
+            const items = list.querySelectorAll('.reference-qa');
+            if (items.length > 1) {
+                items[items.length - 1].remove();
+                updateReferenceNumbers();
             }
         }
 
         function clearReferenceQA() {
-            const textareas = document.querySelectorAll('.refQuestionAnswer');
+            const textareas = document.querySelectorAll('.reference-qa textarea');
             textareas.forEach(textarea => {
                 textarea.value = '';
             });
         }
 
-        function updateControlButtons() {
-            const list = document.getElementById('referenceQAList');
-            const currentCount = list.querySelectorAll('.referenceQA').length;
-            const addBtn = document.querySelector('.addReferenceBtn');
-            const removeBtn = document.querySelector('.removeReferenceBtn');
-            addBtn.disabled = false; // 始終啟用添加按鈕
-            removeBtn.disabled = currentCount <= 1;
+        function updateReferenceNumbers() {
+            const items = document.querySelectorAll('.reference-qa');
+            items.forEach((item, index) => {
+                const numberSpan = item.querySelector('span');
+                numberSpan.textContent = index + 1;
+            });
         }
 
-        // 初始化按鈕狀態
-        updateControlButtons();
+        // 從試題庫獲取參考範例
+       function getQuestionBankExamples(questionType, count = 3) {
+    if (!questionBank.question_types[questionType] || !questionBank.question_types[questionType].examples) {
+        return [];
+    }
+    
+    const examples = questionBank.question_types[questionType].examples;
+    const selectedCount = Math.min(count, examples.length);
+    const selectedExamples = [];
+    const usedIndexes = new Set();
+    
+    while (selectedExamples.length < selectedCount) {
+        const randomIndex = Math.floor(Math.random() * examples.length);
+        if (!usedIndexes.has(randomIndex)) {
+            usedIndexes.add(randomIndex);
+            selectedExamples.push(examples[randomIndex]);
+        }
+    }
+    
+    // 為選擇題特別格式化
+    if (questionType === '選擇') {
+        return selectedExamples.map(example => {
+            let formattedExample = `題目：${example.question}`;
+            if (example.options && example.options.length > 0) {
+                formattedExample += `\n選項：\n${example.options.join('\n')}`;
+            }
+            formattedExample += `\n答案：${example.answer_text || example.answer}`;
+            formattedExample += `\n答題步驟：${example.steps}`;
+            return formattedExample;
+        });
+    }
+    
+    return selectedExamples.map(example => 
+        `題目：${example.question}\n答案：${example.answer}\n答題步驟：${example.steps}`
+    );
+}
+
+
+        // 進度顯示函數
+        function showProgress() {
+            progressModal.classList.remove('hidden');
+            startTime = Date.now();
+            currentProgress = 0;
+            updateProgressBar(currentProgress);
+            
+            progressTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                
+                // 模擬進度更新
+                if (currentProgress < 90) {
+                    currentProgress += Math.random() * 2;
+                    updateProgressBar(currentProgress);
+                }
+                
+                // 更新預計剩餘時間
+                if (currentProgress > 10) {
+                    const estimated = (elapsed / currentProgress) * (100 - currentProgress);
+                    document.getElementById('timeRemaining').textContent = Math.round(estimated) + '秒';
+                }
+            }, 1000);
+        }
+
+        function hideProgress() {
+            progressModal.classList.add('hidden');
+            if (progressTimer) {
+                clearInterval(progressTimer);
+                progressTimer = null;
+            }
+        }
+
+        function updateProgressDisplay() {
+            const steps = [
+                '正在分析您的配置需求...',
+                '正在連接AI智能引擎...',
+                '正在生成專業題目內容...',
+                '正在優化題目格式與排版...'
+            ];
+            
+            const currentStepIndex = Math.floor(currentProgress / 25);
+            const status = steps[Math.min(currentStepIndex, steps.length - 1)];
+            
+            document.getElementById('progressStatus').textContent = status;
+            document.getElementById('currentStep').textContent = `${Math.min(currentStepIndex + 1, 4)}/4`;
+        }
+
+        function updateProgressBar(progress) {
+    const progressCircle = document.getElementById('progressCircle');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    const clampedProgress = Math.min(100, Math.max(0, progress));
+    
+    // 更新圓形進度
+    const circumference = 2 * Math.PI * 54;
+    const strokeDasharray = (clampedProgress / 100) * circumference;
+    progressCircle.style.strokeDasharray = `${strokeDasharray} ${circumference}`;
+    
+    // 更新百分比
+    progressPercent.textContent = Math.round(clampedProgress) + '%';
+}
+
+        // 主要生成函數
+        async function handleGenerate() {
+            const selectedType = document.querySelector('input[name="generatorType"]:checked').value;
+            
+            try {
+                if (!validateInput(selectedType)) {
+                    return;
+                }
+                
+                showProgress();
+                
+                if (selectedType === 'reading') {
+                    await generateReadingQuestions();
+                } else if (selectedType === 'essay') {
+                    await generateEssayQuestions();
+                } else if (selectedType === 'practical') {
+                    await generatePracticalQuestions();
+                }
+                
+            } catch (error) {
+                console.error('生成錯誤：', error);
+                showError('生成過程中發生錯誤，請稍後重試');
+                hideProgress();
+            }
+        }
+
+        function validateInput(type) {
+            if (type === 'reading') {
+                const targetPassage = document.getElementById('targetPassage').value.trim();
+                
+                if (!targetPassage) {
+                    showError('請輸入擬題篇章');
+                    return false;
+                }
+                
+                if (selectedQuestionTypes.size === 0) {
+                    showError('請至少選擇一種題型');
+                    return false;
+                }
+                
+                if (selectedQuestionTypes.has('自訂')) {
+                    const refQAs = Array.from(document.querySelectorAll('.reference-qa textarea')).map(el => el.value.trim()).filter(val => val);
+                    if (refQAs.length === 0) {
+                        showError('自訂模式下請輸入至少一個參考題目與答案');
+                        return false;
+                    }
+                }
+            } else if (type === 'essay') {
+                const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
+                if (!mimicQuestion) {
+                    showError('請輸入參考題目');
+                    return false;
+                }
+            } else if (type === 'practical') {
+                const refQuestion = document.getElementById('refQuestion').value.trim();
+                const refMaterial1 = document.getElementById('refMaterial1').value.trim();
+                const refMaterial2 = document.getElementById('refMaterial2').value.trim();
+                
+                if (!refQuestion || !refMaterial1 || !refMaterial2) {
+                    showError('請輸入所有參考內容');
+                    return false;
+                }
+                
+                const topicSelect = document.getElementById('topicSelect');
+                if (topicSelect.value === 'custom') {
+                    const customTopic = document.getElementById('customTopic').value.trim();
+                    if (!customTopic) {
+                        showError('請輸入自訂主題');
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        // 具體生成函數
+       async function generateReadingQuestions() {
+    const targetPassage = document.getElementById('targetPassage').value.trim();
+    let allQuestions = [];
+    
+    for (const questionType of selectedQuestionTypes) {
+        const quantityInput = document.getElementById(`quantity-${questionType}`);
+        const quantity = parseInt(quantityInput.value);
+        
+        let refQAs = [];
+        let specialInstructions = '';
+        
+        if (questionType === '自訂') {
+            refQAs = Array.from(document.querySelectorAll('.reference-qa textarea'))
+                .map(el => el.value.trim())
+                .filter(val => val);
+        } else {
+            // 從試題庫獲取參考範例
+            const examples = getQuestionBankExamples(questionType, quantity);
+            refQAs = examples;
+            
+            // 為選擇題添加特殊指示
+            if (questionType === '選擇') {
+                specialInstructions = `
+注意：這是選擇題型，必須包含以下格式：
+1. 題目內容
+2. 4個選項（A、B、C、D）
+3. 正確答案（指明哪個選項）
+4. 答題步驟
+
+每個選擇題必須包含4個選項，選項應該合理且有一定的迷惑性。請確保每個選項都是完整的句子或短語。`;
+            }
+        }
+
+        const requestBody = {
+            model: MODEL,
+            messages: [
+                { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成${quantity}個相應的題目和答案：
+
+參考題目與答案：
+${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
+
+題型類別：${questionType}
+${specialInstructions}
+
+擬題篇章：
+${targetPassage}
+
+請為擬題篇章生成${quantity}個「${questionType}」題型的題目和答案。生成的題目應符合「${questionType}」題型的特點和要求。必須用繁體中文回應。
+
+${questionType === '選擇' ? `
+請嚴格按照以下格式輸出選擇題：
+題目1：[生成的題目1]
+選項1：
+A. [選項A]
+B. [選項B] 
+C. [選項C]
+D. [選項D]
+答案1：[正確選項字母] [選項內容]
+步驟1：[生成的步驟1]
+` : `
+請以以下格式輸出生成的題目、答案和步驟：
+題目1：[生成的題目1]
+答案1：[生成的答案1]
+步驟1：[生成的步驟1]
+`}
+
+其他要求保持不變...` }
+            ],
+            max_tokens: 64000
+        };
+
+        const response = await callAPI(requestBody);
+        const parsed = questionType === '選擇' ? 
+            parseChoiceResponse(response, quantity) : 
+            parseReadingResponse(response, quantity);
+        
+        // 為每個題目添加題型標籤
+        parsed.forEach(item => {
+            item.type = questionType;
+        });
+        
+        allQuestions = allQuestions.concat(parsed);
+    }
+    
+    displayReadingQuestions(allQuestions);
+}
+
+function parseChoiceResponse(response, count) {
+    const cleanResponse = removeThinkingTags(response);
+    const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
+    
+    const parsed = [];
+    
+    for (let i = 1; i <= count; i++) {
+        let question = '生成失敗，請檢查輸入內容並重試';
+        let options = [];
+        let answer = '生成失敗，請檢查輸入內容並重試';
+        let steps = '生成失敗，請檢查輸入內容並重試';
+        
+        for (let j = 0; j < lines.length; j++) {
+            const line = lines[j].trim();
+            
+            // 解析題目
+            if (line.startsWith(`題目${i}：`)) {
+                question = line.replace(`題目${i}：`, '').trim();
+            }
+            
+            // 解析選項
+            if (line.startsWith(`選項${i}：`)) {
+                let k = j + 1;
+                options = [];
+                while (k < lines.length) {
+                    const optionLine = lines[k].trim();
+                    if (optionLine.match(/^[A-D]\.\s/)) {
+                        options.push(optionLine);
+                        k++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            
+            // 解析答案
+            if (line.startsWith(`答案${i}：`)) {
+                answer = line.replace(`答案${i}：`, '').trim();
+            }
+            
+            // 解析步驟
+            if (line.startsWith(`步驟${i}：`)) {
+                steps = line.replace(`步驟${i}：`, '').trim();
+            }
+        }
+        
+        // 將選項添加到題目中
+        if (options.length > 0) {
+            question += '\n\n' + options.join('\n');
+        }
+        
+        parsed.push({ question, answer, steps });
+    }
+    
+    return parsed;
+}
+
+
 
         async function generateEssayQuestions() {
             const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
-            if (!mimicQuestion) {
-                alert('請輸入參考題目');
-                return;
-            }
             const quantity = document.getElementById('quantity').value;
-            loadingDiv.style.display = 'block';
-            generateBtn.disabled = true;
-            outputDiv.textContent = '';
 
             const requestBody = {
                 model: MODEL,
@@ -518,62 +2643,19 @@
                 max_tokens: 64000
             };
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
-                }
-
-                const data = await response.json();
-                let generatedQuestions = data.choices[0].message.content;
-                // 移除思考過程標籤
-                generatedQuestions = removeThinkingTags(generatedQuestions);
-                displayEssayQuestions(generatedQuestions);
-            } catch (error) {
-                console.error('錯誤：', error);
-                outputDiv.textContent = '生成題目時出錯，請稍後再試';
-            } finally {
-                loadingDiv.style.display = 'none';
-                generateBtn.disabled = false;
-            }
-        }
-
-        function displayEssayQuestions(questions) {
-            const trimmedQuestions = questions.trim();
-            const formattedQuestions = trimmedQuestions.split('\n').join('\n\n');
-            outputDiv.textContent = formattedQuestions;
+            const response = await callAPI(requestBody);
+            displayEssayQuestions(response);
         }
 
         async function generatePracticalQuestions() {
-            const selectedTopic = topicSelect.value;
+            const selectedTopic = document.getElementById('topicSelect').value;
             const refQuestion = document.getElementById('refQuestion').value.trim();
             const refMaterial1 = document.getElementById('refMaterial1').value.trim();
             const refMaterial2 = document.getElementById('refMaterial2').value.trim();
-            if (!refQuestion || !refMaterial1 || !refMaterial2) {
-                alert('請輸入所有參考內容');
-                return;
-            }
-            loadingDiv.style.display = 'block';
-            generateBtn.disabled = true;
-            outputDiv.innerHTML = '';
 
             let topicInstruction;
             if (selectedTopic === 'custom') {
-                const customTopic = customTopicInput.value.trim();
-                if (!customTopic) {
-                    alert('請輸入自訂主題');
-                    loadingDiv.style.display = 'none';
-                    generateBtn.disabled = false;
-                    return;
-                }
+                const customTopic = document.getElementById('customTopic').value.trim();
                 topicInstruction = `請以「${customTopic}」為主題。`;
             } else if (selectedTopic === 'random') {
                 topicInstruction = '請隨機選擇一個主題，且該主題必須與以下列出的所有主題（運動、生涯規劃、責任、教育、文化、社會、歷史、地理、藝術、體育、法律、健康、心理、家庭、友誼、愛情、就業、經濟、生態、能源、資源、安全、網路、媒體、資訊、道德、誠信、公平、自由、權利、義務、隱私、禮儀、榜樣、創新、創業、消費、儲蓄、民族、語言、宗教、傳統、現代、城鄉、社區、公益、慈善、災害、醫療、疾病、飲食、旅遊、建築、娛樂、音樂、電影、文學、人口、性別、年齡、職業、學業、考試、升學、校園、師生、同學、課外、社團、競賽、志願、壓力、自律、時間、興趣、習慣、遊戲、睡眠、氣候、汙染、閱讀）不同，例如可以選擇「科技發展」、「全球化」等其他主題。';
@@ -606,169 +2688,52 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
                 max_tokens: 8192
             };
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
-                }
-
-                const data = await response.json();
-                let generatedContent = data.choices[0].message.content;
-                // 移除思考過程標籤
-                generatedContent = removeThinkingTags(generatedContent);
-                const parsed = parsePracticalResponse(generatedContent);
-                if (parsed.question === '未生成' || parsed.material1 === '未生成' || parsed.material2 === '未生成') {
-                    outputDiv.textContent = '生成內容失敗，請重試';
-                } else {
-                    displayPracticalQuestions(parsed);
-                }
-            } catch (error) {
-                console.error('錯誤：', error);
-                outputDiv.textContent = '生成題目時出錯，請稍後再試';
-            } finally {
-                loadingDiv.style.display = 'none';
-                generateBtn.disabled = false;
-            }
+            const response = await callAPI(requestBody);
+            const parsed = parsePracticalResponse(response);
+            displayPracticalQuestions(parsed);
         }
 
-        function parsePracticalResponse(response) {
-            // 先移除可能的思考過程標籤
-            const cleanResponse = removeThinkingTags(response);
+        // API 調用函數
+        async function callAPI(requestBody) {
+            // 模擬進度更新
+            updateProgressBar(20);
             
-            // 使用更精確的分割方式
-            const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
-            
-            let question = '未生成';
-            let material1 = '未生成';
-            let material2 = '未生成';
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line.startsWith('題目：')) {
-                    question = line.replace('題目：', '').trim();
-                } else if (line.startsWith('資料一：')) {
-                    // 收集資料一的內容，可能跨多行
-                    let content = line.replace('資料一：', '').trim();
-                    let j = i + 1;
-                    while (j < lines.length && !lines[j].startsWith('資料二：') && !lines[j].startsWith('題目：')) {
-                        content += '\n' + lines[j].trim();
-                        j++;
-                    }
-                    material1 = content.trim();
-                    i = j - 1; // 調整循環索引
-                } else if (line.startsWith('資料二：')) {
-                    // 收集資料二的內容，可能跨多行
-                    let content = line.replace('資料二：', '').trim();
-                    let j = i + 1;
-                    while (j < lines.length && !lines[j].startsWith('題目：') && !lines[j].startsWith('資料一：')) {
-                        content += '\n' + lines[j].trim();
-                        j++;
-                    }
-                    material2 = content.trim();
-                    i = j - 1; // 調整循環索引
-                }
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            updateProgressBar(60);
+
+            if (!response.ok) {
+                throw new Error(`API請求失敗，狀態碼：${response.status}`);
             }
+
+            const data = await response.json();
+            updateProgressBar(90);
             
-            return { question, material1, material2 };
+            let generatedContent = data.choices[0].message.content;
+            generatedContent = removeThinkingTags(generatedContent);
+            
+            updateProgressBar(100);
+            
+            return generatedContent;
         }
 
-        function displayPracticalQuestions(parsed) {
-            outputDiv.innerHTML = `
-                <div class="outputSection">
-                    <h3>題目</h3>
-                    <p>${parsed.question}</p>
-                </div>
-                <div class="outputSection">
-                    <h3>資料一</h3>
-                    <p>${parsed.material1}</p>
-                </div>
-                <div class="outputSection">
-                    <h3>資料二</h3>
-                    <p>${parsed.material2}</p>
-                </div>
-            `;
-        }
-
-        async function generateReadingQuestions() {
-            const targetPassage = document.getElementById('targetPassage').value.trim();
-            const refQAElements = document.querySelectorAll('.refQuestionAnswer');
-            const refQAs = Array.from(refQAElements).map(el => el.value.trim()).filter(val => val);
-
-            if (!targetPassage || refQAs.length === 0) {
-                alert('請輸入擬題篇章和至少一個參考題目與答案');
-                return;
+        // 輔助函數
+        function removeThinkingTags(content) {
+            if (typeof content !== 'string') {
+                return content;
             }
-
-            loadingDiv.style.display = 'block';
-            generateBtn.disabled = true;
-            outputDiv.innerHTML = '';
-
-            const requestBody = {
-                model: MODEL,
-                messages: [
-                    { role: "system", content: "你是一個閱讀卷題目生成器。" },
-                    { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成相應的題目和答案：
-
-參考題目與答案：
-${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
-
-擬題篇章：
-${targetPassage}
-
-請為擬題篇章生成與參考題目數量相同的題目和答案。第一組生成的題目與答案應對應第一組參考題目與答案的形式和風格，第二組生成的題目與答案應對應第二組參考題目與答案的形式和風格，依此類推。生成的題目和答案應與對應的參考題目和答案在形式和風格上相似，但內容和題材必須不同。生成的題目不得包含答案內容，答案不得與其他題目混淆。由於是應試文章題目及答案，因此要避免過份具理論哲學性的字眼，必須減少概念模糊的術語，例如「情感載體」、「能動性」、「因果鏈條」、「辯證關係」、「時空的共創」，請用日常化用語。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
-
-請以以下格式輸出生成的題目和答案，且嚴格遵循此格式：
-題目1：[生成的題目1]
-答案1：[生成的答案1]
-題目2：[生成的題目2]
-答案2：[生成的答案2]
-...` }
-                ],
-                max_tokens: 8192
-            };
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API請求失敗，狀態碼：${response.status}`);
-                }
-
-                const data = await response.json();
-                let generatedContent = data.choices[0].message.content;
-                // 移除思考過程標籤
-                generatedContent = removeThinkingTags(generatedContent);
-                const parsed = parseReadingResponse(generatedContent, refQAs.length);
-                displayReadingQuestions(parsed);
-            } catch (error) {
-                console.error('錯誤：', error);
-                outputDiv.textContent = '生成題目時出錯，請稍後再試';
-            } finally {
-                loadingDiv.style.display = 'none';
-                generateBtn.disabled = false;
-            }
+            return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
         }
 
         function parseReadingResponse(response, count) {
-            // 先移除可能的思考過程標籤
             const cleanResponse = removeThinkingTags(response);
-            
-            // 將回應按行分割，並過濾空行
             const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
             
             const parsed = [];
@@ -776,34 +2741,29 @@ ${targetPassage}
             for (let i = 1; i <= count; i++) {
                 let question = '生成失敗，請檢查輸入內容並重試';
                 let answer = '生成失敗，請檢查輸入內容並重試';
+                let steps = '生成失敗，請檢查輸入內容並重試';
                 
-                // 尋找對應的題目和答案
                 for (let j = 0; j < lines.length; j++) {
                     const line = lines[j].trim();
                     
-                    // 尋找題目
                     if (line.startsWith(`題目${i}：`)) {
                         question = line.replace(`題目${i}：`, '').trim();
-                        // 如果題目內容為空，嘗試從下一行讀取
                         if (!question && j + 1 < lines.length) {
                             const nextLine = lines[j + 1].trim();
-                            if (!nextLine.startsWith('答案') && !nextLine.startsWith('題目')) {
+                            if (!nextLine.startsWith('答案') && !nextLine.startsWith('題目') && !nextLine.startsWith('步驟')) {
                                 question = nextLine;
                             }
                         }
                     }
                     
-                    // 尋找答案
                     if (line.startsWith(`答案${i}：`)) {
                         answer = line.replace(`答案${i}：`, '').trim();
-                        // 如果答案內容為空或很短，嘗試收集多行內容
                         if ((!answer || answer.length < 10) && j + 1 < lines.length) {
                             let answerContent = answer;
                             let k = j + 1;
                             while (k < lines.length) {
                                 const nextLine = lines[k].trim();
-                                // 如果遇到下一個題目或答案標籤，停止收集
-                                if (nextLine.startsWith('題目') || nextLine.startsWith('答案')) {
+                                if (nextLine.startsWith('題目') || nextLine.startsWith('答案') || nextLine.startsWith('步驟')) {
                                     break;
                                 }
                                 if (nextLine) {
@@ -816,42 +2776,285 @@ ${targetPassage}
                             }
                         }
                     }
+
+                    if (line.startsWith(`步驟${i}：`)) {
+                        steps = line.replace(`步驟${i}：`, '').trim();
+                        if ((!steps || steps.length < 5) && j + 1 < lines.length) {
+                            let stepsContent = steps;
+                            let k = j + 1;
+                            while (k < lines.length) {
+                                const nextLine = lines[k].trim();
+                                if (nextLine.startsWith('題目') || nextLine.startsWith('答案') || nextLine.startsWith('步驟')) {
+                                    break;
+                                }
+                                if (nextLine) {
+                                    stepsContent += (stepsContent ? '\n' : '') + nextLine;
+                                }
+                                k++;
+                            }
+                            if (stepsContent) {
+                                steps = stepsContent.trim();
+                            }
+                        }
+                    }
                 }
                 
-                // 確保題目和答案不為空且不相同
                 if (!question || question === answer) {
                     question = `題目${i}生成失敗，請檢查輸入內容並重試`;
                 }
                 if (!answer || answer === question) {
                     answer = `答案${i}生成失敗，請檢查輸入內容並重試`;
                 }
+                if (!steps || steps === question || steps === answer) {
+                    steps = `步驟${i}生成失敗，請檢查輸入內容並重試`;
+                }
                 
-                parsed.push({ question, answer });
+                parsed.push({ question, answer, steps });
             }
             
             return parsed;
         }
 
-        function displayReadingQuestions(parsed) {
-            outputDiv.innerHTML = parsed.map((item, index) => `
-                <div class="outputGroup">
-                    <span class="sequence">${index + 1}.</span>
-                    <div class="outputSection" style="flex: 1; margin-right: 10px;">
-                        <h3>題目</h3>
-                        <p>${item.question}</p>
+        function parsePracticalResponse(response) {
+            const cleanResponse = removeThinkingTags(response);
+            const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
+            
+            let question = '未生成';
+            let material1 = '未生成';
+            let material2 = '未生成';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.startsWith('題目：')) {
+                    question = line.replace('題目：', '').trim();
+                } else if (line.startsWith('資料一：')) {
+                    let content = line.replace('資料一：', '').trim();
+                    let j = i + 1;
+                    while (j < lines.length && !lines[j].startsWith('資料二：') && !lines[j].startsWith('題目：')) {
+                        content += '\n' + lines[j].trim();
+                        j++;
+                    }
+                    material1 = content.trim();
+                    i = j - 1;
+                } else if (line.startsWith('資料二：')) {
+                    let content = line.replace('資料二：', '').trim();
+                    let j = i + 1;
+                    while (j < lines.length && !lines[j].startsWith('題目：') && !lines[j].startsWith('資料一：')) {
+                        content += '\n' + lines[j].trim();
+                        j++;
+                    }
+                    material2 = content.trim();
+                    i = j - 1;
+                }
+            }
+            
+            return { question, material1, material2 };
+        }
+
+        // 顯示結果函數
+        function displayReadingQuestions(allQuestions) {
+            hideProgress();
+            
+            const questionsDisplay = document.getElementById('questionsDisplay');
+            questionsDisplay.innerHTML = '';
+
+            allQuestions.forEach((item, index) => {
+                const questionCard = createQuestionCard(
+                    `第${index + 1}題`,
+                    item.question,
+                    item.answer,
+                    item.steps,
+                    item.type || 'reading'
+                );
+                questionsDisplay.appendChild(questionCard);
+            });
+
+            showResult();
+        }
+
+        function displayEssayQuestions(questions) {
+            hideProgress();
+            
+            const questionsDisplay = document.getElementById('questionsDisplay');
+            questionsDisplay.innerHTML = '';
+
+            const trimmedQuestions = questions.trim();
+            const questionList = trimmedQuestions.split('\n').filter(q => q.trim());
+
+            questionList.forEach((question, index) => {
+                const questionCard = createQuestionCard(
+                    `第${index + 1}題`,
+                    question.trim(),
+                    null,
+                    null,
+                    'essay'
+                );
+                questionsDisplay.appendChild(questionCard);
+            });
+
+            showResult();
+        }
+
+        function displayPracticalQuestions(parsed) {
+            hideProgress();
+            
+            const questionsDisplay = document.getElementById('questionsDisplay');
+            questionsDisplay.innerHTML = '';
+
+            if (parsed.question === '未生成' || parsed.material1 === '未生成' || parsed.material2 === '未生成') {
+                showError('生成內容失敗，請重試');
+                return;
+            }
+
+            // 創建題目卡片
+            const titleCard = createQuestionCard('題目', parsed.question, null, null, 'practical');
+            questionsDisplay.appendChild(titleCard);
+
+            // 創建資料一卡片
+            const material1Card = createQuestionCard('資料一', parsed.material1, null, null, 'practical');
+            questionsDisplay.appendChild(material1Card);
+
+            // 創建資料二卡片
+            const material2Card = createQuestionCard('資料二', parsed.material2, null, null, 'practical');
+            questionsDisplay.appendChild(material2Card);
+
+            showResult();
+        }
+
+        function createQuestionCard(title, content, answer = null, steps = null, type = 'default') {
+            const card = document.createElement('div');
+            card.className = 'question-card p-10 shadow-2xl slide-up mb-12';
+            
+// 格式化選擇題內容
+    let formattedContent = content;
+    if (type === '選擇') {
+        // 確保選項有適當的縮排和格式
+        formattedContent = content.replace(/([A-D]\.\s)/g, '　　$1');
+    }
+
+
+            // 設定題型顏色
+            const typeColors = {
+                'reading': 'var(--primary-teal)',
+                'essay': 'var(--primary-blue)',
+                'practical': 'var(--primary-green)',
+                '複述': 'var(--primary-blue)',
+                '分析': 'var(--primary-green)',
+                '印證': 'var(--primary-purple)',
+                '闡明': 'var(--primary-amber)',
+                '意見': 'var(--primary-rose)',
+                '比較': 'var(--primary-indigo)'
+            };
+            
+            const typeColor = typeColors[type] || 'var(--primary-teal)';
+            
+            let cardHTML = `
+                <div class="flex items-center justify-between mb-8">
+                    <div class="question-title" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}80 100%);">
+                        <i class="fas fa-question-circle mr-4"></i>
+                        ${title}
                     </div>
-                    <div class="outputSection" style="flex: 1;">
-                        <h3>答案</h3>
-                        <p>${item.answer}</p>
-                    </div>
+                    <span class="px-6 py-3 rounded-full text-base font-bold text-white" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}CC 100%);">${type}</span>
                 </div>
-            `).join('');
+                <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 mb-8 border-2 border-gray-100">
+                    <div class="text-gray-800 leading-relaxed whitespace-pre-wrap text-lg font-medium">${content}</div>
+                </div>
+            `;
+
+            if (answer) {
+                cardHTML += `
+                    <div class="border-t-4 pt-8" style="border-color: var(--divider-color);">
+                        <button onclick="toggleAnswer(this)" class="flex items-center font-bold mb-6 transition-colors duration-300 text-xl hover:transform hover:scale-105" style="color: ${typeColor};">
+                            <i class="fas fa-eye mr-4"></i>顯示詳細答案
+                        </button>
+                        <div class="answer-content hidden">
+                            <div class="answer-section mb-6">
+                                <h4 class="font-bold mb-6 flex items-center text-xl" style="color: var(--primary-green);">
+                                    <i class="fas fa-lightbulb mr-4"></i>參考答案
+                                </h4>
+                                <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${answer}</div>
+                            </div>
+                `;
+                
+                if (steps) {
+                    cardHTML += `
+                            <div class="steps-section">
+                                <h4 class="font-bold mb-6 flex items-center text-xl" style="color: #7fb3d5;">
+                                    <i class="fas fa-list-ol mr-4"></i>答題步驟
+                                </h4>
+                                <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${steps}</div>
+                            </div>
+                    `;
+                }
+                
+                cardHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = cardHTML;
+            return card;
+        }
+
+        function showResult() {
+            mainContainer.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            
+            // 添加動畫延遲
+            const cards = document.querySelectorAll('.question-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.15}s`;
+            });
+        }
+
+        function toggleAnswer(button) {
+            const answerContent = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (answerContent.classList.contains('hidden')) {
+                answerContent.classList.remove('hidden');
+                button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
+button.style.color = '#85929e'; // 設置顏色
+                answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
+            } else {
+                answerContent.classList.add('hidden');
+                button.innerHTML = '<i class="fas fa-eye mr-4"></i>顯示詳細答案';
+button.style.color = '#cd6155'; // 設置顏色
+                answerContent.style.maxHeight = '0';
+            }
+        }
+
+        function goBack() {
+            resultContainer.classList.add('hidden');
+            mainContainer.classList.remove('hidden');
+        }
+
+        function regenerate() {
+            handleGenerate();
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-8 right-8 p-8 rounded-2xl shadow-2xl z-50 fade-in text-white max-w-md';
+            errorDiv.style.background = 'linear-gradient(135deg, var(--primary-rose) 0%, var(--secondary-rose) 100%)';
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-4 text-2xl"></i>
+                    <span class="text-lg font-semibold flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-6 text-white hover:text-gray-200 text-2xl transition-colors duration-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                if (errorDiv.parentElement) {
+                    errorDiv.remove();
+                }
+            }, 6000);
         }
     </script>
-
-    <footer class="copyright-footer">
-        <p>Copyright © 2025 陳冠健. All rights reserved.</p>
-    </footer>
-
 </body>
 </html>
