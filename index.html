@@ -41,6 +41,11 @@ body {
     font-size: 18px;
     background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
     background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 .copyright-footer {
@@ -49,6 +54,7 @@ body {
     right: 0;
     padding: 5px 10px;
     background-color: #f1f1f1;
+    z-index: 1000;
 }
 
 .copyright-footer p {
@@ -178,6 +184,7 @@ body {
     overflow: hidden;
     width: fit-content;
     margin: 0 auto;
+    max-width: 150px;
 }
 
 .quantity-btn {
@@ -192,6 +199,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 .quantity-btn:hover {
@@ -207,6 +215,7 @@ body {
     font-size: 18px;
     color: var(--primary-gray);
     background: transparent;
+    flex-shrink: 0;
 }
 
 .toggle-switch {
@@ -217,6 +226,7 @@ body {
     border-radius: 18px;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .toggle-switch.active {
@@ -423,285 +433,493 @@ textarea, input[type="text"] {
     font-weight: 600;
 }
 
-/* 平板 (768px - 1024px) */
-@media (max-width: 1024px) {
+/* 响应式设计 - 桌面端 */
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* 平板端优化 (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .floating-header h1 {
+        font-size: 3rem;
+    }
+    
+    .glass-card, .sidebar-card {
+        padding: 1.5rem;
+    }
+    
+    .question-type-container {
+        max-width: 100%;
+    }
+    
     .grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: 2rem;
     }
-
+    
     .xl\:col-span-1, .xl\:col-span-2 {
-        grid-column: span 1 / span 1;
+        grid-column: span 1;
     }
-
+    
+    .type-selector-btn {
+        padding: 1rem;
+    }
+    
     .floating-generate-btn {
         bottom: 20px;
         right: 20px;
         width: 60px;
         height: 60px;
-        font-size: 24px;
+        font-size: 20px;
     }
-
-    .text-item {
-        padding: 12px;
-    }
-
-    .text-item-title {
-        font-size: 16px;
-    }
-
-    .text-item-info {
-        font-size: 12px;
-    }
-
+    
     .quantity-control {
-        width: 100%;
+        max-width: 140px;
     }
-
+    
     .quantity-btn {
-        width: 30px;
-        height: 30px;
+        width: 35px;
+        height: 35px;
     }
-
+    
     .quantity-input {
         width: 50px;
         font-size: 16px;
     }
-
+    
     .toggle-switch {
         width: 60px;
-        height: 30px;
+        height: 32px;
     }
-
+    
     .toggle-slider {
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
     }
-
+    
     .toggle-switch.active .toggle-slider {
-        transform: translateX(30px);
+        transform: translateX(28px);
     }
-
-    .btn-primary, .btn-secondary, .btn-accent {
-        padding: 10px 20px;
-        font-size: 16px;
-    }
-
-    .question-card {
-        padding: 20px;
-    }
-
-    .question-title {
-        font-size: 18px;
-    }
-
-    .answer-section, .steps-section {
-        padding: 15px;
-    }
-
-    textarea, input[type="text"] {
-        font-size: 14px;
-    }
-
-    #targetPassage {
-        min-height: 250px !important;
-    }
-
-    .reference-qa textarea {
-        min-height: 150px !important;
+    
+    .text-library-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
 }
 
-/* 手機 (max-width: 767px) */
+/* 手机端优化 (max-width: 767px) */
 @media (max-width: 767px) {
+    body {
+        font-size: 14px;
+        padding: 0;
+        margin: 0;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    .container {
+        padding: 0 0.75rem;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    .floating-header {
+        padding: 1rem 0;
+    }
+    
+    .floating-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .floating-header .container {
+        padding: 0 1rem;
+    }
+    
+    /* 主要布局调整 - 单列布局 */
     .grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
-
+    
+    .xl\:col-span-1, .xl\:col-span-2 {
+        grid-column: span 1;
+    }
+    
+    /* 侧边栏卡片调整 - 减少AI擬题系統占比 */
+    .sidebar-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: static;
+    }
+    
+    .sidebar-card h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* 主要配置区域调整 */
+    .glass-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .glass-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* 题型选择器优化 */
+    .type-selector-btn {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .type-selector-btn i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .type-selector-btn div {
+        font-size: 0.875rem;
+    }
+    
+    /* 题型选择网格 */
+    .question-type-container .grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* 题型选择项优化 */
+    .question-type-selection {
+        padding: 0.75rem;
+        border-radius: 1rem;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .question-type-selection .flex {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .question-type-selection .toggle-switch {
+        width: 50px;
+        height: 28px;
+        margin: 0;
+    }
+    
+    .question-type-selection .toggle-slider {
+        width: 22px;
+        height: 22px;
+        top: 3px;
+        left: 3px;
+    }
+    
+    .question-type-selection.active .toggle-slider {
+        transform: translateX(22px);
+    }
+    
+    /* 数量控制器优化 - 修正宽度问题 */
+    .quantity-control {
+        width: auto;
+        max-width: 120px;
+        margin: 0.5rem auto 0;
+        justify-content: center;
+    }
+    
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        font-size: 14px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    /* 浮动生成按钮 */
     .floating-generate-btn {
         bottom: 15px;
         right: 15px;
         width: 50px;
         height: 50px;
-        font-size: 20px;
+        font-size: 18px;
     }
-
+    
+    /* 文本库网格 */
+    .text-library-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        max-height: 300px;
+    }
+    
     .text-item {
-        padding: 10px;
+        padding: 0.75rem;
     }
-
+    
     .text-item-title {
-        font-size: 14px;
+        font-size: 1rem;
     }
-
+    
     .text-item-info {
-        font-size: 10px;
+        font-size: 0.75rem;
     }
-
-    .quantity-control {
+    
+    /* 表单元素 */
+    textarea, input[type="text"], select {
+        font-size: 16px;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
         width: 100%;
+        max-width: 100%;
     }
+    
+    #targetPassage {
+        min-height: 200px !important;
+    }
+    
+    .reference-qa textarea {
+        min-height: 120px !important;
+    }
+    
+    /* 按钮调整 */
+    .btn-primary, .btn-secondary, .btn-accent {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    /* 参考题目控制按钮 */
+    .reference-qa .flex {
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .reference-qa .w-14 {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    /* 问题卡片 */
+    .question-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .question-title {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .answer-section, .steps-section {
+        padding: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    
+    /* 进度模态框 */
+    .progress-ring {
+        width: 80px;
+        height: 80px;
+    }
+    
+    #progressPercent {
+        font-size: 1.25rem;
+    }
+    
+    #timeRemaining {
+        font-size: 1rem;
+    }
+    
+    /* 结果页面 */
+    .result-page .btn-primary, .result-page .btn-secondary {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+        width: auto;
+        min-width: 120px;
+    }
+    
+    /* 版权信息 */
+    .copyright-footer {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    /* 确保没有横向滚动 */
+    .overflow-x-hidden {
+        overflow-x: hidden;
+    }
+    
+    /* 标签和标题调整 */
+    label {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 空间和边距优化 */
+    .space-y-4 > * + * {
+        margin-top: 0.75rem;
+    }
+    
+    .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-10 > * + * {
+        margin-top: 1.5rem;
+    }
+    
+    .mb-10 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .mb-8 {
+        margin-bottom: 1rem;
+    }
+    
+    .mb-6 {
+        margin-bottom: 0.75rem;
+    }
+    
+    .py-12 {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    .p-10 {
+        padding: 1rem;
+    }
+    
+    .p-8 {
+        padding: 0.75rem;
+    }
+    
+    .p-6 {
+        padding: 0.5rem;
+    }
+    
+    /* 自定义题型区域 */
+    .col-span-full {
+        grid-column: 1 / -1;
+    }
+    
+    /* 长文写作配置 */
+    .range-slider {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+    
+    /* 实用文配置 */
+    select option {
+        font-size: 16px;
+    }
+}
 
+/* 超小屏幕优化 (max-width: 480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .floating-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .glass-card, .sidebar-card {
+        padding: 0.75rem;
+        border-radius: 1rem;
+    }
+    
+    .question-type-selection {
+        padding: 0.5rem;
+    }
+    
+    .quantity-control {
+        max-width: 100px;
+    }
+    
     .quantity-btn {
         width: 25px;
         height: 25px;
     }
-
+    
     .quantity-input {
-        width: 40px;
-        font-size: 14px;
+        width: 35px;
+        font-size: 12px;
     }
-
-    .toggle-switch {
-        width: 50px;
-        height: 25px;
-    }
-
-    .toggle-slider {
-        width: 20px;
-        height: 20px;
-    }
-
-    .toggle-switch.active .toggle-slider {
-        transform: translateX(25px);
-    }
-
-    .btn-primary, .btn-secondary, .btn-accent {
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-
-    .question-card {
-        padding: 15px;
-    }
-
-    .question-title {
+    
+    .floating-generate-btn {
+        width: 45px;
+        height: 45px;
         font-size: 16px;
+        bottom: 10px;
+        right: 10px;
     }
+}
 
-    .answer-section, .steps-section {
-        padding: 10px;
-    }
-
-    textarea, input[type="text"] {
-        font-size: 12px;
-    }
-
-    #targetPassage {
-        min-height: 200px !important;
-    }
-
-    .reference-qa textarea {
-        min-height: 120px !important;
-    }
-
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
     .floating-header {
-        padding: 20px 0;
+        position: relative;
     }
-
+    
     .floating-header h1 {
-        font-size: 2.5rem;
-    }
-
-    .config-panel {
-        padding: 20px;
-    }
-
-    .glass-card {
-        padding: 20px;
-    }
-
-    .sidebar-card {
-        padding: 20px;
-    }
-
-    .type-selector-btn {
-        padding: 15px;
-    }
-
-    .type-selector-btn i {
-        font-size: 2rem;
-    }
-
-    .type-selector-btn div {
-        font-size: 1rem;
-    }
-
-    .question-type-selection {
-        padding: 15px;
-    }
-
-    .question-type-selection .toggle-switch {
-        width: 40px;
-        height: 20px;
-    }
-
-    .question-type-selection .toggle-slider {
-        width: 16px;
-        height: 16px;
-    }
-
-    .question-type-selection.active .toggle-slider {
-        transform: translateX(20px);
-    }
-
-    .question-type-selection .quantity-control {
-        margin-top: 10px;
-    }
-
-    .question-type-selection .quantity-btn {
-        width: 20px;
-        height: 20px;
-    }
-
-    .question-type-selection .quantity-input {
-        width: 30px;
-        font-size: 12px;
-    }
-
-    .progress-ring {
-        width: 100px;
-        height: 100px;
-    }
-
-    .progress-ring-circle {
-        r: 45;
-    }
-
-    #progressPercent {
-        font-size: 2rem;
-    }
-
-    #timeRemaining {
         font-size: 1.5rem;
+        margin-bottom: 0.25rem;
     }
-
-    .result-page .btn-primary, .result-page .btn-secondary {
-        padding: 10px 20px;
-        font-size: 1rem;
+    
+    .py-12 {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
-
-    .result-page .question-card {
-        margin-bottom: 20px;
+    
+    .sidebar-card {
+        position: static;
+        margin-bottom: 1rem;
     }
+}
 
-    .result-page .question-title {
-        font-size: 1.25rem;
+/* 确保内容区域不会超出视口 */
+@media (max-width: 767px) {
+    .min-h-screen {
+        min-height: 100vh;
+        width: 100vw;
+        max-width: 100vw;
+        overflow-x: hidden;
     }
-
-    .result-page .answer-section, .result-page .steps-section {
-        padding: 10px;
+    
+    body, html {
+        overflow-x: hidden;
+        max-width: 100vw;
     }
-
-    .result-page .answer-section h4, .result-page .steps-section h4 {
-        font-size: 1.1rem;
-    }
-
-    .result-page .answer-content {
-        font-size: 0.9rem;
-    }
-
-    .copyright-footer p {
-        font-size: 12px;
+    
+    * {
+        max-width: 100%;
+        word-wrap: break-word;
     }
 }
     </style>
