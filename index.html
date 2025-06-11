@@ -43,6 +43,25 @@
             background-attachment: fixed;
         }
 
+ .copyright-footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+        }
+
+        .copyright-footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .copyright-footer p {
+                font-size: 12px;
+            }
+        }
+        
         .divider {
             height: 1px;
             background: linear-gradient(135deg, #a9cce3 0%, #d4e6f1 100%);
@@ -970,10 +989,7 @@
         </div>
     </div>
 
-    <!-- Copyright Footer -->
-    <div class="fixed bottom-8 left-8 sidebar-card px-6 py-3 shadow-xl z-40">
-        <p class="text-base text-gray-700 font-semibold">Copyright © 2025 陳冠健. All rights reserved.</p>
-    </div>
+ 
 
     <script>
         // 範文庫資料
@@ -3056,5 +3072,12 @@ button.style.color = '#cd6155'; // 設置顏色
             }, 6000);
         }
     </script>
+
+   <!-- Copyright Footer -->
+   <footer class="copyright-footer">
+        <p>Copyright © 2025 陳冠健. All rights reserved.</p>
+    </footer>
+
+    
 </body>
 </html>
