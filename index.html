@@ -178,13 +178,16 @@ body {
 .quantity-control {
     display: flex;
     align-items: center;
+    justify-content: center;
     background: white;
     border: 2px solid var(--accent-gray);
     border-radius: 12px;
     overflow: hidden;
-    width: fit-content;
-    margin: 0 auto;
+    width: auto;
     max-width: 150px;
+    margin: 0 auto;
+    padding: 0;
+    gap: 0;
 }
 
 .quantity-btn {
@@ -200,11 +203,8 @@ body {
     transition: all 0.3s ease;
     font-weight: 600;
     flex-shrink: 0;
-}
-
-.quantity-btn:hover {
-    background: linear-gradient(135deg, var(--secondary-indigo) 0%, var(--accent-indigo) 100%);
-    transform: scale(1.05);
+    margin: 0;
+    padding: 0;
 }
 
 .quantity-input {
@@ -216,6 +216,52 @@ body {
     color: var(--primary-gray);
     background: transparent;
     flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    height: 40px;
+    line-height: 40px;
+}
+
+/* 平板設備 */
+@media (max-width: 1023px) {
+    .quantity-control {
+        max-width: 120px;
+        height: 40px;
+    }
+
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .quantity-input {
+        width: 50px;
+        font-size: 16px;
+        height: 35px;
+        line-height: 35px;
+    }
+}
+
+/* 手機設備 */
+@media (max-width: 767px) {
+    .quantity-control {
+        max-width: 100px;
+        height: 35px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .quantity-input {
+        width: 40px;
+        font-size: 14px;
+        height: 30px;
+        line-height: 30px;
+    }
 }
 
 .toggle-switch {
@@ -251,7 +297,7 @@ body {
 
 .floating-generate-btn {
     position: fixed;
-    bottom: 30px;
+    bottom: 40px;
     right: 30px;
     z-index: 1000;
     width: 80px;
@@ -269,9 +315,25 @@ body {
     font-size: 28px;
 }
 
-.floating-generate-btn:hover {
-    transform: translateY(-5px) scale(1.1);
-    box-shadow: 0 25px 50px rgba(225, 29, 72, 0.5);
+/* 平板設備 */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .floating-generate-btn {
+        bottom: 30px;
+        width: 70px;
+        height: 70px;
+        font-size: 24px;
+    }
+}
+
+/* 手機設備 */
+@media (max-width: 767px) {
+    .floating-generate-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+    }
 }
 
 .progress-ring {
