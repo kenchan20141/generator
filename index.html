@@ -3817,19 +3817,21 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             });
         }
 
-      function toggleAnswer(button, typeColor) {
+     function toggleAnswer(button, typeColor) {
     const answerContent = button.nextElementSibling;
     const icon = button.querySelector('i');
     
     if (answerContent.classList.contains('hidden')) {
         answerContent.classList.remove('hidden');
         button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
-        button.style.color = '#85929e'; // 隱藏時使用灰色
+        // 修訂處：移除顏色切換，保持 typeColor
+        button.style.color = typeColor;
         answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
     } else {
         answerContent.classList.add('hidden');
         button.innerHTML = '<i class="fas fa-eye mr-4"></i>顯示詳細答案';
-        button.style.color = typeColor; // 顯示時使用題型顏色
+        // 修訂處：移除顏色切換，保持 typeColor
+        button.style.color = typeColor;
         answerContent.style.maxHeight = '0';
     }
 }
