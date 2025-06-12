@@ -329,7 +329,8 @@ body {
 /* 手機設備 */
 @media (max-width: 767px) {
     .floating-generate-btn {
-        bottom: 50px; /* 修訂為50px，與桌面端一致 */
+        position: fixed;
+        bottom: 50px;
         right: 15px;
         width: 50px;
         height: 50px;
@@ -337,11 +338,6 @@ body {
     }
 }
 
-        @media (max-width: 767px) {
-    div .floating-generate-btn {
-        bottom: 50px;
-    }
-}
 
 /* 更小的手機設備 */
 @media (max-width: 480px) {
