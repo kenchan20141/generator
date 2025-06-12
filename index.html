@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -1865,7 +1868,7 @@ textarea, input[type="text"] {
                 "description": "選擇題型，要求考生從多個選項中選擇正確答案。",
                 "examples": [
                     {
-                        "question": "試根據〈論仁、論孝、論君子〉，判斷以下陳述。\n(1) 孔子認為當父母犯錯時，子女應直接地指出他們的過錯。\n(2) 孔子認為子女供養父母時，不存恭敬的心，便應感到羞恥。",
+                        "question": "試根據〈論仁、論孝、論君子〉，判斷以下陳述。(1) 孔子認為當父母犯錯時，子女應直接地指出他們的過錯。(2) 孔子認為子女供養父母時，不存恭敬的心，便應感到羞恥。",
                         "options": [
                             "(1) A正確 (2) A正確",
                             "(1) A正確 (2) B錯誤", 
@@ -1891,7 +1894,7 @@ textarea, input[type="text"] {
                         "steps": "分析『克己復禮』的含義：『克己』指克制自己的私慾，『復禮』指使行為符合禮法，C選項最準確地概括此意。"
                     },
                     {
-                        "question": "綜合全篇，以下哪些對仁者的描述是正確的？\n(1) 仁者能長期處於窮困或安樂的環境之中。\n(2) 仁者明白實行仁德的好處，於是實行仁德。\n(3) 仁者能時刻堅持仁德。\n(4) 仁者能克制私欲。",
+                        "question": "綜合全篇，以下哪些對仁者的描述是正確的？(1) 仁者能長期處於窮困或安樂的環境之中。(2) 仁者明白實行仁德的好處，於是實行仁德n(3) 仁者能時刻堅持仁德。(4) 仁者能克制私欲。",
                         "options": [
                             "(1)、(2)",
                             "(1)、(3)、(4)",
@@ -1917,7 +1920,7 @@ textarea, input[type="text"] {
                         "steps": "根據《逍遙遊》，狸狌『東西跳梁』，最終『死於罔罟』，象徵自以為聰明卻自陷困境的人，B最貼切。"
                     },
                     {
-                        "question": "以下引文中運用了甚麼修辭手法？\n「今夫斄牛，其大若垂天之雲；此能為大矣，而不能執鼠。」\n(1) 對偶 (2) 比喻 (3) 誇張 (4) 對比",
+                        "question": "「今夫斄牛，其大若垂天之雲；此能為大矣，而不能執鼠」中運用了甚麼修辭手法？(1) 對偶 (2) 比喻 (3) 誇張 (4) 對比",
                         "options": [
                             "(1)、(4)",
                             "(2)、(3)",
@@ -1956,7 +1959,7 @@ textarea, input[type="text"] {
                         "steps": "根據《逍遙遊》，『樗』因無用而不被砍伐，得享天年，A最符合此意。"
                     },
                     {
-                        "question": "莊子認為『樗』有何用途？\n(1) 可供人休憩 (2) 可種在廣漠曠野 (3) 可讓其他生物侵蝕 (4) 可被人砍伐",
+                        "question": "莊子認為『樗』有何用途？(1) 可供人休憩 (2) 可種在廣漠曠野 (3) 可讓其他生物侵蝕 (4) 可被人砍伐",
                         "options": [
                             "(1)、(2)",
                             "(1)、(3)",
@@ -1969,7 +1972,7 @@ textarea, input[type="text"] {
                         "steps": "文本指『樗』可『逍遙乎寢臥其下』及種於『廣莫之野』，(1)(2)正確，(3)(4)無據。"
                     },
                     {
-                        "question": "以下哪些是荀子提倡的學習態度？\n(1) 不斷累積 (2) 不恥下問 (3) 持之以恆 (4) 專心一致",
+                        "question": "以下哪些是荀子提倡的學習態度？(1) 不斷累積 (2) 不恥下問 (3) 持之以恆 (4) 專心一致",
                         "options": [
                             "(2)、(4)",
                             "(1)、(2)、(3)",
@@ -3082,28 +3085,46 @@ textarea, input[type="text"] {
                 .map(el => el.value.trim())
                 .filter(val => val);
         } else {
-            // 從試題庫獲取參考範例
             const examples = getQuestionBankExamples(questionType, quantity);
             refQAs = examples;
             
-            // 為選擇題添加特殊指示
             if (questionType === '選擇') {
                 specialInstructions = `
-注意：這是選擇題型，必須包含以下格式：
-1. 題目內容
-2. 4個選項（A、B、C、D）
-3. 正確答案（指明哪個選項）
-4. 答題步驟
+重要提醒：這是選擇題型，必須嚴格按照以下格式輸出：
 
-每個選擇題必須包含4個選項，選項應該合理且有相當高的迷惑性。請確保每個選項都是完整的句子或短語。`;
+題目[編號]：[題目內容]
+
+選擇題選項容器：
+A. [選項A內容]
+B. [選項B內容]
+C. [選項C內容]
+D. [選項D內容]
+
+答案[編號]：[正確選項字母] [正確選項完整內容]
+步驟[編號]：[答題步驟說明]
+
+每個選擇題必須包含：
+1. 完整的題目內容
+2. 4個選項（A、B、C、D），選項應該合理且有相當高的迷惑性
+3. 正確答案（明確標明選項字母和內容）
+4. 詳細的答題步驟
+
+選項必須放在「選擇題選項容器」下方，確保格式正確。`;
             }
         }
 
-        const requestBody = {
-            model: MODEL,
-            messages: [
-                { role: "system", content: "你是一個閱讀卷題目生成器。" },
-                { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成${quantity}個相應的題目和答案：
+        // 重試機制：最多重試3次直到生成成功
+        let parsed = [];
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        while (retryCount < maxRetries) {
+            try {
+                const requestBody = {
+                    model: MODEL,
+                    messages: [
+                        { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                        { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成${quantity}個相應的題目和答案：
 
 參考題目與答案：
 ${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
@@ -3117,15 +3138,31 @@ ${targetPassage}
 請為擬題篇章生成${quantity}個「${questionType}」題型的題目和答案。生成的題目應符合「${questionType}」題型的特點和要求。必須用繁體中文回應。
 
 ${questionType === '選擇' ? `
-請嚴格按照以下格式輸出選擇題：
-題目1：[生成的題目1]
-選項1：
-A. [選項A]
-B. [選項B] 
-C. [選項C]
-D. [選項D]
-答案1：[正確選項字母] [選項內容]
-步驟1：[生成的步驟1]
+請嚴格按照以下格式輸出選擇題，絕對不能偏離：
+
+題目1：[生成的題目1內容]
+
+選擇題選項容器：
+A. [選項A內容]
+B. [選項B內容]
+C. [選項C內容]
+D. [選項D內容]
+
+答案1：[正確選項字母] [正確選項完整內容]
+步驟1：[答題步驟說明]
+
+題目2：[生成的題目2內容]
+
+選擇題選項容器：
+A. [選項A內容]
+B. [選項B內容]
+C. [選項C內容]
+D. [選項D內容]
+
+答案2：[正確選項字母] [正確選項完整內容]
+步驟2：[答題步驟說明]
+
+（依此類推生成所有題目）
 ` : `
 請以以下格式輸出生成的題目、答案和步驟：
 題目1：[生成的題目1]
@@ -3135,14 +3172,51 @@ D. [選項D]
 
 生成的題目和答案應與參考題目和答案在形式和風格上相似，但內容和題材必須不同。生成的題目不得包含答案內容，答案不得與其他題目混淆。除非題目提及「摘錄」，否則生成的答案中不得直接引用原文文本依據，必須將其原文文本依據的語譯自然無痕地融入到答案之中。4分或以上的題目，生成的答案字數必須強制控制在210字左右。由於是應試文章題目及答案，因此要避免過份具理論哲學性的字眼，必須減少概念模糊的術語，例如「情感載體」、「能動性」、「因果鏈條」、「辯證關係」、「時空的共創」，請用日常化用語。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 ` }
-            ],
-            max_tokens: 64000
-        };
+                    ],
+                    max_tokens: 64000
+                };
 
-        const response = await callAPI(requestBody);
-        const parsed = questionType === '選擇' ? 
-            parseChoiceResponse(response, quantity) : 
-            parseReadingResponse(response, quantity);
+                const response = await callAPI(requestBody);
+                parsed = questionType === '選擇' ? 
+                    parseChoiceResponse(response, quantity) : 
+                    parseReadingResponse(response, quantity);
+                
+                // 檢查是否有生成失敗的題目
+                const hasFailure = parsed.some(item => 
+                    item.question.includes('生成失敗') || 
+                    item.answer.includes('生成失敗') || 
+                    item.steps.includes('生成失敗') ||
+                    item.question.includes('未生成') ||
+                    item.answer.includes('未生成') ||
+                    item.steps.includes('未生成') ||
+                    !item.question.trim() ||
+                    !item.answer.trim() ||
+                    !item.steps.trim()
+                );
+                
+                if (!hasFailure) {
+                    // 生成成功，跳出重試循環
+                    break;
+                } else {
+                    retryCount++;
+                    console.log(`${questionType}題型第${retryCount}次重試`);
+                    if (retryCount >= maxRetries) {
+                        console.error(`${questionType}題型重試${maxRetries}次後仍然失敗`);
+                    }
+                }
+            } catch (error) {
+                retryCount++;
+                console.error(`${questionType}題型生成錯誤，第${retryCount}次重試:`, error);
+                if (retryCount >= maxRetries) {
+                    // 最終失敗，使用錯誤信息
+                    parsed = Array(quantity).fill().map((_, i) => ({
+                        question: `題目${i+1}生成失敗，請檢查網路連接並重試`,
+                        answer: `答案${i+1}生成失敗，請檢查網路連接並重試`,
+                        steps: `步驟${i+1}生成失敗，請檢查網路連接並重試`
+                    }));
+                }
+            }
+        }
         
         // 為每個題目添加題型標籤
         parsed.forEach(item => {
@@ -3155,6 +3229,7 @@ D. [選項D]
     displayReadingQuestions(allQuestions);
 }
 
+
 function parseChoiceResponse(response, count) {
     const cleanResponse = removeThinkingTags(response);
     const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
@@ -3162,10 +3237,15 @@ function parseChoiceResponse(response, count) {
     const parsed = [];
     
     for (let i = 1; i <= count; i++) {
-        let question = '生成失敗，請檢查輸入內容並重試';
+        let question = '';
         let options = [];
-        let answer = '生成失敗，請檢查輸入內容並重試';
-        let steps = '生成失敗，請檢查輸入內容並重試';
+        let answer = '';
+        let steps = '';
+        
+        let questionFound = false;
+        let optionsFound = false;
+        let answerFound = false;
+        let stepsFound = false;
         
         for (let j = 0; j < lines.length; j++) {
             const line = lines[j].trim();
@@ -3173,10 +3253,12 @@ function parseChoiceResponse(response, count) {
             // 解析題目
             if (line.startsWith(`題目${i}：`)) {
                 question = line.replace(`題目${i}：`, '').trim();
+                questionFound = true;
+                continue;
             }
             
-            // 解析選項
-            if (line.startsWith(`選項${i}：`)) {
+            // 解析選項容器
+            if (line === '選擇題選項容器：' && questionFound && !optionsFound) {
                 let k = j + 1;
                 options = [];
                 while (k < lines.length) {
@@ -3188,25 +3270,51 @@ function parseChoiceResponse(response, count) {
                         break;
                     }
                 }
+                optionsFound = true;
+                j = k - 1;
+                continue;
             }
             
             // 解析答案
-            if (line.startsWith(`答案${i}：`)) {
+            if (line.startsWith(`答案${i}：`) && questionFound) {
                 answer = line.replace(`答案${i}：`, '').trim();
+                answerFound = true;
+                continue;
             }
             
             // 解析步驟
-            if (line.startsWith(`步驟${i}：`)) {
+            if (line.startsWith(`步驟${i}：`) && questionFound) {
                 steps = line.replace(`步驟${i}：`, '').trim();
+                stepsFound = true;
+                continue;
             }
         }
         
-        // 將選項添加到題目中
-        if (options.length > 0) {
-            question += '\n\n' + options.join('\n');
+        // 檢查生成是否完整，若有任何部分失敗則標記為生成失敗
+        if (!questionFound || !question) {
+            question = '生成失敗，請檢查輸入內容並重試';
+        }
+        if (!optionsFound || options.length === 0) {
+            options = ['A. 生成失敗', 'B. 生成失敗', 'C. 生成失敗', 'D. 生成失敗'];
+        }
+        if (!answerFound || !answer) {
+            answer = '生成失敗，請檢查輸入內容並重試';
+        }
+        if (!stepsFound || !steps) {
+            steps = '生成失敗，請檢查輸入內容並重試';
         }
         
-        parsed.push({ question, answer, steps });
+        // 構建完整的題目內容：題目 + 選項
+        let fullQuestion = question;
+        if (options.length > 0) {
+            fullQuestion += '\n\n選項：\n' + options.join('\n');
+        }
+        
+        parsed.push({ 
+            question: fullQuestion, 
+            answer, 
+            steps 
+        });
     }
     
     return parsed;
@@ -3214,10 +3322,18 @@ function parseChoiceResponse(response, count) {
 
 
 
-        async function generateEssayQuestions() {
-            const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
-            const quantity = document.getElementById('quantity').value;
 
+
+       async function generateEssayQuestions() {
+    const mimicQuestion = document.getElementById('mimicQuestion').value.trim();
+    const quantity = document.getElementById('quantity').value;
+
+    let retryCount = 0;
+    const maxRetries = 3;
+    let response = '';
+    
+    while (retryCount < maxRetries) {
+        try {
             const requestBody = {
                 model: MODEL,
                 messages: [
@@ -3227,26 +3343,56 @@ function parseChoiceResponse(response, count) {
                 max_tokens: 64000
             };
 
-            const response = await callAPI(requestBody);
-            displayEssayQuestions(response);
+            response = await callAPI(requestBody);
+            
+            // 檢查是否生成成功
+            const trimmedResponse = response.trim();
+            if (trimmedResponse && 
+                !trimmedResponse.includes('生成失敗') && 
+                !trimmedResponse.includes('未生成') &&
+                trimmedResponse.length > 10) {
+                break; // 生成成功，跳出重試循環
+            } else {
+                retryCount++;
+                console.log(`長文寫作第${retryCount}次重試`);
+                if (retryCount >= maxRetries) {
+                    response = '生成失敗，請檢查輸入內容並重試';
+                }
+            }
+        } catch (error) {
+            retryCount++;
+            console.error(`長文寫作生成錯誤，第${retryCount}次重試:`, error);
+            if (retryCount >= maxRetries) {
+                response = '生成失敗，請檢查網路連接並重試';
+            }
         }
+    }
+    
+    displayEssayQuestions(response);
+}
 
         async function generatePracticalQuestions() {
-            const selectedTopic = document.getElementById('topicSelect').value;
-            const refQuestion = document.getElementById('refQuestion').value.trim();
-            const refMaterial1 = document.getElementById('refMaterial1').value.trim();
-            const refMaterial2 = document.getElementById('refMaterial2').value.trim();
+    const selectedTopic = document.getElementById('topicSelect').value;
+    const refQuestion = document.getElementById('refQuestion').value.trim();
+    const refMaterial1 = document.getElementById('refMaterial1').value.trim();
+    const refMaterial2 = document.getElementById('refMaterial2').value.trim();
 
-            let topicInstruction;
-            if (selectedTopic === 'custom') {
-                const customTopic = document.getElementById('customTopic').value.trim();
-                topicInstruction = `請以「${customTopic}」為主題。`;
-            } else if (selectedTopic === 'random') {
-                topicInstruction = '請隨機選擇一個主題，且該主題必須與以下列出的所有主題（運動、生涯規劃、責任、教育、文化、社會、歷史、地理、藝術、體育、法律、健康、心理、家庭、友誼、愛情、就業、經濟、生態、能源、資源、安全、網路、媒體、資訊、道德、誠信、公平、自由、權利、義務、隱私、禮儀、榜樣、創新、創業、消費、儲蓄、民族、語言、宗教、傳統、現代、城鄉、社區、公益、慈善、災害、醫療、疾病、飲食、旅遊、建築、娛樂、音樂、電影、文學、人口、性別、年齡、職業、學業、考試、升學、校園、師生、同學、課外、社團、競賽、志願、壓力、自律、時間、興趣、習慣、遊戲、睡眠、氣候、汙染、閱讀）不同，例如可以選擇「科技發展」、「全球化」等其他主題。';
-            } else {
-                topicInstruction = `請以「${selectedTopic}」為主題。`;
-            }
+    let topicInstruction;
+    if (selectedTopic === 'custom') {
+        const customTopic = document.getElementById('customTopic').value.trim();
+        topicInstruction = `請以「${customTopic}」為主題。`;
+    } else if (selectedTopic === 'random') {
+        topicInstruction = '請隨機選擇一個主題，且該主題必須與以下列出的所有主題（運動、生涯規劃、責任、教育、文化、社會、歷史、地理、藝術、體育、法律、健康、心理、家庭、友誼、愛情、就業、經濟、生態、能源、資源、安全、網路、媒體、資訊、道德、誠信、公平、自由、權利、義務、隱私、禮儀、榜樣、創新、創業、消費、儲蓄、民族、語言、宗教、傳統、現代、城鄉、社區、公益、慈善、災害、醫療、疾病、飲食、旅遊、建築、娛樂、音樂、電影、文學、人口、性別、年齡、職業、學業、考試、升學、校園、師生、同學、課外、社團、競賽、志願、壓力、自律、時間、興趣、習慣、遊戲、睡眠、氣候、汙染、閱讀）不同，例如可以選擇「科技發展」、「全球化」等其他主題。';
+    } else {
+        topicInstruction = `請以「${selectedTopic}」為主題。`;
+    }
 
+    let parsed = { question: '未生成', material1: '未生成', material2: '未生成' };
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+        try {
             const requestBody = {
                 model: MODEL,
                 messages: [
@@ -3273,9 +3419,43 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             };
 
             const response = await callAPI(requestBody);
-            const parsed = parsePracticalResponse(response);
-            displayPracticalQuestions(parsed);
+            parsed = parsePracticalResponse(response);
+            
+            // 檢查是否生成成功
+            if (parsed.question !== '未生成' && 
+                parsed.material1 !== '未生成' && 
+                parsed.material2 !== '未生成' &&
+                parsed.question.trim() &&
+                parsed.material1.trim() &&
+                parsed.material2.trim()) {
+                break; // 生成成功，跳出重試循環
+            } else {
+                retryCount++;
+                console.log(`實用文第${retryCount}次重試`);
+                if (retryCount >= maxRetries) {
+                    parsed = {
+                        question: '生成失敗，請檢查輸入內容並重試',
+                        material1: '生成失敗，請檢查輸入內容並重試',
+                        material2: '生成失敗，請檢查輸入內容並重試'
+                    };
+                }
+            }
+        } catch (error) {
+            retryCount++;
+            console.error(`實用文生成錯誤，第${retryCount}次重試:`, error);
+            if (retryCount >= maxRetries) {
+                parsed = {
+                    question: '生成失敗，請檢查網路連接並重試',
+                    material1: '生成失敗，請檢查網路連接並重試',
+                    material2: '生成失敗，請檢查網路連接並重試'
+                };
+            }
         }
+    }
+    
+    displayPracticalQuestions(parsed);
+}
+
 
         // API 調用函數
         async function callAPI(requestBody) {
@@ -3506,80 +3686,125 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
         }
 
         function createQuestionCard(title, content, answer = null, steps = null, type = 'default') {
-            const card = document.createElement('div');
-            card.className = 'question-card p-10 shadow-2xl slide-up mb-12';
-            
-// 格式化選擇題內容
+    const card = document.createElement('div');
+    card.className = 'question-card p-10 shadow-2xl slide-up mb-12';
+    
+    // 格式化選擇題內容
     let formattedContent = content;
     if (type === '選擇') {
-        // 確保選項有適當的縮排和格式
-        formattedContent = content.replace(/([A-D]\.\s)/g, '　　$1');
+        // 為選擇題選項添加特殊樣式
+        formattedContent = content.replace(/選項：\n/g, '<div class="choice-options-container"><h4 class="choice-options-title">選項：</h4>');
+        formattedContent = formattedContent.replace(/([A-D]\.\s[^\n]+)/g, '<div class="choice-option">$1</div>');
+        if (formattedContent.includes('choice-options-container')) {
+            formattedContent += '</div>';
+        }
     }
 
+    // 設定題型顏色
+    const typeColors = {
+        'reading': 'var(--primary-teal)',
+        'essay': 'var(--primary-blue)',
+        'practical': 'var(--primary-green)',
+        '複述': '#D4909F',
+        '分析': '#4681B4',
+        '印證': '#722F3E',
+        '闡明': '#96E483',
+        '意見': '#8B6455',
+        '比較': '#3EE1C2',
+        '選擇': '##55A193'  // 為選擇題添加特殊顏色
+    };
+    
+    const typeColor = typeColors[type] || 'var(--primary-teal)';
+    
+    let cardHTML = `
+        <div class="flex items-center justify-between mb-8">
+            <div class="question-title" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}80 100%);">
+                <i class="fas fa-question-circle mr-4"></i>
+                ${title}
+            </div>
+            <span class="px-6 py-3 rounded-full text-base font-bold text-white" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}CC 100%);">${type}</span>
+        </div>
+    `;
 
-            // 設定題型顏色
-            const typeColors = {
-                'reading': 'var(--primary-teal)',
-                'essay': 'var(--primary-blue)',
-                'practical': 'var(--primary-green)',
-                '複述': 'var(--primary-blue)',
-                '分析': 'var(--primary-green)',
-                '印證': 'var(--primary-purple)',
-                '闡明': 'var(--primary-amber)',
-                '意見': 'var(--primary-rose)',
-                '比較': 'var(--primary-indigo)'
-            };
-            
-            const typeColor = typeColors[type] || 'var(--primary-teal)';
-            
-            let cardHTML = `
-                <div class="flex items-center justify-between mb-8">
-                    <div class="question-title" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}80 100%);">
-                        <i class="fas fa-question-circle mr-4"></i>
-                        ${title}
-                    </div>
-                    <span class="px-6 py-3 rounded-full text-base font-bold text-white" style="background: linear-gradient(135deg, ${typeColor} 0%, ${typeColor}CC 100%);">${type}</span>
-                </div>
-                <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 mb-8 border-2 border-gray-100">
-                    <div class="text-gray-800 leading-relaxed whitespace-pre-wrap text-lg font-medium">${content}</div>
-                </div>
-            `;
-
-            if (answer) {
-                cardHTML += `
-                    <div class="border-t-4 pt-8" style="border-color: var(--divider-color);">
-                        <button onclick="toggleAnswer(this)" class="flex items-center font-bold mb-6 transition-colors duration-300 text-xl hover:transform hover:scale-105" style="color: ${typeColor};">
-                            <i class="fas fa-eye mr-4"></i>顯示詳細答案
-                        </button>
-                        <div class="answer-content hidden">
-                            <div class="answer-section mb-6">
-                                <h4 class="font-bold mb-6 flex items-center text-xl" style="color: var(--primary-green);">
-                                    <i class="fas fa-lightbulb mr-4"></i>參考答案
-                                </h4>
-                                <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${answer}</div>
-                            </div>
-                `;
-                
-                if (steps) {
-                    cardHTML += `
-                            <div class="steps-section">
-                                <h4 class="font-bold mb-6 flex items-center text-xl" style="color: #7fb3d5;">
-                                    <i class="fas fa-list-ol mr-4"></i>答題步驟
-                                </h4>
-                                <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${steps}</div>
-                            </div>
-                    `;
+    // 選擇題需要特殊的樣式
+    if (type === '選擇') {
+        cardHTML += `
+            <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 mb-8 border-2 border-gray-100">
+                <div class="text-gray-800 leading-relaxed text-lg font-medium">${formattedContent}</div>
+            </div>
+            <style>
+                .choice-options-container {
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                    border-radius: 15px;
+                    border-left: 5px solid ${typeColor};
                 }
-                
-                cardHTML += `
-                        </div>
-                    </div>
-                `;
-            }
+                .choice-options-title {
+                    font-weight: bold;
+                    color: ${typeColor};
+                    margin-bottom: 15px;
+                    font-size: 18px;
+                }
+                .choice-option {
+                    padding: 10px 15px;
+                    margin: 8px 0;
+                    background: white;
+                    border-radius: 8px;
+                    border-left: 3px solid #dee2e6;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+                .choice-option:hover {
+                    border-left-color: ${typeColor};
+                    transform: translateX(5px);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+            </style>
+        `;
+    } else {
+        cardHTML += `
+            <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 mb-8 border-2 border-gray-100">
+                <div class="text-gray-800 leading-relaxed whitespace-pre-wrap text-lg font-medium">${formattedContent}</div>
+            </div>
+        `;
+    }
 
-            card.innerHTML = cardHTML;
-            return card;
+    if (answer) {
+        cardHTML += `
+            <div class="border-t-4 pt-8" style="border-color: var(--divider-color);">
+                <button onclick="toggleAnswer(this)" class="flex items-center font-bold mb-6 transition-colors duration-300 text-xl hover:transform hover:scale-105" style="color: ${typeColor};">
+                    <i class="fas fa-eye mr-4"></i>顯示詳細答案
+                </button>
+                <div class="answer-content hidden">
+                    <div class="answer-section mb-6">
+                        <h4 class="font-bold mb-6 flex items-center text-xl" style="color: var(--primary-green);">
+                            <i class="fas fa-lightbulb mr-4"></i>參考答案
+                        </h4>
+                        <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${answer}</div>
+                    </div>
+        `;
+        
+        if (steps) {
+            cardHTML += `
+                    <div class="steps-section">
+                        <h4 class="font-bold mb-6 flex items-center text-xl" style="color: #7fb3d5;">
+                            <i class="fas fa-list-ol mr-4"></i>答題步驟
+                        </h4>
+                        <div class="leading-relaxed whitespace-pre-wrap text-gray-700 text-lg">${steps}</div>
+                    </div>
+            `;
         }
+        
+        cardHTML += `
+                </div>
+            </div>
+        `;
+    }
+
+    card.innerHTML = cardHTML;
+    return card;
+}
 
         function showResult() {
             mainContainer.classList.add('hidden');
@@ -3592,22 +3817,24 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             });
         }
 
-        function toggleAnswer(button) {
-            const answerContent = button.nextElementSibling;
-            const icon = button.querySelector('i');
-            
-            if (answerContent.classList.contains('hidden')) {
-                answerContent.classList.remove('hidden');
-                button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
-button.style.color = '#85929e'; // 設置顏色
-                answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
-            } else {
-                answerContent.classList.add('hidden');
-                button.innerHTML = '<i class="fas fa-eye mr-4"></i>顯示詳細答案';
-button.style.color = '#cd6155'; // 設置顏色
-                answerContent.style.maxHeight = '0';
-            }
-        }
+       function toggleAnswer(button, typeColor) {
+    const answerContent = button.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (answerContent.classList.contains('hidden')) {
+        answerContent.classList.remove('hidden');
+        button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
+        button.style.color = '#85929e'; // 隱藏時使用灰色
+        answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
+    } else {
+        answerContent.classList.add('hidden');
+        button.innerHTML = '<i class="fas fa-eye mr-4"></i>顯示詳細答案';
+        button.style.color = typeColor; // 顯示時使用題型顏色
+        answerContent.style.maxHeight = '0';
+    }
+}
+
+
 
         function goBack() {
             resultContainer.classList.add('hidden');
