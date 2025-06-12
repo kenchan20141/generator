@@ -3825,7 +3825,7 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
         answerContent.classList.remove('hidden');
         button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
         // 修訂處：移除顏色切換，保持 typeColor
-        button.style.color = '#85929e'; // 隱藏時使用灰色
+        button.style.color = typeColor;
         answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
     } else {
         answerContent.classList.add('hidden');
