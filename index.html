@@ -54,31 +54,132 @@ body {
 }
 
 
-
-@media print {
-    body {
-        margin: 20px; /* 固定邊距 */
-        width: 794px; /* A4 寬度，210mm ≈ 794px @ 96dpi */
-        height: 1123px; /* A4 高度，297mm ≈ 1123px @ 96dpi */
-        overflow: hidden; /* 防止溢出 */
-        background: #ffffff; /* 確保白色背景 */
+@media (max-width: 767px) {
+    .text-center {
+        display: flex;
+        flex-wrap: nowrap; /* 防止換行 */
+        justify-content: center; /* 水平置中 */
+        gap: 10px; /* 按鍵間距 */
+        padding: 0 10px; /* 左右邊距 */
     }
-    .question-card {
-        position: relative;
-        width: 754px; /* 考慮邊距後的寬度：794px - 20px - 20px */
-        margin-bottom: 20px; /* 卡片間距 */
-        page-break-inside: avoid; /* 避免內容截斷 */
-        break-inside: avoid; /* 兼容性 */
-        box-sizing: border-box;
-    }
-    .question-title, .answer-section, .steps-section {
-        width: 100%; /* 適應頁面寬度 */
-    }
-    * {
-        color: #000000 !important; /* 強制黑色文字 */
-        opacity: 1 !important; /* 移除透明度 */
+    .text-center button {
+        flex: 1 1 auto; /* 按鍵寬度自適應 */
+        min-width: 100px; /* 最小寬度 */
+        max-width: 120px; /* 最大寬度，避免過寬 */
+        padding: 10px 12px; /* 調整內距 */
+        font-size: 14px; /* 縮小字體 */
+        margin: 0; /* 移除原始外距 */
     }
 }
+
+
+.question-number {
+    background: linear-gradient(135deg, #45b39d , #2471a3);
+}
+
+
+.btn-pdf {
+    background: linear-gradient(135deg, #73c6b6   0%, #117a65 100%); /* 綠色漸變 */
+    color: white;
+    border-radius: 16px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+
+
+/* 響應式PDF輸出優化 */
+@media print {
+    html, body {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #ffffff !important; /* 純白背景 */
+        color: #000000 !important; /* 純黑文字 */
+        font-family: 'Noto Serif TC', Arial, sans-serif !important;
+        font-size: 12pt !important; /* 足夠大的字體 */
+        line-height: 1.4 !important; /* 合適的行距 */
+    }
+    
+    /* 隱藏不必要的元素 */
+    .floating-header,
+    .floating-generate-btn,
+    .copyright-footer,
+    .btn-primary,
+    .btn-secondary,
+    .btn-accent,
+    button {
+        display: none !important;
+    }
+    
+    /* 確保內容區域佔滿整頁 */
+    #questionsDisplay {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 10mm !important; /* 添加A4邊距 */
+    }
+    
+    /* 調整問題卡片樣式 */
+    .question-card {
+        background: #ffffff !important; /* 純白背景 */
+        border-left: 6px solid #000000 !important; /* 深色邊框 */
+        color: #000000 !important; /* 黑色文字 */
+        page-break-inside: avoid !important; /* 避免跨頁 */
+        margin-bottom: 10mm !important; /* 卡片間距 */
+    }
+    
+    .question-title {
+        background: #cccccc !important; /* CMYK友好灰色背景 */
+        color: #000000 !important; /* 黑色文字 */
+    }
+    
+    .answer-section {
+        background: #eeeeee !important; /* 淺灰背景 */
+        border: 2px solid #000000 !important; /* 黑色邊框 */
+        color: #000000 !important; /* 黑色文字 */
+    }
+    
+    .steps-section {
+        background: #dddddd !important; /* 稍深灰色背景 */
+        border: 2px solid #000000 !important; /* 黑色邊框 */
+        color: #000000 !important; /* 黑色文字 */
+    }
+    
+    /* 移除漸變和透明度 */
+    [style*="linear-gradient"],
+    [style*="opacity"],
+    [style*="rgba"] {
+        background: #ffffff !important; /* 移除漸變 */
+        opacity: 1 !important; /* 移除透明度 */
+        color: #000000 !important; /* 確保文字可見 */
+    }
+    
+    /* 確保所有文字為黑色並清晰 */
+    * {
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
+        print-color-adjust: exact !important; /* 標準屬性 */
+    }
+}
+/* 設備適應性CSS */
+@media screen and (max-width: 768px) {
+    .question-card {
+        font-size: 16px !important;
+        padding: 15px !important;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .question-card {
+        font-size: 18px !important;
+        padding: 25px !important;
+    }
+}
+
 
 
 
@@ -190,7 +291,7 @@ body {
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+    background: linear-gradient(135deg, #2471a3 0%, #a2d9ce  100%);
     color: white;
     border-radius: 16px;
     padding: 12px 24px;
@@ -199,7 +300,7 @@ body {
 }
 
 .btn-accent {
-    background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+    background: linear-gradient(135deg, #d98880 0%, #cb4335 100%);
     color: white;
     border-radius: 16px;
     padding: 12px 24px;
@@ -1406,12 +1507,34 @@ textarea, input[type="text"] {
                             </div>
                         </div>
 
-                        <!-- 長文配置 -->
-                        <div id="essayConfig" class="config-panel hidden">
+                     <!-- 長文配置 -->
+<div id="essayConfig" class="config-panel hidden">
     <div class="glass-card p-10 slide-up">
         <h3 class="text-3xl font-bold mb-8 text-gray-800 flex items-center">
             <i class="fas fa-pen-fancy mr-4 text-blue-600"></i>長文寫作配置
         </h3>
+
+
+
+<div class="mb-10">
+    <label class="block text-xl font-semibold text-gray-700 mb-6">
+        <i class="fas fa-tasks mr-3"></i>題目記錄管理
+    </label>
+</div>
+<div class="flex space-x-4 items-center">
+    <button onclick="showQuestionHistory()" class="btn-secondary px-6 py-3 text-base">
+        <i class="fas fa-eye mr-2"></i> 查看記錄
+    </button>
+    <button onclick="clearGeneratedQuestions()" class="btn-accent px-6 py-3 text-lg">
+        <i class="fas fa-trash mr-3"></i> 清除
+    </button>
+    <div class="text-gray-600 text-base py-4 px-4 bg-gray-100 rounded-lg">
+        <i class="fas fa-info-circle mr-2"></i>
+        系統會自動記住已生成的題目，確保新題目主題不重複
+    </div>
+</div>
+
+  <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
 
         <!-- 題型選擇和數量設定 -->
         <div class="mb-10">
@@ -1420,7 +1543,6 @@ textarea, input[type="text"] {
             </label>
             <div class="question-type-container">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
                     <!-- 敘事題型 -->
                     <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-blue-300 transition-all duration-300" data-type="敘事">
                         <div class="flex items-center justify-between mb-4">
@@ -1505,33 +1627,38 @@ textarea, input[type="text"] {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- 自訂模式的配置 -->
+        <!-- 自訂配置區域 -->
         <div id="customEssayConfig" class="hidden">
+            <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
 
+            <label class="block text-xl font-semibold text-gray-700 mb-4">
+                <i class="fas fa-clipboard-list mr-3"></i>請選擇自訂類型：
+            </label>
+            <div class="custom-essay-container mt-6 mb-8 p-6 bg-white border rounded-lg">
+                <div class="flex space-x-4">
+                    <div class="p-4 border rounded-lg flex-1">
+                        <label class="flex items-center">
+                            <input type="radio" name="customEssayType" value="narrative" class="mr-2">
+                            <i class="fas fa-book-open mr-2"></i>敘事
+                        </label>
+                        <p class="text-sm text-gray-600 mt-2">敘事文著重於講述故事或事件。</p>
+                    </div>
+                    <div class="p-4 border rounded-lg flex-1">
+                        <label class="flex items-center">
+                            <input type="radio" name="customEssayType" value="argumentative" class="mr-2">
+                            <i class="fas fa-gavel mr-2"></i>議論
+                        </label>
+                        <p class="text-sm text-gray-600 mt-2">議論文著重於表達觀點並提供論據支持。</p>
+                    </div>
+                </div>
+            </div>
 
-<div id="customEssaySubType" class="mt-4">
-    <label class="block text-xl font-semibold text-gray-700 mb-4">
-        請選擇自訂類型：
-    </label>
-    <div class="flex space-x-4">
-        <label class="flex items-center">
-            <input type="radio" name="customEssayType" value="narrative" class="mr-2">
-            敘事
-        </label>
-        <label class="flex items-center">
-            <input type="radio" name="customEssayType" value="argumentative" class="mr-2">
-            議論
-        </label>
-    </div>
-</div>
+            <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
 
-
-            <div class="divider"></div>
             <div>
                 <label class="block text-xl font-semibold text-gray-700 mb-6">
                     <i class="fas fa-clipboard-list mr-3"></i>參考題目設定
@@ -1560,6 +1687,7 @@ textarea, input[type="text"] {
     </div>
 </div>
 
+         
 
                         <!-- 實用文配置 -->
                         <div id="practicalConfig" class="config-panel hidden">
@@ -1661,8 +1789,17 @@ textarea, input[type="text"] {
                                     </div>
                                     
 
+<div id="customTopicGroup" class="hidden">
+<label for="customTopic" class="block text-xl font-semibold text-gray-700 mb-6">
+<i class="fas fa-edit mr-3"></i>自訂主題內容
+</label>
+<input type="text" id="customTopic" class="w-full p-6 border-3 border-green-200 rounded-2xl focus:border-green-400 focus:ring-0 transition-colors duration-300 bg-white text-lg" placeholder="請輸入自訂主題">
+</div>
+
+
+
 <!-- 在主題選擇代碼後添加 -->
-<div class="mb-10">s=
+<div class="mb-10">
     <label clas"block text-xl font-semibold text-gray-700 mb-6">
         <i class="fas fa-file-alt mr-3"></i>體裁選擇
     </label>
@@ -1902,9 +2039,9 @@ textarea, input[type="text"] {
                     <i class="fas fa-redo mr-4"></i>重新生成
                 </button>
                 <!-- 新增的輸出PDF按鈕 -->
-                <button onclick="exportToPDF()" class="btn-accent px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300 ml-8">
-                    <i class="fas fa-file-pdf mr-4"></i>輸出PDF
-                </button>
+                <button onclick="exportToPDF()" class="btn-pdf px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300 ml-8">
+    <i class="fas fa-file-pdf mr-4"></i>輸出PDF
+</button>
             </div>
             <!-- 題目內容 -->
             <div id="questionsDisplay" class="space-y-10 max-w-6xl mx-auto">
@@ -1932,72 +2069,156 @@ window.addEventListener('scroll', function() {
 var selectedPracticalTypes = new Set();
 
 
-function exportToPDF() {
+async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     
-    // 固定 A4 尺寸 (210mm × 297mm)，96dpi 下為 794px × 1123px
-    const pdfWidth = 794;
-    const pdfHeight = 1123;
+    // 固定 A4 尺寸配置
+    const A4_WIDTH = 210; // mm
+    const A4_HEIGHT = 297; // mm
     
     const doc = new jsPDF({
         orientation: 'portrait',
-        unit: 'px',
-        format: [pdfWidth, pdfHeight]
+        unit: 'mm',
+        format: 'a4',
+        compress: true
     });
 
-    const element = document.getElementById('questionsDisplay');
+    const questionsContainer = document.getElementById('questionsDisplay');
+    const questionCards = questionsContainer.querySelectorAll('.question-card');
     
-    // 強化文字樣式（假設已有此函數）
-    const originalStyles = enhanceTextForPDF(element);
-    
-    const options = {
-        background: '#ffffff',
-        scale: 1.5,
-        width: pdfWidth - 40, // 留出 20px 邊距
-        windowWidth: element.scrollWidth, // 確保捕捉完整寬度
-        height: element.scrollHeight, // 確保捕捉完整高度
-        useCORS: true,
-        logging: false,
-        allowTaint: true,
-        letterRendering: true,
-        onclone: function(clonedDoc) {
-            const clonedElement = clonedDoc.getElementById('questionsDisplay');
-            if (clonedElement) {
-                enhanceClonedElementForPDF(clonedElement);
+    if (questionCards.length === 0) {
+        alert('沒有可輸出的題目內容');
+        return;
+    }
+
+    // 顯示進度提示
+    const progressDiv = document.createElement('div');
+    progressDiv.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 10000; font-size: 18px; text-align: center; min-width: 300px;
+    `;
+    progressDiv.innerHTML = `
+        <div>正在生成PDF...</div>
+        <div id="pdfProgress" style="margin-top: 10px; font-size: 14px; color: #666;">準備中...</div>
+    `;
+    document.body.appendChild(progressDiv);
+
+    try {
+        // 為每個題目卡片生成截圖並添加到PDF
+        for (let i = 0; i < questionCards.length; i++) {
+            const card = questionCards[i];
+            
+            // 更新進度
+            document.getElementById('pdfProgress').textContent = 
+                `正在處理第 ${i + 1} 題，共 ${questionCards.length} 題...`;
+            
+            // 暫時設置卡片樣式以適應A4頁面
+            const originalStyles = {
+                position: card.style.position,
+                width: card.style.width,
+                height: card.style.height,
+                margin: card.style.margin,
+                padding: card.style.padding,
+                transform: card.style.transform,
+                visibility: card.style.visibility
+            };
+            
+            // 設置卡片為適合A4的尺寸
+            card.style.cssText = `
+                position: relative !important;
+                width: 794px !important;
+                max-width: 794px !important;
+                height: auto !important;
+                min-height: 1123px !important;
+                margin: 0 !important;
+                padding: 40px !important;
+                background: white !important;
+                box-sizing: border-box !important;
+                visibility: visible !important;
+                display: block !important;
+                transform: none !important;
+                page-break-inside: avoid !important;
+                overflow: visible !important;
+            `;
+            
+            // 確保所有子元素適應容器
+            const childElements = card.querySelectorAll('*');
+            childElements.forEach(child => {
+                child.style.maxWidth = '100%';
+                child.style.wordWrap = 'break-word';
+                child.style.overflowWrap = 'break-word';
+                child.style.boxSizing = 'border-box';
+            });
+            
+            // 等待樣式應用
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // 使用html2canvas截圖
+            const canvas = await html2canvas(card, {
+                scale: 2, // 提高解析度
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                width: 794,
+                height: Math.max(1123, card.scrollHeight),
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: 794,
+                windowHeight: 1123,
+                onclone: function(clonedDoc) {
+                    // 在克隆文檔中強化樣式
+                    const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
+                                     clonedDoc.querySelectorAll('.question-card')[0];
+                    if (clonedCard) {
+                        clonedCard.style.cssText += `
+                            color: #000000 !important;
+                            background: #ffffff !important;
+                        `;
+                        
+                        const allElements = clonedCard.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            el.style.color = '#000000 !important';
+                            el.style.opacity = '1 !important';
+                        });
+                    }
+                }
+            });
+            
+            // 還原原始樣式
+            Object.entries(originalStyles).forEach(([prop, value]) => {
+                card.style[prop] = value || '';
+            });
+            
+            // 計算圖片在PDF中的尺寸
+            const imgWidth = A4_WIDTH - 20; // 留10mm邊距
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            // 如果不是第一頁，添加新頁
+            if (i > 0) {
+                doc.addPage();
             }
+            
+            // 將圖片添加到PDF（每題一頁）
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            doc.addImage(imgData, 'PNG', 10, 10, imgWidth, Math.min(imgHeight, A4_HEIGHT - 20));
+            
+            // 為卡片添加標識
+            card.setAttribute('data-card-index', i);
         }
-    };
 
-    html2canvas(element, options).then(canvas => {
-        // 還原原始樣式（假設已有此函數）
-        restoreOriginalStyles(element, originalStyles);
+        // 移除進度提示
+        document.body.removeChild(progressDiv);
         
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const imgWidth = pdfWidth - 40; // 內容寬度，考慮邊距
-        const imgHeight = (canvas.height * imgWidth) / canvas.width; // 按比例計算高度
-
-        let heightLeft = imgHeight; // 剩餘高度
-        let position = 0; // 當前頁起始位置
-
-        // 添加第一頁
-        doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
-
-        // 分頁處理
-        heightLeft -= (pdfHeight - 40); // 減去第一頁可用高度
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight + 20; // 從斷點接續
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
-            heightLeft -= (pdfHeight - 40); // 每頁減去可用高度
-        }
-
+        // 保存PDF
         doc.save('generated_questions.pdf');
-    }).catch(error => {
-        console.error('PDF 生成失敗：', error);
-        alert('PDF 生成失敗，請稍後重試');
-    });
+        
+    } catch (error) {
+        console.error('PDF生成失敗：', error);
+        document.body.removeChild(progressDiv);
+        alert('PDF生成失敗，請稍後重試');
+    }
 }
-
 
 // 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
@@ -4024,37 +4245,38 @@ const writingQuestionBank = {
             return text;
         }
 
-        function initializeEventListeners() {
-            // 範疇選擇事件
-            generatorTypeRadios.forEach(radio => {
-                radio.addEventListener('change', updateConfigPanel);
-            });
+      function initializeEventListeners() {
+    // 範疇選擇事件
+    generatorTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateConfigPanel);
+    });
 
-            // 主題選擇事件
-            const topicSelect = document.getElementById('topicSelect');
-            if (topicSelect) {
-                topicSelect.addEventListener('change', () => {
-                    const customTopicGroup = document.getElementById('customTopicGroup');
-                    if (topicSelect.value === 'custom') {
-                        customTopicGroup.classList.remove('hidden');
-                    } else {
-                        customTopicGroup.classList.add('hidden');
-                    }
-                });
+    // 主題選擇事件
+    const topicSelect = document.getElementById('topicSelect');
+    if (topicSelect) {
+        topicSelect.addEventListener('change', () => {
+            const customTopicGroup = document.getElementById('customTopicGroup');
+            if (topicSelect.value === 'custom') {
+                customTopicGroup.classList.remove('hidden');
+            } else {
+                customTopicGroup.classList.add('hidden');
             }
+        });
+    }
 
-            // 數量滑桿同步
-            const quantityRange = document.getElementById('quantityRange');
-            const quantityInput = document.getElementById('quantity');
-            if (quantityRange && quantityInput) {
-                quantityRange.addEventListener('input', () => {
-                    quantityInput.value = quantityRange.value;
-                });
-            }
+    // 數量滑桿同步（保持不變）
+    const quantityRange = document.getElementById('quantityRange');
+    const quantityInput = document.getElementById('quantity');
+    if (quantityRange && quantityInput) {
+        quantityRange.addEventListener('input', () => {
+            quantityInput.value = quantityRange.value;
+        });
+    }
 
-            // 生成按鈕事件
-            generateBtn.addEventListener('click', handleGenerate);
-        }
+    // 生成按鈕事件（保持不變）
+    generateBtn.addEventListener('click', handleGenerate);
+}
+
 
         function setupQuantityControls() {
             // 設定所有數量控制
@@ -4646,6 +4868,17 @@ async function generateEssayQuestions() {
         let referenceLength = null;
         let promptInstructions = '';
         
+        // 獲取已生成的題目
+        const existingQuestions = getGeneratedQuestions(questionType);
+        let existingKeywordsText = '';
+        
+        if (existingQuestions.length > 0) {
+            const allExistingKeywords = existingQuestions.flatMap(q => q.keywords);
+            existingKeywordsText = `\n\n重要提醒：以下是已經出過的題目主題關鍵詞，新生成的題目主題必須與這些完全不同（不能是近義詞或相關主題）：
+已出過的主題關鍵詞：${allExistingKeywords.join('、')}
+\n請確保新生成題目的主題與上述關鍵詞截然不同，不只是換個近義詞，而是要選擇完全不同的主題領域。`;
+        }
+        
         if (questionType === '自訂') {
             if (!customEssayType) {
                 showError('請選擇自訂類型：敘事或議論');
@@ -4667,7 +4900,6 @@ async function generateEssayQuestions() {
                     refQuestions = refQuestions.concat(examples);
                 });
             }
-            // 修訂點：將quantity設為參考題目數量
             quantity = refQuestions.length;
             const bankQuestions = writingQuestionBank[Object.keys(writingQuestionBank)[0]];
             const randomIndex = Math.floor(Math.random() * bankQuestions.length);
@@ -4680,17 +4912,24 @@ async function generateEssayQuestions() {
             refQuestions = examples;
         }
 
-        const requestBody = {
-            model: MODEL,
-            messages: [
-                { role: "system", content: "你是一個長文寫作題目生成器。" },
-                { role: "user", content: `請根據以下參考題目，生成${quantity}個相應的「${questionType}」類型題目：
+        // 重試機制：最多重試5次直到生成不重複的題目
+        let successfulQuestions = [];
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        while (successfulQuestions.length < quantity && retryCount < maxRetries) {
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個長文寫作題目生成器。你必須確保生成的題目主題與已出過的題目完全不同。" },
+                    { role: "user", content: `請根據以下參考題目，生成${quantity - successfulQuestions.length}個相應的「${questionType}」類型題目：
 參考題目：
 ${refQuestions.map((ref, index) => `參考${index + 1}：${ref}`).join('\n')}
 題型類別：${questionType}
 ${referenceLength ? `請注意，生成的題目長度應與試題庫中的題目相近，約${referenceLength}字。` : ''}
 ${promptInstructions}
-請生成${quantity}個「${questionType}」類型的長文寫作題目。生成的題目應符合「${questionType}」文體的特點和要求，並且內容必須與現有試題庫中的題目不同，但其關鍵詞的性質要與參考題目相似，例如參考題目為「鏡子」，生成題目的關鍵詞可以為「路燈」，因為兩者都是物件。必須用繁體中文回應。
+${existingKeywordsText}
+請生成${quantity - successfulQuestions.length}個「${questionType}」類型的長文寫作題目。生成的題目應符合「${questionType}」文體的特點和要求，並且內容必須與現有試題庫中的題目不同，但其關鍵詞的性質要與參考題目相似，例如參考題目為「鏡子」，生成題目的關鍵詞可以為「路燈」，因為兩者都是物件。必須用繁體中文回應。
 請以以下格式輸出生成的題目、題解和方向：
 題目1：[生成的題目1]
 題解1：[生成的題解1]
@@ -4700,14 +4939,70 @@ ${promptInstructions}
 方向2：[生成的方向2]
 （依此類推生成所有題目）
 必須用繁體中文回應。絕對不要文學性，絕對不要運用文筆及太深奧的詞匯擬題(動詞和名詞的搭配運用不宜搞新意和雕琢，例如「凝結在指縫」的「凝結」和「指縫」、「停駐在窗前」的「停駐」和「窗」，這些都不是常規的配搭，會令題目用語看起來很生澀,請在擬題中斂起你的文筆和才華，題目中不同詞匯的配搭必須平實，不能新鮮)，違反則無效。不要提供太多細節，不要具體描述題目的事件，要足夠空泛才有發揮空間，不要將題目範圍鎖得太小（例如「墜落在深淵的星屑」，太局限了），不要擬訂以描寫為主的題目。擬題時盡量少用以短語構成的定語，必須在形式、句式、用語和字數上參考用家提供的題目（開關引號的內容除外)，違反則無效，但生成題目的內容及題材絕對不可與原本的題目相似（例如參考題目為「沉默」，生成題目則用「留白」或「無聲」等近義詞，這些例子都屬於相似），違反則無效。假如參考題目有逗引，然後再點明題目，便絕對不能只生成題目，假如參考題目沒有逗引，那就必須生成沒有逗引的題目，一切視乎參考題目的形式和字數如何，請模仿參考題目的形式和字數，違反則無效，其生成題目形式及參考題目形式必與參考題目一致。除了生成題目之外，不要顯示任何其他不相關的內容，違反則無效。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。` }
-            ],
-            max_tokens: 64000
-        };
+                ],
+                max_tokens: 64000
+            };
 
-        const response = await callAPI(requestBody);
-        const parsed = parseWritingResponse(response, quantity);
-        parsed.forEach(item => item.type = questionType);
-        allQuestions = allQuestions.concat(parsed);
+            try {
+                const response = await callAPI(requestBody);
+                const parsed = parseWritingResponse(response, quantity - successfulQuestions.length);
+                
+                // 檢查生成的題目是否與已有題目重複
+                for (let item of parsed) {
+                    if (item.question && !item.question.includes('生成失敗') && !item.question.includes('未生成')) {
+                        const newKeywords = extractKeywords(item.question);
+                        let isDuplicate = false;
+                        
+                        // 檢查與已生成題目的重複性
+                        for (let existingQ of existingQuestions) {
+                            if (isTopicSimilar(newKeywords, existingQ.keywords)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        // 檢查與本次已成功生成題目的重複性
+                        for (let successQ of successfulQuestions) {
+                            const successKeywords = extractKeywords(successQ.question);
+                            if (isTopicSimilar(newKeywords, successKeywords)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!isDuplicate) {
+                            item.type = questionType;
+                            successfulQuestions.push(item);
+                            // 保存到 LOCAL STORAGE
+                            saveGeneratedQuestion(questionType, item.question);
+                        }
+                    }
+                    
+                    if (successfulQuestions.length >= quantity) break;
+                }
+                
+                if (successfulQuestions.length >= quantity) {
+                    break;
+                }
+                
+            } catch (error) {
+                console.error(`第${retryCount + 1}次重試失敗:`, error);
+            }
+            
+            retryCount++;
+        }
+        
+        // 如果重試後仍不足數量，用錯誤信息補足
+        while (successfulQuestions.length < quantity) {
+            successfulQuestions.push({
+                question: '生成失敗：無法生成不重複的題目，請清除題目記錄後重試',
+                solution: '請點擊清除記錄按鈕後重新生成',
+                direction: '建議清除已生成的題目記錄',
+                type: questionType
+            });
+        }
+        
+        allQuestions = allQuestions.concat(successfulQuestions);
     }
     
     displayWritingQuestions(allQuestions);
@@ -5461,6 +5756,210 @@ function getPracticalQuestionBankExamples(practicalType, count = 1) {
 
     return selectedExamples;
 }
+
+
+// 輔助函數：準備PDF輸出格式
+function preparePDFLayout() {
+    const questionsDisplay = document.getElementById('questionsDisplay');
+    const cards = questionsDisplay.querySelectorAll('.question-card');
+    
+    cards.forEach((card, index) => {
+        // 為每個卡片設置唯一標識
+        card.setAttribute('data-pdf-page', index + 1);
+        
+        // 確保答案區域在PDF中可見
+        const answerContent = card.querySelector('.answer-content');
+        if (answerContent && answerContent.classList.contains('hidden')) {
+            answerContent.classList.remove('hidden');
+            answerContent.style.display = 'block';
+            answerContent.style.maxHeight = 'none';
+        }
+        
+        // 調整按鈕顯示
+        const toggleButton = card.querySelector('button[onclick*="toggleAnswer"]');
+        if (toggleButton) {
+            toggleButton.style.display = 'none';
+        }
+    });
+}
+
+// 輔助函數：還原顯示格式
+function restorePDFLayout() {
+    const questionsDisplay = document.getElementById('questionsDisplay');
+    const cards = questionsDisplay.querySelectorAll('.question-card');
+    
+    cards.forEach(card => {
+        // 還原答案區域隱藏狀態
+        const answerContent = card.querySelector('.answer-content');
+        if (answerContent) {
+            answerContent.classList.add('hidden');
+            answerContent.style.maxHeight = '0';
+        }
+        
+        // 還原按鈕顯示
+        const toggleButton = card.querySelector('button[onclick*="toggleAnswer"]');
+        if (toggleButton) {
+            toggleButton.style.display = 'flex';
+        }
+    });
+}
+
+
+// LOCAL STORAGE 管理函數
+function saveGeneratedQuestion(questionType, question) {
+    const storageKey = 'generatedQuestions';
+    let generatedQuestions = JSON.parse(localStorage.getItem(storageKey)) || {};
+    
+    if (!generatedQuestions[questionType]) {
+        generatedQuestions[questionType] = [];
+    }
+    
+    // 提取主題關鍵詞
+    const keywords = extractKeywords(question);
+    
+    generatedQuestions[questionType].push({
+        question: question,
+        keywords: keywords,
+        timestamp: new Date().getTime()
+    });
+    
+    localStorage.setItem(storageKey, JSON.stringify(generatedQuestions));
+}
+
+function getGeneratedQuestions(questionType) {
+    const storageKey = 'generatedQuestions';
+    let generatedQuestions = JSON.parse(localStorage.getItem(storageKey)) || {};
+    return generatedQuestions[questionType] || [];
+}
+
+function extractKeywords(question) {
+    // 提取題目中的關鍵詞（主題詞）
+    const keywordPatterns = [
+        /「([^」]+)」/g,  // 引號內的詞
+        /以「([^」]+)」為題/g,  // 以...為題
+        /試以「([^」]+)」/g,   // 試以...
+        /「([^」]+)」為首句/g,  // ...為首句
+        /「([^」]+)」為末句/g   // ...為末句
+    ];
+    
+    let keywords = [];
+    keywordPatterns.forEach(pattern => {
+        let match;
+        while ((match = pattern.exec(question)) !== null) {
+            keywords.push(match[1]);
+        }
+    });
+    
+    // 如果沒有找到引號內容，提取其他可能的主題詞
+    if (keywords.length === 0) {
+        const commonWords = ['以', '為題', '試', '寫作', '文章', '一篇', '根據', '描述'];
+        const words = question.split(/[，。？！\s]+/);
+        keywords = words.filter(word => 
+            word.length >= 2 && 
+            !commonWords.includes(word) &&
+            !/^[0-9]+$/.test(word)
+        ).slice(0, 3);
+    }
+    
+    return keywords;
+}
+
+function clearGeneratedQuestions() {
+    if (confirm('確定要清除所有已生成的題目記錄嗎？')) {
+        localStorage.removeItem('generatedQuestions');
+        alert('已清除所有題目記錄');
+    }
+}
+
+function isTopicSimilar(newKeywords, existingKeywords) {
+    // 檢查主題是否相似
+    for (let newKeyword of newKeywords) {
+        for (let existingKeyword of existingKeywords) {
+            if (newKeyword === existingKeyword || 
+                isSynonym(newKeyword, existingKeyword)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function isSynonym(word1, word2) {
+    // 定義近義詞組
+    const synonymGroups = [
+        ['沉默', '無聲', '寂靜', '安靜'],
+        ['友誼', '友情', '朋友'],
+        ['母愛', '母親', '媽媽'],
+        ['夢想', '理想', '願望'],
+        ['回憶', '記憶', '往事'],
+        ['成長', '長大', '成熟'],
+        ['堅持', '執著', '毅力'],
+        ['勇氣', '勇敢', '膽量'],
+        ['寬容', '包容', '體諒'],
+        ['感恩', '感謝', '謝意']
+    ];
+    
+    for (let group of synonymGroups) {
+        if (group.includes(word1) && group.includes(word2)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function showQuestionHistory() {
+    const storageKey = 'generatedQuestions';
+    const generatedQuestions = JSON.parse(localStorage.getItem(storageKey)) || {};
+    
+    let historyHTML = '<div style="max-height: 400px; overflow-y: auto;">';
+    let totalCount = 0;
+    
+    for (let [type, questions] of Object.entries(generatedQuestions)) {
+        if (questions.length > 0) {
+            historyHTML += `<h3 style="color: var(--primary-blue); margin: 15px 0 10px 0; font-weight: bold;">${type} (${questions.length}題)</h3>`;
+            questions.forEach((q, index) => {
+                const date = new Date(q.timestamp).toLocaleDateString();
+                historyHTML += `
+                    <div style="background: #f8f9fa; padding: 10px; margin: 8px 0; border-radius: 8px; border-left: 4px solid var(--primary-blue);">
+                        <div style="font-weight: bold; margin-bottom: 5px;">第${index + 1}題 (${date})</div>
+                        <div style="margin-bottom: 5px;">${q.question}</div>
+                        <div style="font-size: 12px; color: #666;">關鍵詞：${q.keywords.join('、')}</div>
+                    </div>
+                `;
+                totalCount++;
+            });
+        }
+    }
+    
+    if (totalCount === 0) {
+        historyHTML += '<p style="text-align: center; color: #666; margin: 20px;">尚無生成記錄</p>';
+    }
+    
+    historyHTML += '</div>';
+    
+    // 創建模態框顯示記錄
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.7); z-index: 10000; 
+        display: flex; align-items: center; justify-content: center;
+    `;
+    modal.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 80%; width: 600px; max-height: 80%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: var(--primary-blue);">
+                    <i class="fas fa-history mr-3"></i>題目生成記錄 (共${totalCount}題)
+                </h2>
+                <button onclick="this.closest('.modal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+            </div>
+            ${historyHTML}
+        </div>
+    `;
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+}
+
+
 
     </script>
 
