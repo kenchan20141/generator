@@ -1523,15 +1523,12 @@ textarea, input[type="text"] {
 </div>
 <div class="flex space-x-4 items-center">
     <button onclick="showQuestionHistory()" class="btn-secondary px-6 py-3 text-base">
-        <i class="fas fa-eye mr-2"></i> 查看記錄
+        <i class="fas fa-eye mr-2"></i> 紀錄
     </button>
     <button onclick="clearGeneratedQuestions()" class="btn-accent px-6 py-3 text-lg">
         <i class="fas fa-trash mr-3"></i> 清除
     </button>
-    <div class="text-gray-600 text-base py-4 px-4 bg-gray-100 rounded-lg">
-        <i class="fas fa-info-circle mr-2"></i>
-        系統會自動記住已生成的題目，確保新題目主題不重複
-    </div>
+   
 </div>
 
   <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
@@ -2033,14 +2030,14 @@ textarea, input[type="text"] {
             <!-- 操作按鈕 -->
             <div class="text-center mb-12 slide-up">
                 <button onclick="goBack()" class="btn-secondary px-12 py-5 rounded-2xl font-bold mr-8 text-xl transform hover:-translate-y-2 transition-all duration-300">
-                    <i class="fas fa-arrow-left mr-4"></i>返回配置
+                    <i class="fas fa-arrow-left mr-4"></i>返回
                 </button>
                 <button onclick="regenerate()" class="btn-primary px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300">
                     <i class="fas fa-redo mr-4"></i>重新生成
                 </button>
                 <!-- 新增的輸出PDF按鈕 -->
                 <button onclick="exportToPDF()" class="btn-pdf px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300 ml-8">
-    <i class="fas fa-file-pdf mr-4"></i>輸出PDF
+    <i class="fas fa-file-pdf mr-4"></i>PDF
 </button>
             </div>
             <!-- 題目內容 -->
@@ -5865,7 +5862,7 @@ function extractKeywords(question) {
 }
 
 function clearGeneratedQuestions() {
-    if (confirm('確定要清除所有已生成的題目記錄嗎？')) {
+    if (confirm('系統會自動記住已生成的題目，確保新題目主題不重複，確定要清除所有已生成的題目紀錄嗎？')) {
         localStorage.removeItem('generatedQuestions');
         alert('已清除所有題目記錄');
     }
