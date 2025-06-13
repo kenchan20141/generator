@@ -57,25 +57,25 @@ body {
 
 @media print {
     body {
-        margin: 20px; /* 設置固定的頁邊距 */
-        width: 595px; /* A4寬度，單位px（210mm ≈ 595px） */
-        height: 842px; /* A4高度，單位px（297mm ≈ 842px） */
-        overflow: hidden; /* 防止內容溢出 */
-        background: #ffffff; /* 確保背景為白色 */
+        margin: 20px; /* 固定邊距 */
+        width: 794px; /* A4 寬度，210mm ≈ 794px @ 96dpi */
+        height: 1123px; /* A4 高度，297mm ≈ 1123px @ 96dpi */
+        overflow: hidden; /* 防止溢出 */
+        background: #ffffff; /* 確保白色背景 */
     }
     .question-card {
-        position: relative; /* 使用相對定位 */
-        width: 555px; /* 考慮頁邊距後的寬度 */
+        position: relative;
+        width: 754px; /* 考慮邊距後的寬度：794px - 20px - 20px */
         margin-bottom: 20px; /* 卡片間距 */
-        page-break-inside: avoid; /* 避免卡片在頁面中間被截斷 */
+        page-break-inside: avoid; /* 避免內容截斷 */
         break-inside: avoid; /* 兼容性 */
         box-sizing: border-box;
     }
     .question-title, .answer-section, .steps-section {
-        width: 100%; /* 確保內容適應頁面寬度 */
+        width: 100%; /* 適應頁面寬度 */
     }
     * {
-        color: #000000 !important; /* 強制文字為黑色 */
+        color: #000000 !important; /* 強制黑色文字 */
         opacity: 1 !important; /* 移除透明度 */
     }
 }
@@ -1935,14 +1935,9 @@ var selectedPracticalTypes = new Set();
 function exportToPDF() {
     const { jsPDF } = window.jspdf;
     
-    // 動態獲取設備頁面比例
-    const pageWidth = document.body.clientWidth;
-    const pageHeight = document.body.clientHeight;
-    const aspectRatio = pageWidth / pageHeight;
-    
-    // 設置PDF頁面尺寸，保持設備比例
-    const pdfWidth = 595; // A4寬度，單位px
-    const pdfHeight = pdfWidth / aspectRatio;
+    // 固定 A4 尺寸 (210mm × 297mm)，96dpi 下為 794px × 1123px
+    const pdfWidth = 794;
+    const pdfHeight = 1123;
     
     const doc = new jsPDF({
         orientation: 'portrait',
@@ -1952,13 +1947,15 @@ function exportToPDF() {
 
     const element = document.getElementById('questionsDisplay');
     
-    // 強化文字和背景樣式
+    // 強化文字樣式（假設已有此函數）
     const originalStyles = enhanceTextForPDF(element);
     
     const options = {
         background: '#ffffff',
         scale: 1.5,
-        width: pdfWidth - 40, // 留出20px邊距
+        width: pdfWidth - 40, // 留出 20px 邊距
+        windowWidth: element.scrollWidth, // 確保捕捉完整寬度
+        height: element.scrollHeight, // 確保捕捉完整高度
         useCORS: true,
         logging: false,
         allowTaint: true,
@@ -1972,32 +1969,32 @@ function exportToPDF() {
     };
 
     html2canvas(element, options).then(canvas => {
-        // 還原原始樣式
+        // 還原原始樣式（假設已有此函數）
         restoreOriginalStyles(element, originalStyles);
         
         const imgData = canvas.toDataURL('image/png', 1.0);
-        const imgWidth = pdfWidth - 40;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const imgWidth = pdfWidth - 40; // 內容寬度，考慮邊距
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // 按比例計算高度
 
-        let heightLeft = imgHeight;
-        let position = 0;
+        let heightLeft = imgHeight; // 剩餘高度
+        let position = 0; // 當前頁起始位置
 
         // 添加第一頁
         doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
 
-        // 分頁處理，從上一頁斷點接續
-        heightLeft -= (pdfHeight - 40);
+        // 分頁處理
+        heightLeft -= (pdfHeight - 40); // 減去第一頁可用高度
         while (heightLeft > 0) {
-            position = heightLeft - imgHeight + 20;
+            position = heightLeft - imgHeight + 20; // 從斷點接續
             doc.addPage();
             doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
-            heightLeft -= (pdfHeight - 40);
+            heightLeft -= (pdfHeight - 40); // 每頁減去可用高度
         }
 
         doc.save('generated_questions.pdf');
     }).catch(error => {
-        console.error('PDF生成失敗：', error);
-        showError('PDF生成失敗，請稍後重試');
+        console.error('PDF 生成失敗：', error);
+        alert('PDF 生成失敗，請稍後重試');
     });
 }
 
