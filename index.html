@@ -1,9 +1,5 @@
 
 
-
-
-
-
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -13,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
     --primary-gray: #4B5563;
@@ -52,6 +50,33 @@ body {
 
 * {
     box-sizing: border-box;
+}
+
+
+
+@media print {
+    body {
+        margin: 20px; /* 設置固定的頁邊距 */
+        width: 595px; /* A4寬度，單位px（210mm ≈ 595px） */
+        height: 842px; /* A4高度，單位px（297mm ≈ 842px） */
+        overflow: hidden; /* 防止內容溢出 */
+        background: #ffffff; /* 確保背景為白色 */
+    }
+    .question-card {
+        position: relative; /* 使用相對定位 */
+        width: 555px; /* 考慮頁邊距後的寬度 */
+        margin-bottom: 20px; /* 卡片間距 */
+        page-break-inside: avoid; /* 避免卡片在頁面中間被截斷 */
+        break-inside: avoid; /* 兼容性 */
+        box-sizing: border-box;
+    }
+    .question-title, .answer-section, .steps-section {
+        width: 100%; /* 確保內容適應頁面寬度 */
+    }
+    * {
+        color: #000000 !important; /* 強制文字為黑色 */
+        opacity: 1 !important; /* 移除透明度 */
+    }
 }
 
 
@@ -1877,25 +1902,28 @@ textarea, input[type="text"] {
 
     <!-- 結果顯示頁面 -->
     <div id="resultContainer" class="hidden result-page">
-        <div class="min-h-screen py-12">
-            <div class="container mx-auto px-6">
-                <!-- 操作按鈕 -->
-                <div class="text-center mb-12 slide-up">
-                    <button onclick="goBack()" class="btn-secondary px-12 py-5 rounded-2xl font-bold mr-8 text-xl transform hover:-translate-y-2 transition-all duration-300">
-                        <i class="fas fa-arrow-left mr-4"></i>返回配置
-                    </button>
-                    <button onclick="regenerate()" class="btn-primary px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300">
-                        <i class="fas fa-redo mr-4"></i>重新生成
-                    </button>
-                </div>
-
-                <!-- 題目內容 -->
-                <div id="questionsDisplay" class="space-y-10 max-w-6xl mx-auto">
-                    <!-- 題目會在這裡動態生成 -->
-                </div>
+    <div class="min-h-screen py-12">
+        <div class="container mx-auto px-6">
+            <!-- 操作按鈕 -->
+            <div class="text-center mb-12 slide-up">
+                <button onclick="goBack()" class="btn-secondary px-12 py-5 rounded-2xl font-bold mr-8 text-xl transform hover:-translate-y-2 transition-all duration-300">
+                    <i class="fas fa-arrow-left mr-4"></i>返回配置
+                </button>
+                <button onclick="regenerate()" class="btn-primary px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300">
+                    <i class="fas fa-redo mr-4"></i>重新生成
+                </button>
+                <!-- 新增的輸出PDF按鈕 -->
+                <button onclick="exportToPDF()" class="btn-accent px-12 py-5 rounded-2xl font-bold text-xl transform hover:-translate-y-2 transition-all duration-300 ml-8">
+                    <i class="fas fa-file-pdf mr-4"></i>輸出PDF
+                </button>
+            </div>
+            <!-- 題目內容 -->
+            <div id="questionsDisplay" class="space-y-10 max-w-6xl mx-auto">
+                <!-- 題目會在這裡動態生成 -->
             </div>
         </div>
     </div>
+</div>
 
  
 
@@ -1913,6 +1941,176 @@ window.addEventListener('scroll', function() {
 
 
 var selectedPracticalTypes = new Set();
+
+
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: 'a4'
+    });
+
+    const element = document.getElementById('questionsDisplay');
+    
+    // 在轉換前強化文字和背景樣式
+    const originalStyles = enhanceTextForPDF(element);
+    
+    const options = {
+        background: '#ffffff', // 設置白色背景
+        scale: 1.5, // 適當縮放以適應A4頁面
+        width: 555, // 設置固定寬度，匹配A4頁面（考慮邊距）
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        letterRendering: true,
+        onclone: function(clonedDoc) {
+            const clonedElement = clonedDoc.getElementById('questionsDisplay');
+            if (clonedElement) {
+                enhanceClonedElementForPDF(clonedElement);
+            }
+        }
+    };
+
+    html2canvas(element, options).then(canvas => {
+        // 還原原始樣式
+        restoreOriginalStyles(element, originalStyles);
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pageWidth = doc.internal.pageSize.getWidth(); // 595px
+        const pageHeight = doc.internal.pageSize.getHeight(); // 842px
+        const imgWidth = pageWidth - 40; // 留出20px邊距
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // 添加第一頁
+        doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
+
+        // 分頁處理
+        heightLeft -= (pageHeight - 40); // 減去第一頁高度（考慮邊距）
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight + 20; // 調整新頁起點
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - 40);
+        }
+
+        doc.save('generated_questions.pdf');
+    }).catch(error => {
+        console.error('PDF生成失敗：', error);
+        showError('PDF生成失敗，請稍後重試');
+    });
+}
+
+
+// 修訂：新增函數來強化PDF轉換前的文字樣式
+function enhanceTextForPDF(element) {
+    const originalStyles = new Map();
+    
+    // 強化所有文字元素的顏色和對比度
+    const textElements = element.querySelectorAll('*');
+    textElements.forEach((el, index) => {
+        const computedStyle = window.getComputedStyle(el);
+        const originalColor = computedStyle.color;
+        const originalBackgroundColor = computedStyle.backgroundColor;
+        
+        // 儲存原始樣式
+        originalStyles.set(index, {
+            element: el,
+            color: el.style.color,
+            backgroundColor: el.style.backgroundColor,
+            opacity: el.style.opacity,
+            filter: el.style.filter
+        });
+        
+        // 強化文字顏色
+        if (originalColor && originalColor !== 'rgba(0, 0, 0, 0)') {
+            const rgb = parseRGBA(originalColor);
+            if (rgb && (rgb.r + rgb.g + rgb.b) / 3 > 127) {
+                // 淺色文字改為深色
+                el.style.color = '#000000 !important';
+            } else {
+                // 深色文字保持或加深
+                el.style.color = '#000000 !important';
+            }
+        }
+        
+        // 移除可能影響顏色的效果
+        el.style.opacity = '1 !important';
+        el.style.filter = 'none !important';
+    });
+    
+    return originalStyles;
+}
+
+// 修訂：新增函數來處理克隆元素
+function enhanceClonedElementForPDF(clonedElement) {
+    const style = document.createElement('style');
+    style.textContent = `
+        * {
+            color: #000000 !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            -webkit-print-color-adjust: exact !important;
+        }
+        .question-card {
+            width: 555px !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
+        }
+    `;
+    clonedElement.appendChild(style);
+}
+
+// 修訂：新增函數來還原原始樣式
+function restoreOriginalStyles(element, originalStyles) {
+    originalStyles.forEach((styleData, index) => {
+        const el = styleData.element;
+        el.style.color = styleData.color;
+        el.style.backgroundColor = styleData.backgroundColor;
+        el.style.opacity = styleData.opacity;
+        el.style.filter = styleData.filter;
+    });
+}
+
+// 修訂：新增解析RGBA顏色的輔助函數
+function parseRGBA(colorStr) {
+    const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (match) {
+        return {
+            r: parseInt(match[1]),
+            g: parseInt(match[2]),
+            b: parseInt(match[3]),
+            a: match[4] ? parseFloat(match[4]) : 1
+        };
+    }
+    return null;
+}
+
+
+function toggleAnswer(button) {
+    const answerContent = button.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (answerContent.classList.contains('hidden')) {
+        answerContent.classList.remove('hidden');
+        button.innerHTML = '<i class="fas fa-eye-slash mr-4"></i>隱藏詳細答案';
+        // 修訂：移除動態顏色變更，使用固定深色
+        button.style.color = '#2d3748';
+        answerContent.style.maxHeight = answerContent.scrollHeight + 'px';
+    } else {
+        answerContent.classList.add('hidden');
+        button.innerHTML = '<i class="fas fa-eye mr-4"></i>顯示詳細答案';
+        // 修訂：移除動態顏色變更，使用固定深色
+        button.style.color = '#2d3748';
+        answerContent.style.maxHeight = '0';
+    }
+}
+
+
+
 
 function togglePracticalType(toggleElement, practicalType) {
     const isActive = toggleElement.classList.contains('active');
