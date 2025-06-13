@@ -92,19 +92,48 @@ body {
 /* 響應式PDF輸出優化 */
 @media print {
     html, body {
-        width: 210mm !important;
-        height: 297mm !important;
+        width: 794px !important; /* A4寬度，96dpi */
+        height: 1123px !important; /* A4高度，96dpi */
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
+        overflow: visible !important; /* 確保內容不被截斷 */
         background: #ffffff !important; /* 純白背景 */
         color: #000000 !important; /* 純黑文字 */
-        font-family: 'Noto Serif TC', Arial, sans-serif !important;
-        font-size: 12pt !important; /* 足夠大的字體 */
-        line-height: 1.4 !important; /* 合適的行距 */
+        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
+        print-color-adjust: exact !important; /* 標準屬性 */
     }
-    
-    /* 隱藏不必要的元素 */
+
+    /* 確保內容區域適應A4頁面 */
+    #questionsDisplay {
+        width: 100% !important;
+        max-width: 754px !important; /* 794px - 左右各20px邊距 */
+        margin: 0 auto !important;
+        padding: 20px !important; /* 頁面邊距 */
+    }
+
+    /* 調整問題卡片樣式 */
+    .question-card {
+        width: 754px !important; /* 內容寬度 */
+        height: auto !important;
+        margin: 20px auto !important;
+        padding: 20px !important;
+        background: #ffffff !important; /* 純白背景 */
+        color: #000000 !important; /* 純黑文字 */
+        page-break-inside: avoid !important; /* 避免卡片跨頁 */
+        box-sizing: border-box !important;
+    }
+
+    /* 針對具體元素設置黑色文字 */
+    .question-title, 
+    .answer-section, 
+    .steps-section, 
+    p, span, div, h1, h2, h3, h4, h5, h6 {
+        background: #ffffff !important; /* 移除漸變 */
+        color: #000000 !important; /* 確保文字黑色 */
+        opacity: 1 !important; /* 移除透明度 */
+    }
+
+    /* 移除不需要的元素 */
     .floating-header,
     .floating-generate-btn,
     .copyright-footer,
@@ -114,57 +143,18 @@ body {
     button {
         display: none !important;
     }
-    
-    /* 確保內容區域佔滿整頁 */
-    #questionsDisplay {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 10mm !important; /* 添加A4邊距 */
-    }
-    
-    /* 調整問題卡片樣式 */
-    .question-card {
-        background: #ffffff !important; /* 純白背景 */
-        border-left: 6px solid #000000 !important; /* 深色邊框 */
-        color: #000000 !important; /* 黑色文字 */
-        page-break-inside: avoid !important; /* 避免跨頁 */
-        margin-bottom: 10mm !important; /* 卡片間距 */
-    }
-    
-    .question-title {
-        background: #cccccc !important; /* CMYK友好灰色背景 */
-        color: #000000 !important; /* 黑色文字 */
-    }
-    
-    .answer-section {
-        background: #eeeeee !important; /* 淺灰背景 */
-        border: 2px solid #000000 !important; /* 黑色邊框 */
-        color: #000000 !important; /* 黑色文字 */
-    }
-    
-    .steps-section {
-        background: #dddddd !important; /* 稍深灰色背景 */
-        border: 2px solid #000000 !important; /* 黑色邊框 */
-        color: #000000 !important; /* 黑色文字 */
-    }
-    
-    /* 移除漸變和透明度 */
+
+    /* 移除所有漸變背景和透明度 */
     [style*="linear-gradient"],
     [style*="opacity"],
     [style*="rgba"] {
-        background: #ffffff !important; /* 移除漸變 */
-        opacity: 1 !important; /* 移除透明度 */
-        color: #000000 !important; /* 確保文字可見 */
-    }
-    
-    /* 確保所有文字為黑色並清晰 */
-    * {
+        background: #ffffff !important;
+        opacity: 1 !important;
         color: #000000 !important;
-        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
-        print-color-adjust: exact !important; /* 標準屬性 */
     }
 }
+
+
 /* 設備適應性CSS */
 @media screen and (max-width: 768px) {
     .question-card {
@@ -2068,15 +2058,13 @@ var selectedPracticalTypes = new Set();
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    
-    // 固定 A4 尺寸配置
-    const A4_WIDTH = 210; // mm
-    const A4_HEIGHT = 297; // mm
+    const A4_WIDTH = 794; // A4寬度（像素，96dpi）
+    const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
     
     const doc = new jsPDF({
         orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
+        unit: 'px',
+        format: [A4_WIDTH, A4_HEIGHT],
         compress: true
     });
 
@@ -2102,121 +2090,87 @@ async function exportToPDF() {
     document.body.appendChild(progressDiv);
 
     try {
-        // 為每個題目卡片生成截圖並添加到PDF
         for (let i = 0; i < questionCards.length; i++) {
             const card = questionCards[i];
-            
-            // 更新進度
             document.getElementById('pdfProgress').textContent = 
                 `正在處理第 ${i + 1} 題，共 ${questionCards.length} 題...`;
-            
-            // 暫時設置卡片樣式以適應A4頁面
-            const originalStyles = {
-                position: card.style.position,
-                width: card.style.width,
-                height: card.style.height,
-                margin: card.style.margin,
-                padding: card.style.padding,
-                transform: card.style.transform,
-                visibility: card.style.visibility
-            };
-            
-            // 設置卡片為適合A4的尺寸
+
+            // 設置卡片樣式適應A4
+            const originalStyle = card.getAttribute('style') || '';
             card.style.cssText = `
                 position: relative !important;
-                width: 794px !important;
-                max-width: 794px !important;
+                width: 754px !important;
                 height: auto !important;
-                min-height: 1123px !important;
-                margin: 0 !important;
-                padding: 40px !important;
-                background: white !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                background: #ffffff !important;
+                color: #000000 !important;
                 box-sizing: border-box !important;
-                visibility: visible !important;
-                display: block !important;
-                transform: none !important;
                 page-break-inside: avoid !important;
-                overflow: visible !important;
             `;
-            
-            // 確保所有子元素適應容器
-            const childElements = card.querySelectorAll('*');
-            childElements.forEach(child => {
-                child.style.maxWidth = '100%';
-                child.style.wordWrap = 'break-word';
-                child.style.overflowWrap = 'break-word';
-                child.style.boxSizing = 'border-box';
+
+            // 確保子元素適應
+            const allElements = card.querySelectorAll('*');
+            allElements.forEach(el => {
+                el.style.color = '#000000 !important';
+                el.style.background = '#ffffff !important';
+                el.style.opacity = '1 !important';
             });
-            
+
             // 等待樣式應用
             await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // 使用html2canvas截圖
+
             const canvas = await html2canvas(card, {
-                scale: 2, // 提高解析度
+                scale: 2,
                 useCORS: true,
-                allowTaint: true,
                 backgroundColor: '#ffffff',
-                width: 794,
-                height: Math.max(1123, card.scrollHeight),
-                scrollX: 0,
-                scrollY: 0,
+                width: 754,
+                height: card.scrollHeight,
                 windowWidth: 794,
-                windowHeight: 1123,
+                windowHeight: A4_HEIGHT,
                 onclone: function(clonedDoc) {
-                    // 在克隆文檔中強化樣式
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
                                      clonedDoc.querySelectorAll('.question-card')[0];
                     if (clonedCard) {
-                        clonedCard.style.cssText += `
-                            color: #000000 !important;
-                            background: #ffffff !important;
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            * {
+                                color: #000000 !important;
+                                background: #ffffff !important;
+                                opacity: 1 !important;
+                                -webkit-print-color-adjust: exact !important;
+                            }
+                            .question-card {
+                                width: 754px !important;
+                                padding: 20px !important;
+                                page-break-inside: avoid !important;
+                            }
                         `;
-                        
-                        const allElements = clonedCard.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            el.style.color = '#000000 !important';
-                            el.style.opacity = '1 !important';
-                        });
+                        clonedCard.appendChild(style);
                     }
                 }
             });
-            
-            // 還原原始樣式
-            Object.entries(originalStyles).forEach(([prop, value]) => {
-                card.style[prop] = value || '';
-            });
-            
-            // 計算圖片在PDF中的尺寸
-            const imgWidth = A4_WIDTH - 20; // 留10mm邊距
+
+            // 還原樣式
+            card.setAttribute('style', originalStyle);
+
+            const imgWidth = A4_WIDTH - 40; // 留邊距
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
-            // 如果不是第一頁，添加新頁
-            if (i > 0) {
-                doc.addPage();
-            }
-            
-            // 將圖片添加到PDF（每題一頁）
+
+            if (i > 0) doc.addPage();
             const imgData = canvas.toDataURL('image/png', 1.0);
-            doc.addImage(imgData, 'PNG', 10, 10, imgWidth, Math.min(imgHeight, A4_HEIGHT - 20));
-            
-            // 為卡片添加標識
+            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
             card.setAttribute('data-card-index', i);
         }
 
-        // 移除進度提示
         document.body.removeChild(progressDiv);
-        
-        // 保存PDF
         doc.save('generated_questions.pdf');
-        
     } catch (error) {
         console.error('PDF生成失敗：', error);
         document.body.removeChild(progressDiv);
         alert('PDF生成失敗，請稍後重試');
     }
 }
-
 // 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
