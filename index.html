@@ -1,6 +1,9 @@
 
 
 
+
+
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -50,6 +53,57 @@ body {
 * {
     box-sizing: border-box;
 }
+
+
+
+.progress-ring {
+    position: relative; /* 確保相對定位作為容器 */
+    transform: rotate(-90deg); /* 保持旋轉效果 */
+}
+
+/* 確保進度百分比居中並疊加 */
+.progress-ring .absolute {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(90deg); /* 反向旋轉以保持文字正向 */
+}
+
+/* 手機版調整 */
+@media (max-width: 767px) {
+    .progress-ring {
+        width: 80px;
+        height: 80px;
+    }
+    #progressPercent {
+        font-size: 1.25rem; /* 適配手機版大小 */
+    }
+}
+
+
+
+.practical-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.practical-table th, .practical-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.practical-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
 
 .copyright-footer {
     position: fixed;
@@ -387,6 +441,13 @@ body {
     backdrop-filter: blur(15px);
     background: linear-gradient(135deg, var(--primary-gray) 0%, var(--primary-blue) 100%);
     border-bottom: 3px solid var(--accent-gray);
+    padding: 15px 0; /* 原為 py-10 (40px)，減小到 15px */
+    transition: display 0.3s ease; /* 添加平滑過渡 */
+}
+
+/* 調整標題文字大小 */
+.floating-header h1 {
+    font-size: 2.5rem; /* 原為 5xl (約 3.75rem)，減小到 2.5rem */
 }
 
 .result-page {
@@ -1568,6 +1629,204 @@ textarea, input[type="text"] {
                                         </select>
                                     </div>
                                     
+
+<!-- 在主題選擇代碼後添加 -->
+<div class="mb-10">s=
+    <label clas"block text-xl font-semibold text-gray-700 mb-6">
+        <i class="fas fa-file-alt mr-3"></i>體裁選擇
+    </label>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 書信 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="書信">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '書信')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-envelope text-blue-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">書信</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('書信', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-書信" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('書信', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 演講辭 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="演講辭">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '演講辭')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-microphone text-red-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">演講辭</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('演講辭', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-演講辭" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('演講辭', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 報告 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="報告">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '報告')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-file-alt text-purple-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">報告</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('報告', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-報告" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('報告', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 建議書 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="建議書">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '建議書')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-lightbulb text-yellow-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">建議書</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('建議書', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-建議書" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('建議書', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 評論 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="評論">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '評論')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-comment-dots text-orange-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">評論</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('評論', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-評論" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('評論', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 專題文章 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="專題文章">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '專題文章')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-newspaper text-green-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">專題文章</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('專題文章', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-專題文章" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('專題文章', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 自訂 -->
+        <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-green-300 transition-all duration-300" data-type="自訂">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="toggle-switch mr-4" onclick="togglePracticalType(this, '自訂')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <div>
+                        <i class="fas fa-edit text-gray-500 text-2xl mr-3"></i>
+                        <span class="font-bold text-lg">自訂</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quantity-control mt-4" style="display: none;">
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('自訂', -1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-自訂" min="1" max="10" value="1" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" onclick="adjustPracticalQuantity('自訂', 1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customPracticalConfig" class="hidden">
+    <div class="divider"></div>
+    <div>
+        <label class="block text-xl font-semibold text-gray-700 mb-6">
+            <i class="fas fa-clipboard-list mr-3"></i>自訂參考內容
+        </label>
+        <div class="space-y-6">
+            <div>
+                <label for="customRefQuestion" class="block text-lg font-medium text-gray-700 mb-2">參考題目</label>
+                <textarea id="customRefQuestion" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0" rows="4" placeholder="輸入自訂的參考題目"></textarea>
+            </div>
+            <div>
+                <label for="customRefMaterial1" class="block text-lg font-medium text-gray-700 mb-2">參考資料一</label>
+                <textarea id="customRefMaterial1" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0" rows="4" placeholder="輸入自訂的參考資料一"></textarea>
+            </div>
+            <div>
+                <label for="customRefMaterial2" class="block text-lg font-medium text-gray-700 mb-2">參考資料二</label>
+                <textarea id="customRefMaterial2" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0" rows="4" placeholder="輸入自訂的參考資料二"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
                                     <div id="customTopicGroup" class="hidden">
                                         <label for="customTopic" class="block text-xl font-semibold text-gray-700 mb-6">
                                             <i class="fas fa-edit mr-3"></i>自訂主題內容
@@ -1611,31 +1870,32 @@ textarea, input[type="text"] {
 
     <!-- 進度顯示區域 -->
     <div id="progressModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
-        <div class="glass-card p-12 max-w-2xl w-full mx-6 text-center fade-in">
-            <div class="mb-10">
-                <div class="relative w-32 h-32 mx-auto mb-8">
-                    <svg class="progress-ring w-32 h-32" viewBox="0 0 120 120">
-                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="8"/>
-                        <circle id="progressCircle" cx="60" cy="60" r="54" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-linecap="round" class="progress-ring-circle" stroke-dasharray="0 339"/>
-                        <defs>
-                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#76d7c4"/>
-                                <stop offset="100%" style="stop-color:#45b39d"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span id="progressPercent" class="text-4xl font-bold" style="color: var(--primary-teal);">0%</span>
-                    </div>
+    <div class="glass-card p-12 max-w-2xl w-full mx-6 text-center fade-in">
+        <div class="mb-10">
+            <div class="relative w-32 h-32 mx-auto mb-8">
+                <svg class="progress-ring w-32 h-32" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="8"/>
+                    <circle id="progressCircle" cx="60" cy="60" r="54" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-linecap="round" class="progress-ring-circle" stroke-dasharray="0 339"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#76d7c4"/>
+                            <stop offset="100%" style="stop-color:#45b39d"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <!-- 將進度百分比移入進度圈容器內 -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span id="progressPercent" class="text-4xl font-bold" style="color: var(--primary-teal);">0%</span>
                 </div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-4">AI擬題中......</h3>
             </div>
-            <div class="text-center">
-                <div id="timeRemaining" class="text-3xl font-bold" style="color: var(--primary-blue);">--</div>
-                <div class="text-gray-500 mt-2 font-semibold">剩餘時間</div>
-            </div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">AI擬題中......</h3>
+        </div>
+        <div class="text-center">
+            <div id="timeRemaining" class="text-3xl font-bold" style="color: var(--primary-blue);">--</div>
+            <div class="text-gray-500 mt-2 font-semibold">剩餘時間</div>
         </div>
     </div>
+</div>
 
     <!-- 結果顯示頁面 -->
     <div id="resultContainer" class="hidden result-page">
@@ -1662,6 +1922,57 @@ textarea, input[type="text"] {
  
 
     <script>
+
+
+window.addEventListener('scroll', function() {
+    const header = document.querySelector('.floating-header');
+    if (window.scrollY > 0) {
+        header.style.display = 'none'; /* 滾動時隱藏 */
+    } else {
+        header.style.display = 'block'; /* 最上方時顯示 */
+    }
+});
+
+
+var selectedPracticalTypes = new Set();
+
+function togglePracticalType(toggleElement, practicalType) {
+    const isActive = toggleElement.classList.contains('active');
+    const quantityControl = toggleElement.closest('.question-type-selection').querySelector('.quantity-control');
+    
+    if (isActive) {
+        toggleElement.classList.remove('active');
+        selectedPracticalTypes.delete(practicalType);
+        if (quantityControl) {
+            quantityControl.style.display = 'none';
+        }
+        if (practicalType === '自訂') {
+            document.getElementById('customPracticalConfig').classList.add('hidden');
+        }
+    } else {
+        toggleElement.classList.add('active');
+        selectedPracticalTypes.add(practicalType);
+        if (quantityControl) {
+            quantityControl.style.display = 'flex';
+        }
+        if (practicalType === '自訂') {
+            document.getElementById('customPracticalConfig').classList.remove('hidden');
+        }
+    }
+}
+
+function adjustPracticalQuantity(practicalType, delta) {
+    const input = document.getElementById(`quantity-${practicalType}`);
+    if (input) {
+        let currentValue = parseInt(input.value) || 1;
+        currentValue += delta;
+        if (currentValue < 1) currentValue = 1;
+        if (currentValue > 10) currentValue = 10;
+        input.value = currentValue;
+    }
+}
+
+
         // 範文庫資料
         const textLibrary = {
             "version": "1.0",
@@ -1956,6 +2267,383 @@ textarea, input[type="text"] {
                 }
             ]
         };
+
+
+// 實用文試題庫
+const practicalQuestionBank = {
+    "專題文章": [
+        {
+            "題目": "杏壇中學學生會因應早前有關學生壓力的問卷調查結果，舉辦了「齊來減壓」活動。試以杏壇中學學生會會長董一心的身份，為校刊撰寫一篇專題文章，說明相關活動的好處，並鼓勵同學參加。",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #e3f2fd; border-radius: 10px;">
+<h2 style="color: #0288d1; font-size: 24px; margin: 10px 0;">杏壇中學學生會</h2>
+<h1 style="color: #0277bd; font-size: 28px; margin: 10px 0;">「齊來減壓」活動</h1>
+<p style="color: #039be5; font-size: 18px; margin-top: 15px;">為了讓同學減減壓，好好享受校園生活，學生會將於五月推行「齊來減壓」活動，歡迎同學參加。詳情如下：</p>
+</div>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #f0f8ff;">
+<td style="border: 2px solid #4a90e2; padding: 12px; font-weight: bold;">活動</td>
+<td style="border: 2px solid #4a90e2; padding: 12px; font-weight: bold;">內容</td>
+</tr>
+<tr>
+<td style="border: 2px solid #4a90e2; padding: 12px;">杏壇午間點唱站</td>
+<td style="border: 2px solid #4a90e2; padding: 12px;">經校園電台給同學、老師或工友點唱打打氣。</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #4a90e2; padding: 12px;">忙裡偷閒星期五</td>
+<td style="border: 2px solid #4a90e2; padding: 12px;">逢星期五放學後特設興趣班，例如手工藝、烹飪、樂器體驗等，讓同學放鬆身心。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #0288d1; margin-bottom: 15px;">杏壇中學學生壓力問卷調查報告結果（節錄）</h3>
+<p>根據問卷調查，本校學生的主要壓力來源如下：</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><span style="background-color: #ffeb3b; padding: 4px 8px; font-weight: bold;">學業前途</span>：因測驗、考試、升學方向感到焦慮。</li>
+<li><span style="background-color: #ffeb3b; padding: 4px 8px; font-weight: bold;">常感孤獨</span>：因專注學業忽略與人交往，致人際關係疏離。</li>
+</ul>`
+        },
+        {
+            "題目": "仁德中學將推行「食得健康校園行動」，同學對行動有不同意見。試以仁德中學學生會宣傳幹事潘安儀名義，撰寫一篇刊登在學生會網頁的專題文章，說明該行動如何有助同學改善健康，並鼓勵同學支持。（全文不得多於550字，標點符號計算在內）",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #e8f5e9; border-radius: 10px;">
+<h2 style="color: #2e7d32; font-size: 24px; margin: 10px 0;">仁德中學學生會</h2>
+<h1 style="color: #43a047; font-size: 28px; margin: 10px 0;">識飲識食 健康校園</h1>
+<p style="color: #388e3c; font-size: 18px; margin-top: 15px;">近月，校方發現同學的身體健康情況明顯轉差，不少同學更出現超重和肥胖問題。因此本會將舉辦「食得健康校園行動」，希望能助同學改善身體健康，增強體魄。</p>
+</div>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #e8f5e8;">
+<td style="border: 2px solid #4caf50; padding: 12px; font-weight: bold;">健康行動</td>
+<td style="border: 2px solid #4caf50; padding: 12px; font-weight: bold;">配合措施</td>
+</tr>
+<tr>
+<td style="border: 2px solid #4caf50; padding: 12px;">1. 出售健康食品</td>
+<td style="border: 2px solid #4caf50; padding: 12px;">小食部只出售低脂、低糖、低鈉的三低食品，停止供應油炸小食。</td>
+</tr>
+<tr style="background-color: #f1f8e9;">
+<td style="border: 2px solid #4caf50; padding: 12px;">2. 健康飲食日誌</td>
+<td style="border: 2px solid #4caf50; padding: 12px;">同學填寫健康飲食日誌，記錄每天飲食情況，計算每天攝取的熱量。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #2e7d32; margin-bottom: 15px;">仁德中學校園討論區節錄</h3>
+<p>主題：你支持「食得健康校園行動」嗎？</p>
+
+<div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+<div style="border-left: 4px solid #2196f3; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #1565c0;">樂樂</strong> <span style="color: #666; font-size: 12px;">2024/11/21 20:03</span>
+<p>小食部出售健康食品對我們的身體固然是好，不過三低食品的味道必然是不美味的啊！</p>
+</div>
+
+<div style="border-left: 4px solid #ff5722; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #d84315;">家豪</strong> <span style="color: #666; font-size: 12px;">2024/11/21 20:07</span>
+<p>每天光是做功課和溫習已疲憊不堪，還要記錄飲食情況？太浪費時間了吧？</p>
+</div>
+
+<div style="border-left: 4px solid #4caf50; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #2e7d32;">芷蕙</strong> <span style="color: #666; font-size: 12px;">2024/11/21 20:12</span>
+<p>健康與美味是否不能並存呢？「食得健康校園行動」有助我們建立健康飲食習慣，好處多多，實在是太好了！</p>
+</div>
+</div>`
+        }
+    ],
+    "演講辭": [
+        {
+            "題目": "香城中學中文學會擬推行「開卷有益」計劃，此舉引起同學的討論。試以香城中學中文學會主席何修端名義，撰寫一篇演講辭，在早會上向全體師生演講，針對同學的意見，游說他們支持該計劃。（全文不得多於550字，標點符號計算在內）",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #fff8e1; border-radius: 10px;">
+<h2 style="color: #8b4513; font-size: 24px; margin: 10px 0;">香城中學中文學會</h2>
+<h1 style="color: #d2691e; font-size: 28px; margin: 10px 0;">「開卷有益」計劃</h1>
+<p style="color: #a0522d; font-size: 18px; margin-top: 15px;">鑒於我校同學欠缺閱讀習慣，閱讀風氣未如理想，而閱讀卻在我們的學習以及成長上有舉足輕重的作用。中文學會擬於本學年舉實行「開卷有益」計劃，期望提升同學的閱讀量，培養閱讀習慣。</p>
+</div>
+
+<p>計劃詳情如下：</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #fff8dc;">
+<td style="border: 2px solid #daa520; padding: 12px; font-weight: bold;">「開卷有益」計劃</td>
+<td style="border: 2px solid #daa520; padding: 12px; font-weight: bold;">配合措施</td>
+</tr>
+<tr>
+<td style="border: 2px solid #daa520; padding: 12px; vertical-align: top;">增加閱讀時數<br>提升閱讀深度</td>
+<td style="border: 2px solid #daa520; padding: 12px;">每星期設一節閱讀課，於課堂閱讀。<br>每月一次班內閱讀分享會，由同學匯報閱讀心得。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #8b4513; margin-bottom: 15px;">中文學會討論區對話節錄</h3>
+<p>主題：「開卷有益」計劃之我見</p>
+
+<div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+<div style="border-left: 4px solid #f44336; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #c62828;">一心</strong> <span style="color: #666; font-size: 12px;">17:22</span>
+<p>同學自選讀物在課堂上閱讀，質素沒有保證，倒不如讓老師多教授應試技巧。</p>
+</div>
+
+<div style="border-left: 4px solid #ff9800; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #ef6c00;">允行</strong> <span style="color: #666; font-size: 12px;">18:12</span>
+<p>學校功課量本來就很多，還要應付閱讀分享？課堂分享會？浪費時間！</p>
+</div>
+
+<div style="border-left: 4px solid #4caf50; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #2e7d32;">家寶</strong> <span style="color: #666; font-size: 12px;">18:53</span>
+<p>閱讀幫助我們提升思維能力及拓闊視野，何樂而不為？閱讀課又能為同學提供閱讀空間！其實閱讀並非難事，只是事在人為。</p>
+</div>
+</div>`
+        },
+        {
+            "題目": "杏壇中學將於本學年推行「健康生活 快樂精神」計劃，同學在討論區各自表達了不同意見。試以杏壇中學健康大使洪一心的名義，撰寫一篇演講辭，在早會向全體同學說明該計劃如何有助同學的精神健康，並鼓勵同學支持。（全文不得多於550字，標點符號計算在內）",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #f3e5f5; border-radius: 10px;">
+<h2 style="color: #4a148c; font-size: 24px; margin: 10px 0;">杏壇中學健康校園小組</h2>
+<h1 style="color: #7b1fa2; font-size: 28px; margin: 10px 0;">「健康生活 快樂精神」</h1>
+<p style="color: #6a1b9a; font-size: 18px; margin-top: 15px;">為改善同學的精神健康，本校將於本學年推行「健康生活 快樂精神」計劃，讓全校同學參與。</p>
+</div>
+
+<p>詳情如下：</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #f3e5f5;">
+<td style="border: 2px solid #9c27b0; padding: 12px; font-weight: bold;">措施</td>
+<td style="border: 2px solid #9c27b0; padding: 12px; font-weight: bold;">內容</td>
+</tr>
+<tr>
+<td style="border: 2px solid #9c27b0; padding: 12px;">1. 運動益身心</td>
+<td style="border: 2px solid #9c27b0; padding: 12px;">每週增加兩節體育課，同學進行自選運動項目。</td>
+</tr>
+<tr style="background-color: #fce4ec;">
+<td style="border: 2px solid #9c27b0; padding: 12px;">2. 感恩分享站</td>
+<td style="border: 2px solid #9c27b0; padding: 12px;">收集感恩心意卡，於午膳時間經校園電台朗讀。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #4a148c; margin-bottom: 15px;">杏壇中學討論區對話節錄</h3>
+<p>主題：快樂精神計劃，你支持嗎？</p>
+
+<div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+<div style="border-left: 4px solid #ff9800; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #ef6c00;">楊彥行</strong>
+<p>體育課？學校是要我們身體健康，還是精神健康呢？不如想想其他對症下藥的方法吧？</p>
+</div>
+
+<div style="border-left: 4px solid #4caf50; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #2e7d32;">孫淑兒</strong>
+<p>這個計劃有助改善我們的生活習慣以及態度，值得支持！</p>
+</div>
+
+<div style="border-left: 4px solid #f44336; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #c62828;">曾逸天</strong>
+<p>有恩可感也不能減少生命中的苦難啊！「感恩分享會」實在是多此一舉！</p>
+</div>
+</div>`
+        }
+    ],
+    "書信": [
+        {
+            "題目": "「失明長者安老協會」現正招募中學生服務大使。試以萃文中學中五學生曾玲瓏的身份，撰寫一封自薦信，說明個人具備服務失明長者的兩個條件，並舉相關經驗以作證明。（須運用以下資料作答，全文不得多於550字，標點符號計算在內。）",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #e3f2fd; border-radius: 10px;">
+<h2 style="color: #1565c0; font-size: 24px; margin: 10px 0;">失明長者安老協會</h2>
+<h1 style="color: #0d47a1; font-size: 28px; margin: 10px 0;">中學生服務大使招募</h1>
+<p style="color: #1976d2; font-size: 18px; margin-top: 15px;">歡迎有愛心的中學生加入我們的服務行列，為失明長者提供關懷與支援</p>
+</div>`,
+            "資料二": `<h3 style="color: #1565c0; margin-bottom: 15px;">曾玲瓏的課外活動簡歷</h3>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #e3f2fd;">
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; text-align: center;"></td>
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; text-align: center;">中一</td>
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; text-align: center;">中二</td>
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; text-align: center;">中三</td>
+</tr>
+<tr>
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; background-color: #bbdefb;">服務</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧圖書館管理員</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧社會服務團：長者服務組組員<br>‧參加「與長者溝通」培訓班</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧社會服務團：長者服務組組長</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; background-color: #bbdefb;">文娛</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧校際廣播劇比賽團體冠軍</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧香城電台中學生「聲演好書」比賽亞軍</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧校際朗誦節二人對話亞軍<br>‧參加配音訓練班</td>
+</tr>
+<tr>
+<td style="border: 2px solid #2196f3; padding: 12px; font-weight: bold; background-color: #bbdefb;">學術</td>
+<td style="border: 2px solid #2196f3; padding: 12px;"></td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧聯校文史常識問答比賽亞軍</td>
+<td style="border: 2px solid #2196f3; padding: 12px;">‧校際閱讀報告比賽優異獎</td>
+</tr>
+</table>`
+        }
+    ],
+    "工作報告": [
+        {
+            "題目": "試以風雅中學中文學會主席許心潔的身份，撰寫工作報告，呈交黎曉輝校長，說明中文週活動未能達至活動目的的原因，以總結活動經驗。（須運用以上資料寫作，全文不得多於550字，標點符號計算在內。）",
+            "資料一": `<div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+<h3 style="color Ascendant-color: #e65100; margin-bottom: 10px;">便條內容</h3>
+<p><strong>心潔：</strong></p>
+<p>中文週活動已結束，請盡快撰寫工作報告給校長。報告中需要誠實反映活動的不足之處，以及分析原因。這樣有助於日後改善。</p>
+<p><strong>林博文老師</strong><br>中文學會顧問</p>
+</div>`,
+            "資料二": `<h3 style="color: #e65100; margin-bottom: 15px;">中文週活動檢討會議錄音（節錄）</h3>
+<p>會議重點摘錄</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>參與度問題</strong>：各項活動的學生參與率偏低，未能達到預期效果</li>
+<li><strong>宣傳不足</strong>：活動宣傳時間過短，同學對活動內容認識不足</li>
+<li><strong>時間安排</strong>：活動時間與其他學科考試撞期，影響同學參與意願</li>
+<li><strong>資源配置</strong>：部分活動預算不足，設備租借出現問題</li>
+</ul>`
+        },
+        {
+            "題目": "香城中學時事學會於三月舉行了「時事週」。試以時事學會會長王啟太的身份，撰寫一篇工作報告給學會顧問陳一新老師，說明「時事週」的成功及不足之處。",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #e0f7fa; border-radius: 10px;">
+<h2 style="color: #006064; font-size: 24px; margin: 10px 0;">香城中學時事學會「時事週」</h2>
+<h1 style="color: #00838f; font-size: 28px; margin: 10px 0;">關心社會大小事 由你我做起</h1>
+<p style="color: #00695c; font-size: 18px; margin-top: 15px;">為了提升同學對社會時事的認識和關注，時事學會將於3月18日至22日舉辦「時事週」，希望同學踴躍參與。活動詳情如下：</p>
+</div>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #e0f7fa;">
+<td style="border: 2px solid #00acc1; padding: 12px; font-weight: bold;">活動</td>
+<td style="border: 2px solid #00acc1; padding: 12px; font-weight: bold;">內容</td>
+</tr>
+<tr>
+<td style="border: 2px solid #00acc1; padding: 12px;">「時事知多少」講座</td>
+<td style="border: 2px solid #00acc1; padding: 12px;">講員從多角度分析香城人口老化的問題。</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #00acc1; padding: 12px;">十大本地新聞選舉</td>
+<td style="border: 2px solid #00acc1; padding: 12px;">同學投票選出十大本地新聞，並在早會時間增設新聞評論環節，同學可報名參加，暢所欲言。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #006064; margin-bottom: 15px;">「時事週」意見調查（節錄）</h3>
+<p>整理日期：2024年3月28日</p>
+<p>受訪參加者的意見：</p>
+
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>意見一</strong><br>本年活動使我獲益良多。十大本地新聞選舉讓我們有機會就熱門時事議題發表意見，同學的評論都很有見地。</li>
+<li><strong>意見二</strong><br>「時事知多少」講座內容涵蓋的議題不多，建議探討更多社會議題。</li>
+</ul>`
+        },
+        {
+            "題目": "禮賢書院於9月10日安排領袖生參與「揚帆出海 發揮潛能」海上教室活動。試以禮賢書院領袖生總隊長方智和的名義，撰寫一份工作報告，呈交梁文杰校長，說明該活動如何有助同學提升領袖才能，並感謝校方的栽培。（全文不得多於550字，標點符號計算在內。）",
+            "資料一": `<div style="text-align: center; margin: 20px 0; padding: 20px; background-color: #e8eaf6; border-radius: 10px;">
+<h2 style="color: #283593; font-size: 24px; margin: 10px 0;">禮賢書院</h2>
+<h1 style="color: #3f51b5; font-size: 28px; margin: 10px 0;">「揚帆出海 發揮潛能」海上教室活動通告</h1>
+<p style="color: #3949ab; font-size: 18px; margin-top: 15px;">為培育學生成為優秀的領袖，本校將於9月10日參與「揚帆出海 發揮潛能」海上教室活動，讓本校領袖生接受訓練。詳情如下：</p>
+</div>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #e8eaf6;">
+<td style="border: 2px solid #5c6bc0; padding: 12px; font-weight: bold;">活動</td>
+<td style="border: 2px solid #5c6bc0; padding: 12px; font-weight: bold;">內容詳情</td>
+</tr>
+<tr>
+<td style="border: 2px solid #5c6bc0; padding: 12px;">駕駛帆船</td>
+<td style="border: 2px solid #5c6bc0; padding: 12px;">同學分組駕駛帆船，學習操舵、升帆、換舷、下錨等，完成船長指令。</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #5c6bc0; padding: 12px;">逃生演習</td>
+<td style="border: 2px solid #5c6bc0; padding: 12px;">由導師指導同學穿上救生衣棄船逃生，突破自我。</td>
+</tr>
+</table>`,
+            "資料二": `<h3 style="color: #283593; margin-bottom: 15px;">參與同學的活動意見（節錄）</h3>
+
+<div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+<div style="border-left: 4px solid #2196f3; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #1565c0;">林家寶（中四甲）</strong>
+<p>參加前擔心活動太危險，怕自己沒有經驗，會發生意外，但其實是我杞人憂天而已。</p>
+</div>
+
+<div style="border-left: 4px solid #4caf50; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #2e7d32;">曾修端（中五乙）</strong>
+<p>活動令我獲益良多。領袖不是完美的，優秀的領袖生正是從各種挑戰和失敗中成長的。</p>
+</div>
+
+<div style="border-left: 4px solid #ff9800; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #ef6c00;">陳念慈（中四乙）</strong>
+<p>我和其他同學都覺得活動要日曬雨淋，很辛苦。不過也是值得的。</p>
+</div>
+
+<div style="border-left: 4px solid #9c27b0; padding-left: 15px; margin: 10px 0;">
+<strong style="color: #6a1b9a;">方智和（中五甲）</strong>
+<p>謝謝，我會歸納大家的意見，撰寫活動報告，在9月底前呈交給梁校長，匯報活動成果。</p>
+</div>
+</div>`
+        }
+    ],
+    "評論文章": [
+        {
+            "題目": "試以香城中學文化學會主席張家寶的名義，撰寫一篇刊登於學生報的評論文章，就香城文化節的目標，提出看法。（全文不得多於550字，標點符號計算在內。）",
+            "資料一": `<div style="margin: 20px 0; padding: 20px; background-color: #efebe9; border-radius: 10px;">
+<h2 style="color: #5d4037; font-size: 24px; margin: 10px 0;">香城中學網頁</h2>
+<h3 style="color: #6d4c41; font-size: 20px; margin: 10px 0;">中國語文科</h3>
+<h1 style="color: #4e342e; font-size: 28px; margin: 10px 0;">香城文化節</h1>
+
+<p><strong>背景</strong></p>
+<p style="color: #5d4037; margin: 10px 0;">香城是一個現代化城市，也擁有獨特的歷史背景。幾個世紀以來，孕育了香城特有的傳統文化。然而隨著社會發展，許多地道的傳統節日已今非昔比，其源流及習俗已被遺忘；同時，一些傳統手工藝，也因時代發展而日漸式微，入行的年輕人越來越少，傳統手藝面臨失傳的危機。</p>
+<p style="color: #5d4037; margin: 10px 0;">有見及此，本校中國語文科擬於下學期舉辦香城文化節，供全校同學參加。</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #d7ccc8;">
+<td style="border: 2px solid #8d5524; padding: 12px; font-weight: bold;">香城文化節</td>
+<td style="border: 2px solid #8d5524; padding: 12px; font-weight: bold;">目標</td>
+<td style="border: 2px solid #8d5524; padding: 12px; font-weight: bold;">內容</td>
+</tr>
+<tr>
+<td style="border: 2px solid #8d5524; padding: 12px;">推廣傳統節日</td>
+<td style="border: 2px solid #8d5524; padding: 12px;">推廣傳統節日</td>
+<td style="border: 2px solid #8d5524; padding: 12px;">以展板介紹香城的道地節日，包括節日起源、傳統習俗等。</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #8d5524; padding: 12px;">探知傳統文化背後的人物故事</td>
+<td style="border: 2px solid #8d5524; padding: 12px;">讓市民與昔日香城鄉村生活連繫。</td>
+<td style="border: 2px solid #8d5524; padding: 12px;">邀請從事傳統手工藝行業的老師傅，分享入行經歷及與行業相關的趣事。</td>
+</tr>
+</table>
+</div>`,
+            "資料二": `<h3 style="color: #5d4037; margin-bottom: 15px;">香城中學文化學會問卷調查結果（節錄）</h3>
+<p>調查重點發現</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>文化認知度</strong>：82%學生對香城傳統文化了解不足</li>
+<li><strong>參與意願</strong>：67%學生表示有興趣參加文化節活動</li>
+<li><strong>期望內容</strong>：學生最感興趣的是傳統手工藝體驗</li>
+<li><strong>時間安排</strong>：建議安排在學期中段，避免考試期間</li>
+</ul>`
+        },
+        {
+            "題目": "試以「活化善行小學關注組」主席林青青名義，撰寫一篇刊登於香城南區區報的評論文章，就南區區議會「活化善行小學方案」的目標，提出看法。（全文不得多於550字，標點符號計算在內。）",
+            "資料一": `<div style="margin: 20px 0; padding: 20px; background-color: #e0f2f1; border-radius: 10px;">
+<h2 style="color: #00695c; font-size: 24px; margin: 10px 0;">香城南區區議會</h2>
+<h1 style="color: #00897b; font-size: 28px; margin: 10px 0;">活化善行小學方案</h1>
+
+<p><strong>背景</strong></p>
+<p style="color: #00695c; margin: 10px 0;">樂漁村位處香城南區，是區內已有二百多年歷史的臨海村落。善行小學是該村的地標，鄰近避風塘，在近百年前由村民籌辦，為該村及附近的漁民子弟提供上學讀書機會，後來更成為香城首間由私塾轉為官立的學校。</p>
+<p style="color: #00695c; margin: 10px 0;">小學停辦已近十年，校舍至今仍然廢置，故南區區議會於本年初向香城政府提出「活化善行小學方案」，建議把小學活化為「民間生活館」，開放予公眾參觀及參與活動。</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+<tr style="background-color: #b2dfdb;">
+<td style="border: 2px solid #26a69a; padding: 12px; font-weight: bold;">「活化善行小學方案」</td>
+<td style="border: 2px solid #26a69a; padding: 12px; font-weight: bold;">目標</td>
+<td style="border: 2px solid #26a69a; padding: 12px; font-weight: bold;">內容</td>
+</tr>
+<tr>
+<td style="border: 2px solid #26a69a; padding: 12px;">活化計劃</td>
+<td style="border: 2px solid #26a69a; padding: 12px;">使下一代認識香城早期教育的特色。</td>
+<td style="border: 2px solid #26a69a; padding: 12px;">設展示廊，介紹善行小學校史及香城早期教育發展。</td>
+</tr>
+<tr style="background-color: #f9f9f9;">
+<td style="border: 2px solid #26a69a; padding: 12px;">活化計劃</td>
+<td style="border: 2px solid #26a69a; padding: 12px;">讓市民與昔日香城鄉村生活連繫。</td>
+<td style="border: 2px solid #26a69a; padding: 12px;">設生活體驗中心，用以舉辦農耕生活體驗活動。</td>
+</tr>
+</table>
+</div>`,
+            "資料二": `<h3 style="color: #00695c; margin-bottom: 15px;">「活化善行小學關注組」問卷調查結果（節錄）</h3>
+<p>調查重點發現</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>地區支持度</strong>：78%居民支持活化計劃</li>
+<li><strong>關注重點</strong>：希望保留小學原有建築特色</li>
+<li><strong>期望用途</strong>：優先考慮教育展示功能</li>
+<li><strong>交通配套</strong>：建議增設公共交通路線</li>
+<li><strong>營運模式</strong>：傾向非牟利機構管理</li>
+</ul>`
+        }
+    ]
+};
+
 
 
 // 寫作試題庫資料
@@ -3564,6 +4252,7 @@ D. [選項D內容]
 2. 4個選項（A、B、C、D），選項應該合理且有相當高的迷惑性
 3. 正確答案（明確標明選項字母和內容）
 4. 詳細的答題步驟
+5. 4個選項（A、B、C、D）都必須是意思相近的句子，不可以是反義的句子
 
 選項必須放在「選擇題選項容器」下方，確保格式正確。`;
             }
@@ -3779,8 +4468,7 @@ function parseChoiceResponse(response, count) {
 
 
 
-
-      async function generateEssayQuestions() {
+async function generateEssayQuestions() {
     let allQuestions = [];
     
     for (const questionType of selectedWritingTypes) {
@@ -3788,95 +4476,48 @@ function parseChoiceResponse(response, count) {
         const quantity = parseInt(quantityInput.value);
         
         let refQuestions = [];
+        let referenceLength = null;
         
         if (questionType === '自訂') {
             refQuestions = Array.from(document.querySelectorAll('.essay-reference textarea'))
                 .map(el => el.value.trim())
                 .filter(val => val);
+            // 從試題庫中隨機選取一個題目作為長度參考
+            const bankQuestions = writingQuestionBank[Object.keys(writingQuestionBank)[0]];
+            const randomIndex = Math.floor(Math.random() * bankQuestions.length);
+            const referenceQuestion = bankQuestions[randomIndex].題目;
+            referenceLength = referenceQuestion.length;
         } else {
             const examples = getWritingQuestionBankExamples(questionType, quantity);
             refQuestions = examples;
         }
 
-        // 重試機制
-        let parsed = [];
-        let retryCount = 0;
-        const maxRetries = 3;
-        
-        while (retryCount < maxRetries) {
-            try {
-                const requestBody = {
-                    model: MODEL,
-                    messages: [
-                        { role: "system", content: "你是一個長文寫作題目生成器。" },
-                        { role: "user", content: `請根據以下參考題目，生成${quantity}個相應的「${questionType}」類型題目：
-
+        const requestBody = {
+            model: MODEL,
+            messages: [
+                { role: "system", content: "你是一個長文寫作題目生成器。" },
+                { role: "user", content: `請根據以下參考題目，生成${quantity}個相應的「${questionType}」類型題目：
 參考題目：
 ${refQuestions.map((ref, index) => `參考${index + 1}：${ref}`).join('\n')}
-
 題型類別：${questionType}
-
-請生成${quantity}個「${questionType}」類型的長文寫作題目。生成的題目應符合「${questionType}」文體的特點和要求。必須用繁體中文回應。
-
+${referenceLength ? `請注意，生成的題目長度與參考題目不必相近，應與試題庫中的題目相近，約${referenceLength}字。` : ''}
+請生成${quantity}個「${questionType}」類型的長文寫作題目。生成的題目應符合「${questionType}」文體的特點和要求，並且內容必須與現有試題庫中的題目不同，但其關鍵詞的性質要與參考題目相似，例如參考題目為「鏡子」，生成題目的關鍵詞可以為「路燈」，因為兩者都是物件。必須用繁體中文回應。
 請以以下格式輸出生成的題目、題解和方向：
 題目1：[生成的題目1]
 題解1：[生成的題解1]
 方向1：[生成的方向1]
-
 題目2：[生成的題目2]
 題解2：[生成的題解2]
 方向2：[生成的方向2]
-
 （依此類推生成所有題目）
-
 必須用繁體中文回應。絕對不要文學性，絕對不要運用文筆及太深奧的詞匯擬題(動詞和名詞的搭配運用不宜搞新意和雕琢，例如「凝結在指縫」的「凝結」和「指縫」、「停駐在窗前」的「停駐」和「窗」，這些都不是常規的配搭，會令題目用語看起來很生澀,請在擬題中斂起你的文筆和才華，題目中不同詞匯的配搭必須平實，不能新鮮)，違反則無效。不要提供太多細節，不要具體描述題目的事件，要足夠空泛才有發揮空間，不要將題目範圍鎖得太小（例如「墜落在深淵的星屑」，太局限了），不要擬訂以描寫為主的題目。擬題時盡量少用以短語構成的定語，必須在形式、句式、用語和字數上參考用家提供的題目（開關引號的內容除外)，違反則無效，但生成題目的內容及題材絕對不可與原本的題目相似（例如參考題目為「沉默」，生成題目則用「留白」或「無聲」等近義詞，這些例子都屬於相似），違反則無效。假如參考題目有逗引，然後再點明題目，便絕對不能只生成題目，假如參考題目沒有逗引，那就必須生成沒有逗引的題目，一切視乎參考題目的形式和字數如何，請模仿參考題目的形式和字數，違反則無效，其生成題目形式及參考題目形式必與參考題目一致。除了生成題目之外，不要顯示任何其他不相關的內容，違反則無效。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。` }
-                    ],
-                    max_tokens: 64000
-                };
+            ],
+            max_tokens: 64000
+        };
 
-                const response = await callAPI(requestBody);
-                parsed = parseWritingResponse(response, quantity);
-                
-                // 檢查是否有生成失敗的題目
-                const hasFailure = parsed.some(item => 
-                    item.question.includes('生成失敗') || 
-                    item.solution.includes('生成失敗') || 
-                    item.direction.includes('生成失敗') ||
-                    item.question.includes('未生成') ||
-                    item.solution.includes('未生成') ||
-                    item.direction.includes('未生成') ||
-                    !item.question.trim() ||
-                    !item.solution.trim() ||
-                    !item.direction.trim()
-                );
-                
-                if (!hasFailure) {
-                    break;
-                } else {
-                    retryCount++;
-                    console.log(`${questionType}題型第${retryCount}次重試`);
-                    if (retryCount >= maxRetries) {
-                        console.error(`${questionType}題型重試${maxRetries}次後仍然失敗`);
-                    }
-                }
-            } catch (error) {
-                retryCount++;
-                console.error(`${questionType}題型生成錯誤，第${retryCount}次重試:`, error);
-                if (retryCount >= maxRetries) {
-                    parsed = Array(quantity).fill().map((_, i) => ({
-                        question: `題目${i+1}生成失敗，請檢查網路連接並重試`,
-                        solution: `題解${i+1}生成失敗，請檢查網路連接並重試`,
-                        direction: `方向${i+1}生成失敗，請檢查網路連接並重試`
-                    }));
-                }
-            }
-        }
-        
-        // 為每個題目添加題型標籤
-        parsed.forEach(item => {
-            item.type = questionType;
-        });
-        
+        const response = await callAPI(requestBody);
+        const parsed = parseWritingResponse(response, quantity);
+        parsed.forEach(item => item.type = questionType);
         allQuestions = allQuestions.concat(parsed);
     }
     
@@ -4011,15 +4652,16 @@ function toggleWritingAnswer(button, typeColor) {
 }
 
 
-        async function generatePracticalQuestions() {
+     async function generatePracticalQuestions() {
     const selectedTopic = document.getElementById('topicSelect').value;
-    const refQuestion = document.getElementById('refQuestion').value.trim();
-    const refMaterial1 = document.getElementById('refMaterial1').value.trim();
-    const refMaterial2 = document.getElementById('refMaterial2').value.trim();
-
     let topicInstruction;
     if (selectedTopic === 'custom') {
         const customTopic = document.getElementById('customTopic').value.trim();
+        if (!customTopic) {
+            showError('請輸入自訂主題');
+            hideProgress();
+            return;
+        }
         topicInstruction = `請以「${customTopic}」為主題。`;
     } else if (selectedTopic === 'random') {
         topicInstruction = '請隨機選擇一個主題，且該主題必須與以下列出的所有主題（運動、生涯規劃、責任、教育、文化、社會、歷史、地理、藝術、體育、法律、健康、心理、家庭、友誼、愛情、就業、經濟、生態、能源、資源、安全、網路、媒體、資訊、道德、誠信、公平、自由、權利、義務、隱私、禮儀、榜樣、創新、創業、消費、儲蓄、民族、語言、宗教、傳統、現代、城鄉、社區、公益、慈善、災害、醫療、疾病、飲食、旅遊、建築、娛樂、音樂、電影、文學、人口、性別、年齡、職業、學業、考試、升學、校園、師生、同學、課外、社團、競賽、志願、壓力、自律、時間、興趣、習慣、遊戲、睡眠、氣候、汙染、閱讀）不同，例如可以選擇「科技發展」、「全球化」等其他主題。';
@@ -4027,73 +4669,81 @@ function toggleWritingAnswer(button, typeColor) {
         topicInstruction = `請以「${selectedTopic}」為主題。`;
     }
 
-    let parsed = { question: '未生成', material1: '未生成', material2: '未生成' };
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (retryCount < maxRetries) {
-        try {
+    if (selectedPracticalTypes.size === 0) {
+        showError('請至少選擇一種體裁');
+        hideProgress();
+        return;
+    }
+
+    let allQuestions = [];
+
+    for (const practicalType of selectedPracticalTypes) {
+        const quantityInput = document.getElementById(`quantity-${practicalType}`);
+        const quantity = parseInt(quantityInput.value);
+
+        let refQuestion = '';
+        let refMaterial1 = '';
+        let refMaterial2 = '';
+        let formatReference = '';
+
+        if (practicalType === '自訂') {
+            refQuestion = document.getElementById('customRefQuestion').value.trim();
+            refMaterial1 = document.getElementById('customRefMaterial1').value.trim();
+            refMaterial2 = document.getElementById('customRefMaterial2').value.trim();
+            if (!refQuestion || !refMaterial1 || !refMaterial2) {
+                showError('自訂模式下請完整輸入參考題目及資料');
+                hideProgress();
+                return;
+            }
+            // 選取一個隨機的實用文範例作為格式參考
+            const randomType = Object.keys(practicalQuestionBank)[Math.floor(Math.random() * Object.keys(practicalQuestionBank).length)];
+            const examples = getPracticalQuestionBankExamples(randomType, 1);
+            if (examples.length > 0) {
+                formatReference = `請參考以下格式：
+題目格式：${examples[0].題目}
+資料一格式：${examples[0].資料一}
+資料二格式：${examples[0].資料二}`;
+            }
+        } else {
+            const examples = getPracticalQuestionBankExamples(practicalType, 1);
+            if (examples.length > 0) {
+                const example = examples[0];
+                refQuestion = example.題目;
+                refMaterial1 = example.資料一;
+                refMaterial2 = example.資料二;
+            }
+        }
+
+        for (let i = 0; i < quantity; i++) {
             const requestBody = {
                 model: MODEL,
                 messages: [
                     { role: "system", content: "你是一個實用文題目生成器。" },
                     { role: "user", content: `請根據以下參考內容生成相應的實用文題目和資料：
-
 參考題目：
 ${refQuestion}
-
 參考資料一：
 ${refMaterial1}
-
 參考資料二：
 ${refMaterial2}
-
-${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內容的風格和形式，但內容和題材必須不同。生成的題目應與參考題目在形式和字數上相似，但內容和題材必須不同。生成的資料一應與參考資料一在形式和風格上相似，但內容和題材必須不同；生成的資料二應與參考資料二在形式和風格上相似，但內容和題材必須不同。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
-
+${formatReference}
+${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內容的風格和形式，但內容和題材必須不同。生成的題目應與參考題目在形式和字數上相似，但內容和題材必須不同。生成的資料一應與參考資料一在形式和風格上相似，但內容和題材必須不同；生成的資料二應與參考資料二在形式和風格上相似，但內容和題材必須不同。資料中若包含表格，需使用HTML格式生成，表格樣式需與參考資料一致。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 請以以下格式輸出生成的題目和資料：
 題目：[生成的題目]
 資料一：[生成的資料一]
 資料二：[生成的資料二]` }
                 ],
-                max_tokens: 8192
+                max_tokens: 64000
             };
 
             const response = await callAPI(requestBody);
-            parsed = parsePracticalResponse(response);
-            
-            // 檢查是否生成成功
-            if (parsed.question !== '未生成' && 
-                parsed.material1 !== '未生成' && 
-                parsed.material2 !== '未生成' &&
-                parsed.question.trim() &&
-                parsed.material1.trim() &&
-                parsed.material2.trim()) {
-                break; // 生成成功，跳出重試循環
-            } else {
-                retryCount++;
-                console.log(`實用文第${retryCount}次重試`);
-                if (retryCount >= maxRetries) {
-                    parsed = {
-                        question: '生成失敗，請檢查輸入內容並重試',
-                        material1: '生成失敗，請檢查輸入內容並重試',
-                        material2: '生成失敗，請檢查輸入內容並重試'
-                    };
-                }
-            }
-        } catch (error) {
-            retryCount++;
-            console.error(`實用文生成錯誤，第${retryCount}次重試:`, error);
-            if (retryCount >= maxRetries) {
-                parsed = {
-                    question: '生成失敗，請檢查網路連接並重試',
-                    material1: '生成失敗，請檢查網路連接並重試',
-                    material2: '生成失敗，請檢查網路連接並重試'
-                };
-            }
+            const parsed = parsePracticalResponse(response);
+            parsed.type = practicalType;
+            allQuestions.push(parsed);
         }
     }
-    
-    displayPracticalQuestions(parsed);
+
+    displayPracticalQuestions(allQuestions);
 }
 
 
@@ -4218,42 +4868,41 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
             
             return parsed;
         }
+function parsePracticalResponse(response) {
+    const cleanResponse = removeThinkingTags(response);
+    const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
 
-        function parsePracticalResponse(response) {
-            const cleanResponse = removeThinkingTags(response);
-            const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
-            
-            let question = '未生成';
-            let material1 = '未生成';
-            let material2 = '未生成';
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line.startsWith('題目：')) {
-                    question = line.replace('題目：', '').trim();
-                } else if (line.startsWith('資料一：')) {
-                    let content = line.replace('資料一：', '').trim();
-                    let j = i + 1;
-                    while (j < lines.length && !lines[j].startsWith('資料二：') && !lines[j].startsWith('題目：')) {
-                        content += '\n' + lines[j].trim();
-                        j++;
-                    }
-                    material1 = content.trim();
-                    i = j - 1;
-                } else if (line.startsWith('資料二：')) {
-                    let content = line.replace('資料二：', '').trim();
-                    let j = i + 1;
-                    while (j < lines.length && !lines[j].startsWith('題目：') && !lines[j].startsWith('資料一：')) {
-                        content += '\n' + lines[j].trim();
-                        j++;
-                    }
-                    material2 = content.trim();
-                    i = j - 1;
-                }
+    let question = '未生成';
+    let material1 = '未生成';
+    let material2 = '未生成';
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.startsWith('題目：')) {
+            question = line.replace('題目：', '').trim();
+        } else if (line.startsWith('資料一：')) {
+            let content = line.replace('資料一：', '').trim();
+            let j = i + 1;
+            while (j < lines.length && !lines[j].startsWith('資料二：') && !lines[j].startsWith('題目：')) {
+                content += '\n' + lines[j].trim();
+                j++;
             }
-            
-            return { question, material1, material2 };
+            material1 = content.trim();
+            i = j - 1;
+        } else if (line.startsWith('資料二：')) {
+            let content = line.replace('資料二：', '').trim();
+            let j = i + 1;
+            while (j < lines.length && !lines[j].startsWith('題目：') && !lines[j].startsWith('資料一：')) {
+                content += '\n' + lines[j].trim();
+                j++;
+            }
+            material2 = content.trim();
+            i = j - 1;
         }
+    }
+
+    return { question, material1, material2 };
+}
 
         // 顯示結果函數
         function displayReadingQuestions(allQuestions) {
@@ -4298,32 +4947,25 @@ ${topicInstruction}請生成一個新的題目和兩個資料，模仿參考內�
 
             showResult();
         }
+function displayPracticalQuestions(allQuestions) {
+    hideProgress();
 
-        function displayPracticalQuestions(parsed) {
-            hideProgress();
-            
-            const questionsDisplay = document.getElementById('questionsDisplay');
-            questionsDisplay.innerHTML = '';
+    const questionsDisplay = document.getElementById('questionsDisplay');
+    questionsDisplay.innerHTML = '';
 
-            if (parsed.question === '未生成' || parsed.material1 === '未生成' || parsed.material2 === '未生成') {
-                showError('生成內容失敗，請重試');
-                return;
-            }
+    allQuestions.forEach((item, index) => {
+        const titleCard = createQuestionCard(`第${index + 1}題 - 題目`, item.question, null, null, item.type);
+        questionsDisplay.appendChild(titleCard);
 
-            // 創建題目卡片
-            const titleCard = createQuestionCard('題目', parsed.question, null, null, 'practical');
-            questionsDisplay.appendChild(titleCard);
+        const material1Card = createQuestionCard(`第${index + 1}題 - 資料一`, item.material1, null, null, item.type);
+        questionsDisplay.appendChild(material1Card);
 
-            // 創建資料一卡片
-            const material1Card = createQuestionCard('資料一', parsed.material1, null, null, 'practical');
-            questionsDisplay.appendChild(material1Card);
+        const material2Card = createQuestionCard(`第${index + 1}題 - 資料二`, item.material2, null, null, item.type);
+        questionsDisplay.appendChild(material2Card);
+    });
 
-            // 創建資料二卡片
-            const material2Card = createQuestionCard('資料二', parsed.material2, null, null, 'practical');
-            questionsDisplay.appendChild(material2Card);
-
-            showResult();
-        }
+    showResult();
+}
 
         function createQuestionCard(title, content, answer = null, steps = null, type = 'default') {
     const card = document.createElement('div');
@@ -4610,13 +5252,32 @@ function getWritingQuestionBankExamples(questionType, count = 3) {
 }
 
 
+function getPracticalQuestionBankExamples(practicalType, count = 1) {
+    if (!practicalQuestionBank[practicalType]) {
+        return [];
+    }
 
+    const examples = practicalQuestionBank[practicalType];
+    const selectedCount = Math.min(count, examples.length);
+    const selectedExamples = [];
+    const usedIndexes = new Set();
+
+    while (selectedExamples.length < selectedCount) {
+        const randomIndex = Math.floor(Math.random() * examples.length);
+        if (!usedIndexes.has(randomIndex)) {
+            usedIndexes.add(randomIndex);
+            selectedExamples.push(examples[randomIndex]);
+        }
+    }
+
+    return selectedExamples;
+}
 
     </script>
 
    <!-- Copyright Footer -->
    <footer class="copyright-footer">
-        <p>Copyright © 2025 陳冠健. All rights reserved.</p>
+        <p>Copyright © 2025 陳. All rights reserved.</p>
     </footer>
 
     
