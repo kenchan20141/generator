@@ -90,20 +90,94 @@ body {
 
 
 /* 響應式PDF輸出優化 */
+/* 修訂：手機端 PDF 優化樣式 */
 @media print {
     html, body {
-        width: 794px !important; /* A4寬度，96dpi */
-        height: 1123px !important; /* A4高度，96dpi */
+        width: 794px !important;
+        height: 1123px !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important; /* 確保內容不被截斷 */
-        background: #ffffff !important; /* 純白背景 */
-        color: #000000 !important; /* 純黑文字 */
-        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
-        print-color-adjust: exact !important; /* 標準屬性 */
-        font-size: 12pt !important; /* 提高可讀性 */
-        line-height: 1.5 !important; /* 調整行距 */
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-size: 14pt !important; /* 修訂：調整字體大小 */
+        line-height: 1.6 !important; /* 修訂：優化行距 */
     }
+
+    /* 修訂：內容區域最大化利用空間 */
+    #questionsDisplay {
+        width: 100% !important;
+        max-width: 754px !important; /* 修訂：減少邊距 */
+        margin: 0 auto !important;
+        padding: 15px !important; /* 修訂：減少內距 */
+    }
+
+    /* 修訂：問題卡片最大化利用空間 */
+    .question-card {
+        width: 724px !important; /* 修訂：增加寬度 */
+        height: auto !important;
+        margin: 15px auto !important; /* 修訂：減少間距 */
+        padding: 20px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        page-break-inside: avoid !important;
+        box-sizing: border-box !important;
+        border: 1px solid #000000 !important;
+        font-size: 14px !important; /* 修訂：調整字體 */
+    }
+
+    /* 修訂：標題區域優化 */
+    .question-title {
+        font-size: 16px !important; /* 修訂：適度放大標題 */
+        padding: 15px 20px !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* 修訂：內容區域優化 */
+    .question-card .bg-gradient-to-br {
+        padding: 20px !important; /* 修訂：增加內容區padding */
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+
+    /* 強化文字與背景高對比 */
+    .question-title, .answer-section, .steps-section, 
+    p, span, div, h1, h2, h3, h4, h5, h6 {
+        background: #ffffff !important;
+        color: #000000 !important;
+        opacity: 1 !important;
+    }
+
+    /* 表格清晰度 */
+    table, th, td {
+        border: 1px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12px !important; /* 修訂：表格字體調整 */
+    }
+
+    /* 移除不需要的元素 */
+    .floating-header, .floating-generate-btn, 
+    .copyright-footer, .btn-primary, .btn-secondary, 
+    .btn-accent, button {
+        display: none !important;
+    }
+
+    /* 移除漸變與透明度 */
+    [style*="linear-gradient"], [style*="opacity"], [style*="rgba"] {
+        background: #ffffff !important;
+        opacity: 1 !important;
+        color: #000000 !important;
+    }
+
+    /* 確保所有文字為黑色 */
+    * {
+        color: #000000 !important;
+    }
+}
+
 
     /* 內容區域適應A4 */
     #questionsDisplay {
@@ -2064,14 +2138,17 @@ var selectedPracticalTypes = new Set();
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    const A4_WIDTH = 794; // A4寬度（像素，96dpi）
-    const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
+    
+    // 修訂：調整 A4 尺寸以更好利用空間，並設置壓縮參數
+    const A4_WIDTH = 794;
+    const A4_HEIGHT = 1123;
     
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
         format: [A4_WIDTH, A4_HEIGHT],
-        compress: false // 禁用壓縮以提升質量
+        compress: true, // 修訂：啟用壓縮
+        compressPdf: true // 修訂：額外壓縮選項
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
@@ -2104,31 +2181,35 @@ async function exportToPDF() {
             // 保存原始樣式並強化文字
             const originalStyles = enhanceTextForPDF(card);
             
-            // 設置A4適應樣式
+            // 修訂：設置更大的擷取尺寸以更好利用 A4 空間
             const originalStyle = card.getAttribute('style') || '';
             card.style.cssText = `
                 position: relative !important;
-                width: 754px !important;
+                width: 750px !important;
                 height: auto !important;
                 margin: 0 auto !important;
-                padding: 20px !important;
+                padding: 25px !important;
                 background: #ffffff !important;
                 color: #000000 !important;
                 page-break-inside: avoid !important;
                 border: 1px solid #000000 !important;
+                font-size: 16px !important;
+                line-height: 1.6 !important;
             `;
 
             // 等待樣式應用
             await new Promise(resolve => setTimeout(resolve, 100));
 
             const canvas = await html2canvas(card, {
-                scale: 3, // 提升解析度
+                scale: 4, // 修訂：提升解析度至 4 倍
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                width: 754,
+                width: 750,
                 height: card.scrollHeight,
                 windowWidth: 794,
                 windowHeight: A4_HEIGHT,
+                logging: false, // 修訂：關閉日誌以減少檔案大小
+                allowTaint: false,
                 onclone: function(clonedDoc) {
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
                                      clonedDoc.querySelectorAll('.question-card')[0];
@@ -2142,23 +2223,112 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            const imgWidth = A4_WIDTH - 40; // 留邊距
+            // 修訂：調整圖片尺寸以更好利用 A4 空間
+            const imgWidth = A4_WIDTH - 30; // 修訂：減少邊距至 15px 每邊
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             if (i > 0) doc.addPage();
-            const imgData = canvas.toDataURL('image/png', 1.0); // 最高質量PNG
-            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
+            
+            // 修訂：使用 JPEG 格式和適度壓縮以控制檔案大小
+            const imgData = canvas.toDataURL('image/jpeg', 0.85); // 修訂：JPEG 格式，85% 品質
+            doc.addImage(imgData, 'JPEG', 15, 15, imgWidth, Math.min(imgHeight, A4_HEIGHT - 30));
             card.setAttribute('data-card-index', i);
         }
 
         document.body.removeChild(progressDiv);
-        doc.save('generated_questions.pdf');
+        
+        // 修訂：檢查檔案大小並在超過 15MB 時進一步壓縮
+        const pdfOutput = doc.output('blob');
+        const fileSizeMB = pdfOutput.size / (1024 * 1024);
+        
+        if (fileSizeMB > 15) {
+            // 如果檔案超過 15MB，重新生成較低品質版本
+            alert(`檔案大小為 ${fileSizeMB.toFixed(1)}MB，超過限制。正在重新生成壓縮版本...`);
+            await regeneratePDFWithCompression(questionCards);
+        } else {
+            doc.save('generated_questions.pdf');
+        }
+        
     } catch (error) {
         console.error('PDF生成失敗：', error);
         document.body.removeChild(progressDiv);
         alert('PDF生成失敗，請稍後重試');
     }
-}// 修訂：新增函數來強化PDF轉換前的文字樣式
+}
+
+        async function regeneratePDFWithCompression(questionCards) {
+    const { jsPDF } = window.jspdf;
+    const A4_WIDTH = 794;
+    const A4_HEIGHT = 1123;
+    
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [A4_WIDTH, A4_HEIGHT],
+        compress: true,
+        compressPdf: true
+    });
+
+    for (let i = 0; i < questionCards.length; i++) {
+        const card = questionCards[i];
+        
+        const originalStyles = enhanceTextForPDF(card);
+        const originalStyle = card.getAttribute('style') || '';
+        
+        card.style.cssText = `
+            position: relative !important;
+            width: 750px !important;
+            height: auto !important;
+            margin: 0 auto !important;
+            padding: 25px !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            page-break-inside: avoid !important;
+            border: 1px solid #000000 !important;
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+        `;
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const canvas = await html2canvas(card, {
+            scale: 2, // 降低解析度
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            width: 750,
+            height: card.scrollHeight,
+            windowWidth: 794,
+            windowHeight: A4_HEIGHT,
+            logging: false,
+            allowTaint: false
+        });
+
+        card.setAttribute('style', originalStyle);
+        restoreOriginalStyles(card, originalStyles);
+
+        const imgWidth = A4_WIDTH - 30;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (i > 0) doc.addPage();
+        
+        // 使用更低品質的壓縮
+        const imgData = canvas.toDataURL('image/jpeg', 0.6); // 60% 品質
+        doc.addImage(imgData, 'JPEG', 15, 15, imgWidth, Math.min(imgHeight, A4_HEIGHT - 30));
+    }
+
+    const finalPdfOutput = doc.output('blob');
+    const finalFileSizeMB = finalPdfOutput.size / (1024 * 1024);
+    
+    if (finalFileSizeMB > 15) {
+        alert(`壓縮後檔案仍為 ${finalFileSizeMB.toFixed(1)}MB，建議減少題目數量。`);
+    }
+    
+    doc.save('generated_questions_compressed.pdf');
+}
+
+        
+        
+        // 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
     
