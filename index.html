@@ -92,39 +92,40 @@ body {
 /* 響應式PDF輸出優化 */
 @media print {
     html, body {
-        width: 794px !important; /* A4寬度，96dpi */
-        height: 1123px !important; /* A4高度，96dpi */
+        width: 210mm !important; /* A4寬度 */
+        height: 297mm !important; /* A4高度 */
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important; /* 確保內容不被截斷 */
-        background: #ffffff !important; /* 純白背景 */
-        color: #000000 !important; /* 純黑文字 */
-        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
-        print-color-adjust: exact !important; /* 標準屬性 */
-        font-size: 12pt !important; /* 提高可讀性 */
-        line-height: 1.5 !important; /* 調整行距 */
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
     }
 
     /* 內容區域適應A4 */
     #questionsDisplay {
         width: 100% !important;
-        max-width: 754px !important; /* 保留20px邊距 */
+        max-width: 190mm !important; /* 保留10mm邊距 */
         margin: 0 auto !important;
-        padding: 20px !important;
+        padding: 10mm !important;
     }
 
     /* 問題卡片樣式 */
     .question-card {
-        width: 754px !important;
+        width: 100% !important;
         height: auto !important;
-        margin: 20px auto !important;
-        padding: 20px !important;
+        margin: 10mm auto !important;
+        padding: 10mm !important;
         background: #ffffff !important;
         color: #000000 !important;
-        page-break-inside: avoid !important; /* 避免跨頁 */
+        page-break-inside: avoid !important;
         box-sizing: border-box !important;
-        border: 1px solid #000000 !important; /* 深色邊框 */
+        border: 1px solid #000000 !important;
     }
+
 
     /* 強制文字與背景高對比 */
     .question-title, .answer-section, .steps-section, 
@@ -2071,7 +2072,8 @@ async function exportToPDF() {
         orientation: 'portrait',
         unit: 'px',
         format: [A4_WIDTH, A4_HEIGHT],
-        compress: false // 禁用壓縮以提升質量
+        compress: true, // 啟用壓縮
+        compression: 'MEDIUM' // 設置中等壓縮級別
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
@@ -2115,6 +2117,7 @@ async function exportToPDF() {
                 background: #ffffff !important;
                 color: #000000 !important;
                 page-break-inside: avoid !important;
+                box-sizing: border-box !important;
                 border: 1px solid #000000 !important;
             `;
 
@@ -2158,7 +2161,8 @@ async function exportToPDF() {
         document.body.removeChild(progressDiv);
         alert('PDF生成失敗，請稍後重試');
     }
-}// 修訂：新增函數來強化PDF轉換前的文字樣式
+}
+        // 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
     
