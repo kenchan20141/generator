@@ -2066,18 +2066,17 @@ async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const A4_WIDTH = 794; // A4寬度（像素，96dpi）
     const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
-    const MARGIN = 20; // 設置邊距為20像素
-
+    
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
         format: [A4_WIDTH, A4_HEIGHT],
-        compress: true // 啟用壓縮
+        compress: false // 禁用壓縮以提升質量
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
     const questionCards = questionsContainer.querySelectorAll('.question-card');
-
+    
     if (questionCards.length === 0) {
         alert('沒有可輸出的題目內容');
         return;
@@ -2104,12 +2103,12 @@ async function exportToPDF() {
 
             // 保存原始樣式並強化文字
             const originalStyles = enhanceTextForPDF(card);
-
-            // 設置A4適應樣式，最大化內容空間
+            
+            // 設置A4適應樣式
             const originalStyle = card.getAttribute('style') || '';
             card.style.cssText = `
                 position: relative !important;
-                width: ${A4_WIDTH - 2 * MARGIN}px !important;
+                width: 754px !important;
                 height: auto !important;
                 margin: 0 auto !important;
                 padding: 20px !important;
@@ -2126,9 +2125,9 @@ async function exportToPDF() {
                 scale: 3, // 提升解析度
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                width: A4_WIDTH - 2 * MARGIN,
+                width: 754,
                 height: card.scrollHeight,
-                windowWidth: A4_WIDTH,
+                windowWidth: 794,
                 windowHeight: A4_HEIGHT,
                 onclone: function(clonedDoc) {
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
@@ -2143,26 +2142,13 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            const imgWidth = A4_WIDTH - 2 * MARGIN;
+            const imgWidth = A4_WIDTH - 40; // 留邊距
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             if (i > 0) doc.addPage();
-            const imgData = canvas.toDataURL('image/jpeg', 0.7); // 使用JPEG格式並設置品質為0.7
-            doc.addImage(imgData, 'JPEG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, A4_HEIGHT - 2 * MARGIN));
-
-            // 檢查檔案大小
-            const pdfSize = doc.output('blob').size / 1024 / 1024; // 轉換為MB
-            if (pdfSize > 15) {
-                // 如果檔案過大，進一步壓縮
-                const compressedDoc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'px',
-                    format: [A4_WIDTH, A4_HEIGHT],
-                    compress: true
-                });
-                compressedDoc.addImage(imgData, 'JPEG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, A4_HEIGHT - 2 * MARGIN), null, 'FAST');
-                doc = compressedDoc;
-            }
+            const imgData = canvas.toDataURL('image/png', 1.0); // 最高質量PNG
+            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
+            card.setAttribute('data-card-index', i);
         }
 
         document.body.removeChild(progressDiv);
@@ -2172,9 +2158,7 @@ async function exportToPDF() {
         document.body.removeChild(progressDiv);
         alert('PDF生成失敗，請稍後重試');
     }
-}
-        
-        // 修訂：新增函數來強化PDF轉換前的文字樣式
+}// 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
     
