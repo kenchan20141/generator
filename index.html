@@ -90,73 +90,68 @@ body {
 
 /* 響應式PDF輸出優化 */
 @media print {
+    @page {
+        size: landscape; /* 預設橫向，適合大多數內容 */
+        margin: 1cm; /* 統一邊距 */
+    }
     html, body {
-        width: 794px !important; /* A4寬度，96dpi，約210mm */
-        height: auto !important; /* 自適應內容高度 */
+        width: 100% !important; /* 使用相對單位，適應設備 */
+        height: auto !important; /* 高度自適應內容 */
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important; /* 防止內容截斷 */
         background: #ffffff !important; /* 純白背景 */
         color: #000000 !important; /* 純黑文字 */
-        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
-        print-color-adjust: exact !important; /* 標準屬性 */
         font-size: 12pt !important; /* 提高可讀性 */
         line-height: 1.5 !important; /* 調整行距 */
     }
-
     #questionsDisplay {
         width: 100% !important;
-        max-width: 754px !important; /* 保留20px邊距，總寬度794px */
-        margin: 0 auto !important;
-        padding: 20px !important;
-        height: auto !important; /* 確保高度自適應 */
+        margin: 0 !important;
+        padding: 0 !important;
     }
-
     .question-card {
-        width: 754px !important; /* 與#questionsDisplay一致，確保內容全顯 */
-        height: auto !important; /* 自適應內容高度 */
-        margin: 20px auto !important;
-        padding: 20px !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        page-break-inside: avoid !important; /* 避免跨頁截斷 */
-        box-sizing: border-box !important; /* 包含內邊距和邊框 */
-        border: 1px solid #000000 !important; /* 深色邊框 */
-    }
-
-    /* 確保內部元素適配 */
-    .question-title, .answer-section, .steps-section, 
-    p, span, div, h1, h2, h3, h4, h5, h6 {
-        background: #ffffff !important;
-        color: #000000 !important;
-        opacity: 1 !important; /* 移除透明度 */
         width: 100% !important;
-        max-width: 714px !important; /* 內部保留20px邊距 */
-        margin: 0 auto !important;
-    }
-
-    /* 表格樣式 */
-    table, th, td {
-        border: 1px solid #000000 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 1cm !important;
         background: #ffffff !important;
         color: #000000 !important;
+        page-break-inside: avoid !important; /* 避免內容跨頁截斷 */
+        box-sizing: border-box !important;
+    }
+    table {
         width: 100% !important;
-        max-width: 714px !important;
+        border-collapse: collapse !important;
     }
-
-    /* 隱藏不必要元素 */
-    .floating-header, .floating-generate-btn, 
-    .copyright-footer, .btn-primary, .btn-secondary, 
-    .btn-accent, button {
-        display: none !important;
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 8pt !important;
     }
+    .floating-header, .floating-generate-btn, .copyright-footer, 
+    .btn-primary, .btn-secondary, .btn-accent, button {
+        display: none !important; /* 移除不必要元素 */
+    }
+}
 
-    /* 針對電腦和平板設備的額外調整 */
-    @media screen and (min-width: 768px) {
-        .question-card {
-            width: 100% !important;
-            max-width: 754px !important; /* 與A4寬度匹配 */
-        }
+/* 手機設備（螢幕寬度 <= 767px） */
+@media print and (max-width: 767px) {
+    @page {
+        size: portrait; /* 手機預設縱向 */
+        margin: 0.5cm; /* 較小邊距適應小螢幕 */
+    }
+    .question-card {
+        padding: 0.5cm !important;
+    }
+}
+
+/* 平板和電腦設備（螢幕寬度 >= 768px） */
+@media print and (min-width: 768px) {
+    @page {
+        size: landscape; /* 橫向適應寬螢幕 */
+        margin: 1cm;
+    }
+    .question-card {
+        padding: 1cm !important;
     }
 }
 
