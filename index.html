@@ -91,76 +91,74 @@ body {
 
 /* 響應式PDF輸出優化 */
 @media print {
-    html, body {
-        width: 210mm !important; /* A4寬度 */
-        height: 297mm !important; /* A4高度 */
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        font-size: 12pt !important;
-        line-height: 1.5 !important;
-    }
+        html, body {
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-size: 12pt !important;
+            line-height: 1.5 !important;
+        }
 
-    /* 內容區域適應A4 */
-    #questionsDisplay {
-        width: 100% !important;
-        max-width: 190mm !important; /* 保留10mm邊距 */
-        margin: 0 auto !important;
-        padding: 10mm !important;
-    }
+        /* 內容區域適應頁面 */
+        #questionsDisplay {
+            width: 100% !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+        }
 
-    /* 問題卡片樣式 */
-    .question-card {
-        width: 100% !important;
-        height: auto !important;
-        margin: 10mm auto !important;
-        padding: 10mm !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        page-break-inside: avoid !important;
-        box-sizing: border-box !important;
-        border: 1px solid #000000 !important;
-    }
+        /* 問題卡片樣式 */
+        .question-card {
+            width: 100% !important;
+            height: auto !important;
+            margin: 20px auto !important;
+            padding: 20px !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            page-break-inside: avoid !important;
+            box-sizing: border-box !important;
+            border: 1px solid #000000 !important;
+        }
 
+        /* 強制文字與背景高對比 */
+        .question-title, .answer-section, .steps-section, 
+        p, span, div, h1, h2, h3, h4, h5, h6 {
+            background: #ffffff !important;
+            color: #000000 !important;
+            opacity: 1 !important;
+        }
 
-    /* 強制文字與背景高對比 */
-    .question-title, .answer-section, .steps-section, 
-    p, span, div, h1, h2, h3, h4, h5, h6 {
-        background: #ffffff !important;
-        color: #000000 !important;
-        opacity: 1 !important; /* 移除透明度 */
-    }
+        /* 表格清晰度 */
+        table, th, td {
+            border: 1px solid #000000 !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
 
-    /* 表格清晰度 */
-    table, th, td {
-        border: 1px solid #000000 !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-    }
+        /* 移除不需要的元素 */
+        .floating-header, .floating-generate-btn, 
+        .copyright-footer, .btn-primary, .btn-secondary, 
+        .btn-accent, button {
+            display: none !important;
+        }
 
-    /* 移除不需要的元素 */
-    .floating-header, .floating-generate-btn, 
-    .copyright-footer, .btn-primary, .btn-secondary, 
-    .btn-accent, button {
-        display: none !important;
-    }
+        /* 移除漸變與透明度 */
+        [style*="linear-gradient"], [style*="opacity"], [style*="rgba"] {
+            background: #ffffff !important;
+            opacity: 1 !important;
+            color: #000000 !important;
+        }
 
-    /* 移除漸變與透明度 */
-    [style*="linear-gradient"], [style*="opacity"], [style*="rgba"] {
-        background: #ffffff !important;
-        opacity: 1 !important;
-        color: #000000 !important;
+        /* 確保所有文字為黑色 */
+        * {
+            color: #000000 !important;
+        }
     }
-
-    /* 確保所有文字為黑色 */
-    * {
-        color: #000000 !important;
-    }
-}
 
 /* 設備適應性CSS */
 @media screen and (max-width: 768px) {
@@ -2065,17 +2063,6 @@ var selectedPracticalTypes = new Set();
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    const A4_WIDTH = 794; // A4寬度（像素，96dpi）
-    const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
-    
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [A4_WIDTH, A4_HEIGHT],
-        compress: true, // 啟用壓縮
-        compression: 'MEDIUM' // 設置中等壓縮級別
-    });
-
     const questionsContainer = document.getElementById('questionsDisplay');
     const questionCards = questionsContainer.querySelectorAll('.question-card');
     
@@ -2084,7 +2071,6 @@ async function exportToPDF() {
         return;
     }
 
-    // 進度提示
     const progressDiv = document.createElement('div');
     progressDiv.style.cssText = `
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2098,19 +2084,23 @@ async function exportToPDF() {
     document.body.appendChild(progressDiv);
 
     try {
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            compress: false
+        });
+
         for (let i = 0; i < questionCards.length; i++) {
             const card = questionCards[i];
             document.getElementById('pdfProgress').textContent = 
                 `正在處理第 ${i + 1} 題，共 ${questionCards.length} 題...`;
 
-            // 保存原始樣式並強化文字
             const originalStyles = enhanceTextForPDF(card);
             
-            // 設置A4適應樣式
             const originalStyle = card.getAttribute('style') || '';
             card.style.cssText = `
                 position: relative !important;
-                width: 754px !important;
+                width: 100% !important;
                 height: auto !important;
                 margin: 0 auto !important;
                 padding: 20px !important;
@@ -2121,17 +2111,16 @@ async function exportToPDF() {
                 border: 1px solid #000000 !important;
             `;
 
-            // 等待樣式應用
             await new Promise(resolve => setTimeout(resolve, 100));
 
             const canvas = await html2canvas(card, {
-                scale: 3, // 提升解析度
+                scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                width: 754,
-                height: card.scrollHeight,
-                windowWidth: 794,
-                windowHeight: A4_HEIGHT,
+                width: card.offsetWidth,
+                height: card.offsetHeight,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
                 onclone: function(clonedDoc) {
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
                                      clonedDoc.querySelectorAll('.question-card')[0];
@@ -2141,16 +2130,15 @@ async function exportToPDF() {
                 }
             });
 
-            // 還原樣式
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            const imgWidth = A4_WIDTH - 40; // 留邊距
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            const imgWidth = doc.internal.pageSize.getWidth() - 40; // 留20px邊距
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             if (i > 0) doc.addPage();
-            const imgData = canvas.toDataURL('image/png', 1.0); // 最高質量PNG
-            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
+            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
             card.setAttribute('data-card-index', i);
         }
 
