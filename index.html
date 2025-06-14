@@ -1206,28 +1206,6 @@ textarea, input[type="text"] {
     background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
 }
 
-        /* 手機PDF輸出優化 */
-@media screen and (max-width: 768px) {
-    .question-card.pdf-mobile-optimized {
-        transform: scale(1.1);
-        transform-origin: top left;
-        font-size: 16px !important;
-        line-height: 1.6 !important;
-    }
-    
-    .question-card.pdf-mobile-optimized .question-title {
-        font-size: 20px !important;
-        padding: 15px 25px !important;
-    }
-    
-    .question-card.pdf-mobile-optimized .answer-section,
-    .question-card.pdf-mobile-optimized .steps-section {
-        padding: 25px !important;
-        margin-top: 20px !important;
-        font-size: 15px !important;
-    }
-}
-
 
     </style>
 </head>
@@ -1958,14 +1936,14 @@ var selectedPracticalTypes = new Set();
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    const A4_WIDTH = 794;
-    const A4_HEIGHT = 1123;
+    const A4_WIDTH = 794; // A4寬度（像素，96dpi）
+    const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
     
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
         format: [A4_WIDTH, A4_HEIGHT],
-        compress: true
+        compress: true // 禁用壓縮以提升質量
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
@@ -1976,9 +1954,7 @@ async function exportToPDF() {
         return;
     }
 
-    // 檢測是否為手機設備
-    const isMobile = window.innerWidth <= 768;
-    
+    // 進度提示
     const progressDiv = document.createElement('div');
     progressDiv.style.cssText = `
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -1997,46 +1973,32 @@ async function exportToPDF() {
             document.getElementById('pdfProgress').textContent = 
                 `正在處理第 ${i + 1} 題，共 ${questionCards.length} 題...`;
 
+            // 保存原始樣式並強化文字
             const originalStyles = enhanceTextForPDF(card);
             
-            // 根據設備類型設置不同的樣式
+            // 設置A4適應樣式
             const originalStyle = card.getAttribute('style') || '';
-            if (isMobile) {
-                // 手機端：使用更大的寬度以充分利用PDF空間
-                card.style.cssText = `
-                    position: relative !important;
-                    width: 754px !important;
-                    height: auto !important;
-                    margin: 0 auto !important;
-                    padding: 20px !important;
-                    background: #ffffff !important;
-                    color: #000000 !important;
-                    page-break-inside: avoid !important;
-                    border: 1px solid #000000 !important;
-                    transform: scale(1.2) !important;
-                    transform-origin: top left !important;
-                `;
-            } else {
-                // 電腦端：保持原有設定
-                card.style.cssText = `
-                    position: relative !important;
-                    width: 754px !important;
-                    height: auto !important;
-                    margin: 0 auto !important;
-                    padding: 20px !important;
-                    background: #ffffff !important;
-                    color: #000000 !important;
-                    page-break-inside: avoid !important;
-                    border: 1px solid #000000 !important;
-                `;
-            }
+            card.style.cssText = `
+                position: relative !important;
+                width: 754px !important;
+                height: auto !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                page-break-inside: avoid !important;
+                border: 1px solid #000000 !important;
+            `;
 
+            // 等待樣式應用
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // 根據設備類型設置不同的html2canvas參數
-            const canvasOptions = {
+            const canvas = await html2canvas(card, {
+                scale: 3, // 提升解析度
                 useCORS: true,
                 backgroundColor: '#ffffff',
+                width: 754,
+                height: card.scrollHeight,
                 windowWidth: 794,
                 windowHeight: A4_HEIGHT,
                 onclone: function(clonedDoc) {
@@ -2046,30 +2008,17 @@ async function exportToPDF() {
                         enhanceClonedElementForPDF(clonedCard);
                     }
                 }
-            };
+            });
 
-            if (isMobile) {
-                // 手機端：調整參數以優化顯示效果
-                canvasOptions.scale = 2.5;
-                canvasOptions.width = 905; // 754 * 1.2
-                canvasOptions.height = card.scrollHeight * 1.2;
-            } else {
-                // 電腦端：保持原有設定
-                canvasOptions.scale = 3;
-                canvasOptions.width = 754;
-                canvasOptions.height = card.scrollHeight;
-            }
-
-            const canvas = await html2canvas(card, canvasOptions);
-
+            // 還原樣式
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            const imgWidth = A4_WIDTH - 40;
+            const imgWidth = A4_WIDTH - 40; // 留邊距
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             if (i > 0) doc.addPage();
-            const imgData = canvas.toDataURL('image/png', 1.0);
+            const imgData = canvas.toDataURL('image/png', 1.0); // 最高質量PNG
             doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
             card.setAttribute('data-card-index', i);
         }
@@ -2081,8 +2030,7 @@ async function exportToPDF() {
         document.body.removeChild(progressDiv);
         alert('PDF生成失敗，請稍後重試');
     }
-}
-// 修訂：新增函數來強化PDF轉換前的文字樣式
+}// 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
     
@@ -2124,53 +2072,22 @@ function enhanceTextForPDF(element) {
 
 // 修訂：新增函數來處理克隆元素
 function enhanceClonedElementForPDF(clonedElement) {
-    const isMobile = window.innerWidth <= 768;
-    
     const style = document.createElement('style');
-    if (isMobile) {
-        // 手機端：增加字體大小和間距以提高可讀性
-        style.textContent = `
-            * {
-                color: #000000 !important;
-                background-color: #ffffff !important;
-                opacity: 1 !important;
-                -webkit-print-color-adjust: exact !important;
-            }
-            .question-card {
-                width: 754px !important;
-                margin-bottom: 20px !important;
-                page-break-inside: avoid !important;
-                font-size: 16px !important;
-                line-height: 1.6 !important;
-            }
-            .question-title {
-                font-size: 22px !important;
-                padding: 15px 25px !important;
-            }
-            .answer-section, .steps-section {
-                padding: 25px !important;
-                margin-top: 20px !important;
-            }
-        `;
-    } else {
-        // 電腦端：保持原有設定
-        style.textContent = `
-            * {
-                color: #000000 !important;
-                background-color: #ffffff !important;
-                opacity: 1 !important;
-                -webkit-print-color-adjust: exact !important;
-            }
-            .question-card {
-                width: 754px !important;
-                margin-bottom: 20px !important;
-                page-break-inside: avoid !important;
-            }
-        `;
-    }
+    style.textContent = `
+        * {
+            color: #000000 !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            -webkit-print-color-adjust: exact !important;
+        }
+        .question-card {
+            width: 555px !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
+        }
+    `;
     clonedElement.appendChild(style);
 }
-
 
 // 修訂：新增函數來還原原始樣式
 function restoreOriginalStyles(element, originalStyles) {
