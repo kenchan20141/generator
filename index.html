@@ -93,7 +93,7 @@ body {
 @media print {
     html, body {
         width: 794px !important; /* A4寬度，96dpi */
-        height: auto !important; /* 改為auto以適應內容高度 */
+        height: auto !important; /* 自動適應內容高度 */
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important; /* 確保內容不被截斷 */
@@ -117,7 +117,7 @@ body {
     /* 問題卡片樣式 */
     .question-card {
         width: 754px !important;
-        height: auto !important; /* 改為auto以適應內容 */
+        height: auto !important;
         margin: 20px auto !important;
         padding: 20px !important;
         background: #ffffff !important;
@@ -2065,11 +2065,13 @@ var selectedPracticalTypes = new Set();
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
+    const A4_WIDTH = 794; // A4寬度（像素，96dpi）
+    const A4_HEIGHT = 1123; // A4高度（像素，96dpi）
     
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
-        format: 'a4', // 初始格式，後續會動態調整
+        format: [A4_WIDTH, A4_HEIGHT],
         compress: false
     });
 
@@ -2081,7 +2083,6 @@ async function exportToPDF() {
         return;
     }
 
-    // 進度提示
     const progressDiv = document.createElement('div');
     progressDiv.style.cssText = `
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2095,143 +2096,54 @@ async function exportToPDF() {
     document.body.appendChild(progressDiv);
 
     try {
-        // 檢測是否為手機設備
-        const isMobile = window.innerWidth <= 768;
-        const MARGIN = 20; // 統一邊距
-
         for (let i = 0; i < questionCards.length; i++) {
             const card = questionCards[i];
             document.getElementById('pdfProgress').textContent = 
                 `正在處理第 ${i + 1} 題，共 ${questionCards.length} 題...`;
 
-            // 保存原始樣式並強化文字
             const originalStyles = enhanceTextForPDF(card);
             
-            // 設置用於測量的臨時樣式
             const originalStyle = card.getAttribute('style') || '';
             card.style.cssText = `
                 position: relative !important;
-                width: auto !important;
+                width: 754px !important;
                 height: auto !important;
-                margin: 0 !important;
-                padding: ${MARGIN}px !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
                 background: #ffffff !important;
                 color: #000000 !important;
-                border: none !important;
-                max-width: none !important;
-                font-size: ${isMobile ? '16px' : '14px'} !important;
-                line-height: 1.6 !important;
+                page-break-inside: avoid !important;
+                border: 1px solid #000000 !important;
             `;
 
-            // 等待樣式應用
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // 測量內容實際尺寸
-            const tempCanvas = await html2canvas(card, {
-                scale: 2,
+            const canvas = await html2canvas(card, {
+                scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                logging: false,
+                width: 754,
+                height: card.scrollHeight,
+                windowWidth: 794,
+                windowHeight: A4_HEIGHT,
                 onclone: function(clonedDoc) {
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
-                                     clonedDoc.querySelectorAll('.question-card')[i];
+                                     clonedDoc.querySelectorAll('.question-card')[0];
                     if (clonedCard) {
                         enhanceClonedElementForPDF(clonedCard);
                     }
                 }
             });
 
-            // 還原樣式
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            // 計算最佳頁面尺寸
-            const contentWidth = tempCanvas.width / 2; // 除以scale
-            const contentHeight = tempCanvas.height / 2;
-            
-            // 動態計算頁面尺寸，確保內容充滿頁面
-            let pageWidth, pageHeight;
-            
-            if (isMobile) {
-                // 手機版：根據內容動態調整，但保持合理比例
-                const minWidth = 400;
-                const maxWidth = 600;
-                const minHeight = 500;
-                const maxHeight = 1000;
-                
-                pageWidth = Math.max(minWidth, Math.min(maxWidth, contentWidth + MARGIN * 2));
-                pageHeight = Math.max(minHeight, Math.min(maxHeight, contentHeight + MARGIN * 2));
-                
-                // 如果內容很長，適當增加高度
-                if (contentHeight > 400) {
-                    pageHeight = Math.min(maxHeight, contentHeight + MARGIN * 2);
-                }
-            } else {
-                // 桌面版：使用標準A4或根據內容調整
-                pageWidth = Math.max(595, contentWidth + MARGIN * 2); // A4寬度為595px
-                pageHeight = Math.max(842, contentHeight + MARGIN * 2); // A4高度為842px
-            }
+            const imgWidth = A4_WIDTH - 40;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // 為每頁設置頁面格式
-            if (i > 0) {
-                doc.addPage([pageWidth, pageHeight], 'portrait');
-            } else {
-                // 設置第一頁的尺寸
-                doc.internal.pageSize.width = pageWidth;
-                doc.internal.pageSize.height = pageHeight;
-            }
-
-            // 重新設置卡片樣式以適應計算出的頁面尺寸
-            card.style.cssText = `
-                position: relative !important;
-                width: ${pageWidth - MARGIN * 2}px !important;
-                height: auto !important;
-                margin: 0 !important;
-                padding: ${MARGIN}px !important;
-                background: #ffffff !important;
-                color: #000000 !important;
-                border: none !important;
-                font-size: ${isMobile ? '16px' : '14px'} !important;
-                line-height: 1.6 !important;
-                box-sizing: border-box !important;
-            `;
-
-            // 再次強化文字
-            enhanceTextForPDF(card);
-            
-            // 等待樣式應用
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            // 生成最終的畫布
-            const finalCanvas = await html2canvas(card, {
-                scale: 3, // 高解析度
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                width: pageWidth,
-                height: Math.min(pageHeight, card.scrollHeight + MARGIN * 2),
-                logging: false,
-                onclone: function(clonedDoc) {
-                    const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
-                                     clonedDoc.querySelectorAll('.question-card')[i];
-                    if (clonedCard) {
-                        enhanceClonedElementForPDF(clonedCard);
-                    }
-                }
-            });
-
-            // 還原原始樣式
-            card.setAttribute('style', originalStyle);
-            restoreOriginalStyles(card, originalStyles);
-
-            // 計算圖片在頁面中的尺寸（充滿頁面，保留少量邊距）
-            const imgWidth = pageWidth - MARGIN * 2;
-            const imgHeight = (finalCanvas.height * imgWidth) / finalCanvas.width;
-
-            // 添加圖片到PDF
-            const imgData = finalCanvas.toDataURL('image/png', 1.0);
-            doc.addImage(imgData, 'PNG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, pageHeight - MARGIN * 2));
-            
-            // 為下次循環設置卡片索引
+            if (i > 0) doc.addPage();
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            doc.addImage(imgData, 'PNG', 20, 20, imgWidth, Math.min(imgHeight, A4_HEIGHT - 40));
             card.setAttribute('data-card-index', i);
         }
 
