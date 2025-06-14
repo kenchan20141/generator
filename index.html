@@ -1168,6 +1168,26 @@ textarea, input[type="text"] {
         word-wrap: break-word;
     }
 }
+
+
+.keyword-inputs input[type="text"] {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+.keyword-inputs input[type="number"] {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+
+
     </style>
 </head>
 <body class="min-h-screen">
@@ -1243,196 +1263,58 @@ textarea, input[type="text"] {
                                     <i class="fas fa-book mr-4 text-teal-600"></i>閱讀理解配置
                                 </h3>
 
-                                <!-- 題型選擇和數量設定 -->
-                                <div class="mb-10">
+                               
+
+                                <!-- 擬題篇章選擇 -->
+                                <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
+                                <div>
                                     <label class="block text-xl font-semibold text-gray-700 mb-6">
-                                        <i class="fas fa-tasks mr-3"></i>題型選擇及數量設定
+                                        <i class="fas fa-scroll mr-3"></i>擬題篇章選擇
                                     </label>
-                                    <div class="question-type-container">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            
-<!-- 選擇題型 -->
-<div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="選擇">
+                                    
+                                   <div class="text-library-selector mb-6">
     <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center">
-            <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '選擇')">
-                <div class="toggle-slider"></div>
-            </div>
-            <div>
-                <i class="fas fa-check-square text-orange-500 text-2xl mr-3"></i>
-                <span class="font-bold text-lg">選擇</span>
-            </div>
-        </div>
+        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+            <i class="fas fa-book-open mr-3 text-blue-600"></i>範文庫選擇
+        </h4>
     </div>
-    <div class="quantity-control mt-4" style="display: none;">
-        <button type="button" class="quantity-btn" onclick="adjustQuantity('選擇', -1)">
-            <i class="fas fa-minus"></i>
-        </button>
-        <input type="number" id="quantity-選擇" min="1" max="10" value="1" class="quantity-input" readonly>
-        <button type="button" class="quantity-btn" onclick="adjustQuantity('選擇', 1)">
-            <i class="fas fa-plus"></i>
-        </button>
+    
+    <div id="textLibraryGrid" class="text-library-grid">
+        <!-- 範文庫內容將通過 JavaScript 生成 -->
+    </div>
+</div>
+                                        
+                                        <div id="textLibraryGrid" class="text-library-grid hidden">
+                                            <!-- 範文庫內容將通過 JavaScript 生成 -->
+                                        </div>
+                                    </div>
+
+                                    <!-- 自訂篇章輸入 -->
+                                    <div>
+                                        <label for="targetPassage" class="block text-lg font-semibold text-gray-700 mb-4">
+                                            <i class="fas fa-edit mr-3"></i>自訂篇章內容
+                                        </label>
+                                        <textarea id="targetPassage" class="w-full p-8 border-3 border-teal-200 rounded-2xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入擬題篇章內容，或從上方範文庫選擇"></textarea>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+ <!-- 題型選擇和數量設定 -->
+                                <div class="mb-10" id="dynamicQuestionTypes">
+    <label class="block text-xl font-semibold text-gray-700 mb-6">
+        <i class="fas fa-tasks mr-3"></i>題型選擇及數量設定
+    </label>
+    <div id="questionTypeContainer">
+        <div class="bg-gray-100 p-6 rounded-xl text-center text-gray-500">
+            <i class="fas fa-info-circle text-3xl mb-3"></i>
+            <p>請先選擇擬題篇章，系統將為每篇篇章提供獨立的題型設定</p>
+        </div>
     </div>
 </div>
 
-
-                                            <!-- 複述題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="複述">
-                                                <div class="flex items-center justify-between mb-4">
-
-
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '複述')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-quote-left text-blue-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">複述</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('複述', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-複述" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('複述', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 分析題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="分析">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '分析')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-search text-green-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">分析</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('分析', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-分析" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('分析', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 印證題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="印證">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '印證')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-check-circle text-purple-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">印證</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('印證', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-印證" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('印證', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 闡明題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="闡明">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '闡明')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-lightbulb text-yellow-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">闡明</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('闡明', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-闡明" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('闡明', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 意見題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="意見">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '意見')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-comment text-red-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">意見</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('意見', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-意見" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('意見', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 比較題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="比較">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <div class="flex items-center">
-                                                        <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '比較')">
-                                                            <div class="toggle-slider"></div>
-                                                        </div>
-                                                        <div>
-                                                            <i class="fas fa-balance-scale text-indigo-500 text-2xl mr-3"></i>
-                                                            <span class="font-bold text-lg">比較</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="quantity-control mt-4" style="display: none;">
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('比較', -1)">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" id="quantity-比較" min="1" max="10" value="1" class="quantity-input" readonly>
-                                                    <button type="button" class="quantity-btn" onclick="adjustQuantity('比較', 1)">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- 自訂題型 -->
-                                            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300 col-span-full" data-type="自訂">
-                                                <div class="flex items-center justify-center">
-                                                    <div class="toggle-switch mr-4" onclick="toggleQuestionType(this, '自訂')">
-                                                        <div class="toggle-slider"></div>
-                                                    </div>
-                                                    <div>
-                                                        <i class="fas fa-edit text-gray-500 text-2xl mr-3"></i>
-                                                        <span class="font-bold text-lg">自訂</span>
-                                                    </div>
-                                                </div>
+                                            
                                             </div>
 
                                         </div>
@@ -1468,40 +1350,11 @@ textarea, input[type="text"] {
                                     </div>
                                 </div>
 
-                                <!-- 擬題篇章選擇 -->
-                                <div class="h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full my-8"></div>
-                                <div>
-                                    <label class="block text-xl font-semibold text-gray-700 mb-6">
-                                        <i class="fas fa-scroll mr-3"></i>擬題篇章選擇
-                                    </label>
-                                    
-                                   <div class="text-library-selector mb-6">
-    <div class="flex items-center justify-between mb-4">
-        <h4 class="text-lg font-bold text-gray-800 flex items-center">
-            <i class="fas fa-book-open mr-3 text-blue-600"></i>範文庫選擇
-        </h4>
-    </div>
-    
-    <div id="textLibraryGrid" class="text-library-grid">
-        <!-- 範文庫內容將通過 JavaScript 生成 -->
-    </div>
-</div>
-                                        
-                                        <div id="textLibraryGrid" class="text-library-grid hidden">
-                                            <!-- 範文庫內容將通過 JavaScript 生成 -->
-                                        </div>
-                                    </div>
-
-                                    <!-- 自訂篇章輸入 -->
-                                    <div>
-                                        <label for="targetPassage" class="block text-lg font-semibold text-gray-700 mb-4">
-                                            <i class="fas fa-edit mr-3"></i>自訂篇章內容
-                                        </label>
-                                        <textarea id="targetPassage" class="w-full p-8 border-3 border-teal-200 rounded-2xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical bg-white" placeholder="在此輸入擬題篇章內容，或從上方範文庫選擇"></textarea>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+
+
+
+
 
                      <!-- 長文配置 -->
 <div id="essayConfig" class="config-panel hidden">
@@ -4231,48 +4084,344 @@ const writingQuestionBank = {
         }
 
         function generateTextLibrary() {
-            const grid = document.getElementById('textLibraryGrid');
-            grid.innerHTML = '';
+    const grid = document.getElementById('textLibraryGrid');
+    grid.innerHTML = '';
 
-            textLibrary.texts.forEach(text => {
-                const item = document.createElement('div');
-                item.className = 'text-item';
-                item.onclick = () => selectText(text.id, item);
-                
-                item.innerHTML = `
-                    <div class="text-item-title">${text.title}</div>
-                    <div class="text-item-info">
-                        <span>${text.author} · ${text.length}</span>
-                        <span class="text-category">${text.category}</span>
-                    </div>
-                `;
-                
-                grid.appendChild(item);
-            });
-        }
+    // 添加自訂篇章選項
+    const customItem = document.createElement('div');
+    customItem.className = 'text-item';
+    customItem.onclick = () => toggleCustomText(customItem);
+    customItem.innerHTML = `
+        <div class="text-item-title">自訂篇章</div>
+        <div class="text-item-info">
+            <span>用戶自訂 · 自由</span>
+            <span class="text-category">自訂</span>
+        </div>
+    `;
+    grid.appendChild(customItem);
+
+    // 添加原有範文
+    textLibrary.texts.forEach(text => {
+        const item = document.createElement('div');
+        item.className = 'text-item';
+        item.onclick = () => selectText(text.id, item);
+        
+        item.innerHTML = `
+            <div class="text-item-title">${text.title}</div>
+            <div class="text-item-info">
+                <span>${text.author} · ${text.length}</span>
+                <span class="text-category">${text.category}</span>
+            </div>
+        `;
+        
+        grid.appendChild(item);
+    });
+}
+
+function toggleCustomText(element) {
+    const targetPassage = document.getElementById('targetPassage');
+    const isSelected = element.classList.contains('selected');
+    
+    if (isSelected) {
+        // 取消選中自訂篇章
+        element.classList.remove('selected');
+        targetPassage.style.display = 'block';
+        targetPassage.value = '';
+        // 清除所有範文選擇
+        document.querySelectorAll('.text-item').forEach(item => {
+            if (item !== element) item.classList.remove('selected');
+        });
+        updateSelectedTexts([]);
+        // 顯示提示信息
+        const questionTypeContainer = document.getElementById('questionTypeContainer');
+        questionTypeContainer.innerHTML = `
+            <div class="bg-gray-100 p-6 rounded-xl text-center text-gray-500">
+                <i class="fas fa-info-circle text-3xl mb-3"></i>
+                <p>請先選擇擬題篇章，系統將為每篇篇章提供獨立的題型設定</p>
+            </div>
+        `;
+    } else {
+        // 選中自訂篇章
+        document.querySelectorAll('.text-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        targetPassage.style.display = 'block';
+        targetPassage.value = '';
+        targetPassage.placeholder = '請在此輸入自訂篇章內容';
+        // 清除範文選擇記錄
+        updateSelectedTexts([]);
+        // 為自訂篇章生成題型選擇
+        generateCustomTextQuestionTypes();
+    }
+}
+
+function generateCustomTextQuestionTypes() {
+    const questionTypeContainer = document.getElementById('questionTypeContainer');
+    questionTypeContainer.innerHTML = `
+        <div class="mb-8 p-6 bg-white rounded-xl border-2 border-teal-200">
+            <h4 class="text-lg font-bold mb-4 text-teal-700">
+                <i class="fas fa-edit mr-2"></i>自訂篇章題型選擇
+            </h4>
+            <div class="question-type-container">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${generateQuestionTypeButtons('custom')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 
      
 
         function selectText(textId, element) {
-    if (selectedTextId === textId) {
-        // 如果點擊已選中的範文，取消選擇
+    // 檢查是否已選中
+    if (element.classList.contains('selected')) {
+        // 取消選擇
         element.classList.remove('selected');
-        selectedTextId = null;
-        document.getElementById('targetPassage').value = '';
+        const selectedTexts = getSelectedTexts();
+        const index = selectedTexts.findIndex(text => text.id === textId);
+        if (index !== -1) {
+            selectedTexts.splice(index, 1);
+            updateSelectedTexts(selectedTexts);
+        }
     } else {
-        // 清除之前的選中狀態
-        document.querySelectorAll('.text-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-        // 選中新的範文
+        // 選中範文
         element.classList.add('selected');
-        selectedTextId = textId;
         const selectedText = textLibrary.texts.find(text => text.id === textId);
         if (selectedText) {
-            document.getElementById('targetPassage').value = selectedText.content;
+            const selectedTexts = getSelectedTexts();
+            selectedTexts.push(selectedText);
+            updateSelectedTexts(selectedTexts);
+        }
+    }
+    updateTargetPassage();
+}
+
+function getSelectedTexts() {
+    return JSON.parse(sessionStorage.getItem('selectedTexts') || '[]');
+}
+
+function updateSelectedTexts(texts) {
+    sessionStorage.setItem('selectedTexts', JSON.stringify(texts));
+}
+
+function updateTargetPassage() {
+    const selectedTexts = getSelectedTexts();
+    const targetPassage = document.getElementById('targetPassage');
+    const questionTypeContainer = document.getElementById('questionTypeContainer');
+    
+    if (selectedTexts.length === 0) {
+        targetPassage.value = '';
+        // 顯示提示信息
+        questionTypeContainer.innerHTML = `
+            <div class="bg-gray-100 p-6 rounded-xl text-center text-gray-500">
+                <i class="fas fa-info-circle text-3xl mb-3"></i>
+                <p>請先選擇擬題篇章，系統將為每篇篇章提供獨立的題型設定</p>
+            </div>
+        `;
+    } else {
+        // 將選中的範文內容合併
+        const combinedContent = selectedTexts.map(text => 
+            `【${text.title}】（${text.author}）\n${text.content}`
+        ).join('\n\n─────────────\n\n');
+        targetPassage.value = combinedContent;
+        
+        // 生成獨立的題型選擇
+        generateIndependentQuestionTypes(selectedTexts);
+    }
+}
+
+function generateIndependentQuestionTypes(selectedTexts) {
+    const questionTypeContainer = document.getElementById('questionTypeContainer');
+    questionTypeContainer.innerHTML = '';
+    
+    selectedTexts.forEach((text, index) => {
+        const textSection = document.createElement('div');
+        textSection.className = 'mb-8 p-6 bg-white rounded-xl border-2 border-teal-200';
+        textSection.innerHTML = `
+            <h4 class="text-lg font-bold mb-4 text-teal-700">
+                <i class="fas fa-book mr-2"></i>篇章${index + 1}：${text.title}
+            </h4>
+            <div class="question-type-container">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="textTypes-${text.id}">
+                    ${generateQuestionTypeButtons(text.id)}
+                </div>
+            </div>
+        `;
+        questionTypeContainer.appendChild(textSection);
+    });
+}
+
+function generateQuestionTypeButtons(textId) {
+    const questionTypes = [
+        { type: '選擇', icon: 'fa-check-square', color: 'orange' },
+        { type: '複述', icon: 'fa-quote-left', color: 'blue' },
+        { type: '分析', icon: 'fa-search', color: 'green' },
+        { type: '印證', icon: 'fa-check-circle', color: 'purple' },
+        { type: '闡明', icon: 'fa-lightbulb', color: 'yellow' },
+        { type: '意見', icon: 'fa-comment', color: 'red' },
+        { type: '比較', icon: 'fa-balance-scale', color: 'indigo' },
+        { type: '自訂', icon: 'fa-edit', color: 'gray' }
+    ];
+    
+    return questionTypes.map(qt => {
+        // 自訂題型不顯示數量控制和關鍵詞輸入
+        const showQuantityControl = qt.type !== '自訂';
+        const showKeywordInput = qt.type !== '自訂';
+        
+        return `
+            <div class="question-type-selection bg-white p-6 rounded-2xl border-3 border-transparent hover:border-teal-300 transition-all duration-300" data-type="${qt.type}" data-text-id="${textId}">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="toggle-switch mr-4" onclick="toggleIndependentQuestionType(this, '${qt.type}', '${textId}')">
+                            <div class="toggle-slider"></div>
+                        </div>
+                        <div>
+                            <i class="fas ${qt.icon} text-${qt.color}-500 text-2xl mr-3"></i>
+                            <span class="font-bold text-lg">${qt.type}</span>
+                        </div>
+                    </div>
+                </div>
+                ${showQuantityControl ? `
+                <div class="quantity-control mt-4" style="display: none;">
+                    <button type="button" class="quantity-btn" onclick="adjustIndependentQuantity('${qt.type}', '${textId}', -1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" id="quantity-${qt.type}-${textId}" min="1" max="10" value="1" class="quantity-input" readonly>
+                    <button type="button" class="quantity-btn" onclick="adjustIndependentQuantity('${qt.type}', '${textId}', 1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                ` : ''}
+                ${showKeywordInput ? `
+                <div class="keyword-input-section mt-4" style="display: none;">
+                    <button type="button" class="keyword-toggle-btn text-sm text-teal-600 hover:text-teal-800" onclick="toggleKeywordInput('${qt.type}', '${textId}')">
+                        <i class="fas fa-key mr-2"></i>輸入關鍵詞及分數
+                    </button>
+                    <div class="keyword-inputs hidden mt-3" id="keywords-${qt.type}-${textId}">
+                        <!-- 關鍵詞輸入框將動態生成 -->
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+
+function toggleIndependentQuestionType(toggleElement, questionType, textId) {
+    const isActive = toggleElement.classList.contains('active');
+    const quantityControl = toggleElement.closest('.question-type-selection').querySelector('.quantity-control');
+    const keywordSection = toggleElement.closest('.question-type-selection').querySelector('.keyword-input-section');
+    
+    if (isActive) {
+        toggleElement.classList.remove('active');
+        if (quantityControl && questionType !== '自訂') quantityControl.style.display = 'none';
+        if (keywordSection) keywordSection.style.display = 'none';
+        removeFromIndependentSelection(questionType, textId);
+        
+        // 如果是自訂題型，隱藏參考題目設定
+        if (questionType === '自訂') {
+            const customConfig = document.getElementById('customReadingConfig');
+            if (customConfig) customConfig.classList.add('hidden');
+        }
+    } else {
+        toggleElement.classList.add('active');
+        if (quantityControl && questionType !== '自訂') quantityControl.style.display = 'flex';
+        if (keywordSection) keywordSection.style.display = 'block';
+        addToIndependentSelection(questionType, textId);
+        
+        // 如果是自訂題型，顯示參考題目設定
+        if (questionType === '自訂') {
+            const customConfig = document.getElementById('customReadingConfig');
+            if (customConfig) customConfig.classList.remove('hidden');
+        } else {
+            updateKeywordInputs(questionType, textId, 1);
         }
     }
 }
+
+function adjustIndependentQuantity(questionType, textId, delta) {
+    const input = document.getElementById(`quantity-${questionType}-${textId}`);
+    if (input) {
+        let currentValue = parseInt(input.value) || 1;
+        currentValue += delta;
+        if (currentValue < 1) currentValue = 1;
+        if (currentValue > 10) currentValue = 10;
+        input.value = currentValue;
+        updateKeywordInputs(questionType, textId, currentValue);
+    }
+}
+
+function addToIndependentSelection(questionType, textId) {
+    if (!window.independentSelections) {
+        window.independentSelections = {};
+    }
+    if (!window.independentSelections[textId]) {
+        window.independentSelections[textId] = new Set();
+    }
+    window.independentSelections[textId].add(questionType);
+}
+
+function removeFromIndependentSelection(questionType, textId) {
+    if (window.independentSelections && window.independentSelections[textId]) {
+        window.independentSelections[textId].delete(questionType);
+    }
+}
+
+
+function toggleKeywordInput(questionType, textId) {
+    const keywordInputs = document.getElementById(`keywords-${questionType}-${textId}`);
+    if (keywordInputs.classList.contains('hidden')) {
+        keywordInputs.classList.remove('hidden');
+    } else {
+        keywordInputs.classList.add('hidden');
+    }
+}
+
+function updateKeywordInputs(questionType, textId, quantity) {
+    const keywordContainer = document.getElementById(`keywords-${questionType}-${textId}`);
+    if (!keywordContainer) return;
+    
+    keywordContainer.innerHTML = '';
+    for (let i = 1; i <= quantity; i++) {
+        const keywordInput = document.createElement('div');
+        keywordInput.className = 'flex items-center mb-2';
+        keywordInput.innerHTML = `
+            <span class="text-sm mr-2">第${i}題：</span>
+            <input type="text" 
+                   id="keyword-${questionType}-${textId}-${i}" 
+                   class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm mr-2" 
+                   style="max-width: 120px; width: 120px;" 
+                   placeholder="關鍵詞（可選）">
+            <input type="number" 
+                   id="score-${questionType}-${textId}-${i}" 
+                   class="px-2 py-1 border border-gray-300 rounded text-sm" 
+                   style="width: 50px;" 
+                   placeholder="分"
+                   min="1" 
+                   max="10">
+        `;
+        keywordContainer.appendChild(keywordInput);
+    }
+}
+
+
+function getScoreForQuestion(questionType, textId, questionIndex) {
+    const scoreInput = document.getElementById(`score-${questionType}-${textId}-${questionIndex}`);
+    return scoreInput ? scoreInput.value.trim() : '';
+}
+
+
+function getKeywordsForQuestion(questionType, textId, questionIndex) {
+    const keywordInput = document.getElementById(`keyword-${questionType}-${textId}-${questionIndex}`);
+    return keywordInput ? keywordInput.value.trim() : '';
+}
+
+
+
 
         function toggleQuestionType(toggleElement, questionType) {
             const isActive = toggleElement.classList.contains('active');
@@ -4542,26 +4691,67 @@ const writingQuestionBank = {
 
         // 具體生成函數
        async function generateReadingQuestions() {
-    const targetPassage = document.getElementById('targetPassage').value.trim();
+    const selectedTexts = getSelectedTexts();
     let allQuestions = [];
     
-    for (const questionType of selectedQuestionTypes) {
-        const quantityInput = document.getElementById(`quantity-${questionType}`);
-        const quantity = parseInt(quantityInput.value);
+    if (selectedTexts.length === 0) {
+        // 處理自訂篇章
+        const targetPassage = document.getElementById('targetPassage').value.trim();
+        if (!targetPassage) {
+            showError('請選擇範文或輸入自訂篇章內容');
+            hideProgress();
+            return;
+        }
+        // 使用原有邏輯處理自訂篇章
+        for (const questionType of selectedQuestionTypes) {
+            const questions = await generateQuestionsForText(questionType, targetPassage, 'custom');
+            allQuestions = allQuestions.concat(questions);
+        }
+    } else {
+        // 處理選中的範文
+        for (const text of selectedTexts) {
+            if (window.independentSelections && window.independentSelections[text.id]) {
+                for (const questionType of window.independentSelections[text.id]) {
+                    const questions = await generateQuestionsForText(questionType, text.content, text.id, text.title);
+                    allQuestions = allQuestions.concat(questions);
+                }
+            }
+        }
+    }
+    
+    displayReadingQuestions(allQuestions);
+}
+
+async function generateQuestionsForText(questionType, textContent, textId, textTitle = '') {
+    const quantityInput = document.getElementById(`quantity-${questionType}-${textId}`) || 
+                         document.getElementById(`quantity-${questionType}`);
+    const quantity = parseInt(quantityInput?.value || 1);
+    
+    // 獲取關鍵詞和分數
+const keywords = [];
+const scores = [];
+for (let i = 1; i <= quantity; i++) {
+    const keyword = getKeywordsForQuestion(questionType, textId, i);
+    const score = getScoreForQuestion(questionType, textId, i);
+    keywords.push(keyword);
+    scores.push(score);
+}
+
+    
+    // 生成題目的邏輯保持不變，但加入關鍵詞要求
+    let refQAs = [];
+    let specialInstructions = '';
+    
+    if (questionType === '自訂') {
+        refQAs = Array.from(document.querySelectorAll('.reference-qa textarea'))
+            .map(el => el.value.trim())
+            .filter(val => val);
+    } else {
+        const examples = getQuestionBankExamples(questionType, quantity);
+        refQAs = examples;
         
-        let refQAs = [];
-        let specialInstructions = '';
-        
-        if (questionType === '自訂') {
-            refQAs = Array.from(document.querySelectorAll('.reference-qa textarea'))
-                .map(el => el.value.trim())
-                .filter(val => val);
-        } else {
-            const examples = getQuestionBankExamples(questionType, quantity);
-            refQAs = examples;
-            
-            if (questionType === '選擇') {
-                specialInstructions = `
+        if (questionType === '選擇') {
+            specialInstructions = `
 重要提醒：這是選擇題型，必須嚴格按照以下格式輸出：
 
 題目[編號]：[題目內容]
@@ -4583,30 +4773,53 @@ D. [選項D內容]
 5. 4個選項（A、B、C、D）都必須是意思相近的句子，不可以是反義的句子
 
 選項必須放在「選擇題選項容器」下方，確保格式正確。`;
-            }
         }
+    }
+    
+   // 加入關鍵詞和分數要求
+let keywordInstructions = '';
+const validKeywords = keywords.filter(k => k.length > 0);
+const validScores = scores.filter(s => s.length > 0);
 
-        // 重試機制：最多重試3次直到生成成功
-        let parsed = [];
-        let retryCount = 0;
-        const maxRetries = 3;
-        
-        while (retryCount < maxRetries) {
-            try {
-                const requestBody = {
-                    model: MODEL,
-                    messages: [
-                        { role: "system", content: "你是一個閱讀卷題目生成器。" },
-                        { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成${quantity}個相應的題目和答案：
+if (validKeywords.length > 0 || validScores.length > 0) {
+    keywordInstructions = `\n\n特別要求：\n`;
+    for (let i = 0; i < quantity; i++) {
+        if (keywords[i] && keywords[i].length > 0) {
+            keywordInstructions += `第${i + 1}題必須包含關鍵詞「${keywords[i]}」`;
+        }
+        if (scores[i] && scores[i].length > 0) {
+            keywordInstructions += `${keywords[i] && keywords[i].length > 0 ? '，' : `第${i + 1}題`}分數設定為${scores[i]}分`;
+        }
+        if ((keywords[i] && keywords[i].length > 0) || (scores[i] && scores[i].length > 0)) {
+            keywordInstructions += `\n`;
+        }
+    }
+}
+
+    
+    // 重試機制保持不變
+    let parsed = [];
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+        try {
+            const requestBody = {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: "你是一個閱讀卷題目生成器。" },
+                    { role: "user", content: `請根據以下參考題目與答案，為擬題篇章生成${quantity}個相應的題目和答案：
 
 參考題目與答案：
 ${refQAs.map((qa, index) => `題目${index + 1}與答案：${qa}`).join('\n')}
 
 題型類別：${questionType}
+${textTitle ? `篇章名稱：${textTitle}` : ''}
 ${specialInstructions}
+${keywordInstructions}
 
 擬題篇章：
-${targetPassage}
+${textContent}
 
 請為擬題篇章生成${quantity}個「${questionType}」題型的題目和答案。生成的題目應符合「${questionType}」題型的特點和要求。必須用繁體中文回應。
 
@@ -4645,153 +4858,58 @@ D. [選項D內容]
 
 生成的題目和答案應與參考題目和答案在形式和風格上相似，但內容和題材必須不同。生成的題目不得包含答案內容，答案不得與其他題目混淆。除非題目提及「摘錄」，否則生成的答案中不得直接引用原文文本依據，必須將其原文文本依據的語譯自然無痕地融入到答案之中。4分的題目，生成的答案字數必須強制控制在210字左右；5分的題目，生成的答案字數必須強制控制在230字左右；6分的題目，生成的答案字數必須強制控制在250字左右。由於是應試文章題目及答案，因此要避免過份具理論哲學性的字眼，必須減少概念模糊的術語，例如「情感載體」、「能動性」、「因果鏈條」、「辯證關係」、「時空的共創」，請用日常化用語。請確保生成的內容不為空白。若無法生成有效內容，則返回「未生成」。
 ` }
-                    ],
-                    max_tokens: 64000
-                };
+                ],
+                max_tokens: 64000
+            };
 
-                const response = await callAPI(requestBody);
-                parsed = questionType === '選擇' ? 
-                    parseChoiceResponse(response, quantity) : 
-                    parseReadingResponse(response, quantity);
-                
-                // 檢查是否有生成失敗的題目
-                const hasFailure = parsed.some(item => 
-                    item.question.includes('生成失敗') || 
-                    item.answer.includes('生成失敗') || 
-                    item.steps.includes('生成失敗') ||
-                    item.question.includes('未生成') ||
-                    item.answer.includes('未生成') ||
-                    item.steps.includes('未生成') ||
-                    !item.question.trim() ||
-                    !item.answer.trim() ||
-                    !item.steps.trim()
-                );
-                
-                if (!hasFailure) {
-                    // 生成成功，跳出重試循環
-                    break;
-                } else {
-                    retryCount++;
-                    console.log(`${questionType}題型第${retryCount}次重試`);
-                    if (retryCount >= maxRetries) {
-                        console.error(`${questionType}題型重試${maxRetries}次後仍然失敗`);
-                    }
-                }
-            } catch (error) {
+            const response = await callAPI(requestBody);
+            parsed = questionType === '選擇' ? 
+                parseChoiceResponse(response, quantity) : 
+                parseReadingResponse(response, quantity);
+            
+            const hasFailure = parsed.some(item => 
+                item.question.includes('生成失敗') || 
+                item.answer.includes('生成失敗') || 
+                item.steps.includes('生成失敗') ||
+                item.question.includes('未生成') ||
+                item.answer.includes('未生成') ||
+                item.steps.includes('未生成') ||
+                !item.question.trim() ||
+                !item.answer.trim() ||
+                !item.steps.trim()
+            );
+            
+            if (!hasFailure) {
+                break;
+            } else {
                 retryCount++;
-                console.error(`${questionType}題型生成錯誤，第${retryCount}次重試:`, error);
+                console.log(`${questionType}題型第${retryCount}次重試`);
                 if (retryCount >= maxRetries) {
-                    // 最終失敗，使用錯誤信息
-                    parsed = Array(quantity).fill().map((_, i) => ({
-                        question: `題目${i+1}生成失敗，請檢查網路連接並重試`,
-                        answer: `答案${i+1}生成失敗，請檢查網路連接並重試`,
-                        steps: `步驟${i+1}生成失敗，請檢查網路連接並重試`
-                    }));
+                    console.error(`${questionType}題型重試${maxRetries}次後仍然失敗`);
                 }
             }
+        } catch (error) {
+            retryCount++;
+            console.error(`${questionType}題型生成錯誤，第${retryCount}次重試:`, error);
+            if (retryCount >= maxRetries) {
+                parsed = Array(quantity).fill().map((_, i) => ({
+                    question: `題目${i+1}生成失敗，請檢查網路連接並重試`,
+                    answer: `答案${i+1}生成失敗，請檢查網路連接並重試`,
+                    steps: `步驟${i+1}生成失敗，請檢查網路連接並重試`
+                }));
+            }
         }
-        
-        // 為每個題目添加題型標籤
-        parsed.forEach(item => {
-            item.type = questionType;
-        });
-        
-        allQuestions = allQuestions.concat(parsed);
     }
     
-    displayReadingQuestions(allQuestions);
-}
-
-
-function parseChoiceResponse(response, count) {
-    const cleanResponse = removeThinkingTags(response);
-    const lines = cleanResponse.split('\n').filter(line => line.trim() !== '');
-    
-    const parsed = [];
-    
-    for (let i = 1; i <= count; i++) {
-        let question = '';
-        let options = [];
-        let answer = '';
-        let steps = '';
-        
-        let questionFound = false;
-        let optionsFound = false;
-        let answerFound = false;
-        let stepsFound = false;
-        
-        for (let j = 0; j < lines.length; j++) {
-            const line = lines[j].trim();
-            
-            // 解析題目
-            if (line.startsWith(`題目${i}：`)) {
-                question = line.replace(`題目${i}：`, '').trim();
-                questionFound = true;
-                continue;
-            }
-            
-            // 解析選項容器
-            if (line === '選擇題選項容器：' && questionFound && !optionsFound) {
-                let k = j + 1;
-                options = [];
-                while (k < lines.length) {
-                    const optionLine = lines[k].trim();
-                    if (optionLine.match(/^[A-D]\.\s/)) {
-                        options.push(optionLine);
-                        k++;
-                    } else {
-                        break;
-                    }
-                }
-                optionsFound = true;
-                j = k - 1;
-                continue;
-            }
-            
-            // 解析答案
-            if (line.startsWith(`答案${i}：`) && questionFound) {
-                answer = line.replace(`答案${i}：`, '').trim();
-                answerFound = true;
-                continue;
-            }
-            
-            // 解析步驟
-            if (line.startsWith(`步驟${i}：`) && questionFound) {
-                steps = line.replace(`步驟${i}：`, '').trim();
-                stepsFound = true;
-                continue;
-            }
-        }
-        
-        // 檢查生成是否完整，若有任何部分失敗則標記為生成失敗
-        if (!questionFound || !question) {
-            question = '生成失敗，請檢查輸入內容並重試';
-        }
-        if (!optionsFound || options.length === 0) {
-            options = ['A. 生成失敗', 'B. 生成失敗', 'C. 生成失敗', 'D. 生成失敗'];
-        }
-        if (!answerFound || !answer) {
-            answer = '生成失敗，請檢查輸入內容並重試';
-        }
-        if (!stepsFound || !steps) {
-            steps = '生成失敗，請檢查輸入內容並重試';
-        }
-        
-        // 構建完整的題目內容：題目 + 選項
-        let fullQuestion = question;
-        if (options.length > 0) {
-            fullQuestion += '\n\n選項：\n' + options.join('\n');
-        }
-        
-        parsed.push({ 
-            question: fullQuestion, 
-            answer, 
-            steps 
-        });
-    }
+    // 為每個題目添加題型標籤和篇章信息
+    parsed.forEach(item => {
+        item.type = questionType;
+        item.textTitle = textTitle;
+    });
     
     return parsed;
 }
+
 
 
 
