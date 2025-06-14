@@ -91,7 +91,7 @@ body {
 /* 響應式PDF輸出優化 */
 @media print {
     html, body {
-        width: 794px !important; /* A4 寬度，96dpi */
+        width: 794px !important; /* A4寬度，96dpi，約210mm */
         height: auto !important; /* 自適應內容高度 */
         margin: 0 !important;
         padding: 0 !important;
@@ -106,67 +106,57 @@ body {
 
     #questionsDisplay {
         width: 100% !important;
-        max-width: 754px !important; /* 保留 20px 邊距 */
+        max-width: 754px !important; /* 保留20px邊距，總寬度794px */
         margin: 0 auto !important;
         padding: 20px !important;
         height: auto !important; /* 確保高度自適應 */
     }
 
     .question-card {
-        width: 754px !important;
+        width: 754px !important; /* 與#questionsDisplay一致，確保內容全顯 */
         height: auto !important; /* 自適應內容高度 */
         margin: 20px auto !important;
         padding: 20px !important;
         background: #ffffff !important;
         color: #000000 !important;
         page-break-inside: avoid !important; /* 避免跨頁截斷 */
-        box-sizing: border-box !important;
+        box-sizing: border-box !important; /* 包含內邊距和邊框 */
         border: 1px solid #000000 !important; /* 深色邊框 */
     }
 
+    /* 確保內部元素適配 */
     .question-title, .answer-section, .steps-section, 
     p, span, div, h1, h2, h3, h4, h5, h6 {
         background: #ffffff !important;
         color: #000000 !important;
         opacity: 1 !important; /* 移除透明度 */
+        width: 100% !important;
+        max-width: 714px !important; /* 內部保留20px邊距 */
+        margin: 0 auto !important;
     }
 
+    /* 表格樣式 */
     table, th, td {
         border: 1px solid #000000 !important;
         background: #ffffff !important;
         color: #000000 !important;
+        width: 100% !important;
+        max-width: 714px !important;
     }
 
+    /* 隱藏不必要元素 */
     .floating-header, .floating-generate-btn, 
     .copyright-footer, .btn-primary, .btn-secondary, 
     .btn-accent, button {
-        display: none !important; /* 移除不必要元素 */
+        display: none !important;
     }
 
-    [style*="linear-gradient"], [style*="opacity"], [style*="rgba"] {
-        background: #ffffff !important;
-        opacity: 1 !important;
-        color: #000000 !important;
-    }
-
-    * {
-        color: #000000 !important; /* 確保所有文字為黑色 */
-    }
-}
-
-        /* 平板設備 */
-@media screen and (max-width: 1023px) and (min-width: 768px) {
-    .question-card {
-        font-size: 16px !important;
-        padding: 15px !important;
-    }
-}
-
-/* 電腦設備 */
-@media screen and (min-width: 1200px) {
-    .question-card {
-        font-size: 18px !important;
-        padding: 25px !important;
+    /* 針對電腦和平板設備的額外調整 */
+    @media screen and (min-width: 768px) {
+        .question-card {
+            width: 100% !important;
+            max-width: 754px !important; /* 與A4寬度匹配 */
+        }
     }
 }
 
