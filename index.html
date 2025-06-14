@@ -2064,12 +2064,8 @@ var selectedPracticalTypes = new Set();
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     
-    // 檢測設備方向
-    const isLandscape = window.innerWidth > window.innerHeight;
-    const orientation = isLandscape ? 'landscape' : 'portrait';
-    
     const doc = new jsPDF({
-        orientation: orientation,
+        orientation: 'portrait',
         unit: 'px',
         format: 'a4',
         compress: true
@@ -2097,6 +2093,8 @@ async function exportToPDF() {
     document.body.appendChild(progressDiv);
 
     try {
+        // 檢測設備方向
+        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
         const MARGIN = 20;
 
         for (let i = 0; i < questionCards.length; i++) {
@@ -2109,11 +2107,9 @@ async function exportToPDF() {
             
             // 設置用於測量的臨時樣式
             const originalStyle = card.getAttribute('style') || '';
-            const contentWidth = orientation === 'landscape' ? 1122 : 794; // A4 寬度 (px)
-            const contentHeight = orientation === 'landscape' ? 794 : 1122; // A4 高度 (px)
             card.style.cssText = `
                 position: relative !important;
-                width: ${contentWidth - MARGIN * 2}px !important;
+                width: auto !important;
                 height: auto !important;
                 margin: 0 !important;
                 padding: ${MARGIN}px !important;
@@ -2121,8 +2117,8 @@ async function exportToPDF() {
                 color: #000000 !important;
                 border: none !important;
                 max-width: none !important;
-                font-size: 12pt !important;
-                line-height: 1.5 !important;
+                font-size: 14px !important;
+                line-height: 1.6 !important;
             `;
 
             // 等待樣式應用
@@ -2147,38 +2143,61 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            // 計算最佳頁面尺寸
-            const contentWidthPx = tempCanvas.width / 2;
-            const contentHeightPx = tempCanvas.height / 2;
-            
-            // 動態設置頁面尺寸
-            let pageWidth = orientation === 'landscape' ? 1122 : 794;
-            let pageHeight = orientation === 'landscape' ? 794 : 1122;
-            
-            if (contentHeightPx > pageHeight - MARGIN * 2) {
-                pageHeight = contentHeightPx + MARGIN * 2;
+            // 計算內容實際尺寸
+            const contentWidth = tempCanvas.width / 2;
+            const contentHeight = tempCanvas.height / 2;
+
+            // 根據內容尺寸和設備方向決定頁面方向和大小
+            let pageOrientation, pageWidth, pageHeight;
+            if (isLandscape) {
+                // 橫向設備
+                if (contentWidth > contentHeight) {
+                    pageOrientation = 'landscape';
+                    pageWidth = Math.max(842, contentWidth + MARGIN * 2);
+                    pageHeight = Math.max(595, contentHeight + MARGIN * 2);
+                } else {
+                    pageOrientation = 'portrait';
+                    pageWidth = Math.max(595, contentWidth + MARGIN * 2);
+                    pageHeight = Math.max(842, contentHeight + MARGIN * 2);
+                }
+            } else {
+                // 直向設備
+                if (contentHeight > contentWidth) {
+                    pageOrientation = 'portrait';
+                    pageWidth = Math.max(595, contentWidth + MARGIN * 2);
+                    pageHeight = Math.max(842, contentHeight + MARGIN * 2);
+                } else {
+                    pageOrientation = 'landscape';
+                    pageWidth = Math.max(842, contentWidth + MARGIN * 2);
+                    pageHeight = Math.max(595, contentHeight + MARGIN * 2);
+                }
             }
 
             // 為每頁設置頁面格式
             if (i > 0) {
-                doc.addPage([pageWidth, pageHeight], orientation);
+                doc.addPage([pageWidth, pageHeight], pageOrientation);
             } else {
+                // 設置第一頁的尺寸和方向
                 doc.internal.pageSize.width = pageWidth;
                 doc.internal.pageSize.height = pageHeight;
+                doc.setPage(1);
+                doc.setPageOrientation(pageOrientation);
             }
 
             // 重新設置卡片樣式以適應計算出的頁面尺寸
+            const cardWidth = pageOrientation === 'landscape' ? pageHeight - MARGIN * 2 : pageWidth - MARGIN * 2;
+            const cardHeight = pageOrientation === 'landscape' ? pageWidth - MARGIN * 2 : pageHeight - MARGIN * 2;
             card.style.cssText = `
                 position: relative !important;
-                width: ${pageWidth - MARGIN * 2}px !important;
+                width: ${cardWidth}px !important;
                 height: auto !important;
                 margin: 0 !important;
                 padding: ${MARGIN}px !important;
                 background: #ffffff !important;
                 color: #000000 !important;
                 border: none !important;
-                font-size: 12pt !important;
-                line-height: 1.5 !important;
+                font-size: 14px !important;
+                line-height: 1.6 !important;
                 box-sizing: border-box !important;
             `;
 
@@ -2193,8 +2212,8 @@ async function exportToPDF() {
                 scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                width: pageWidth,
-                height: Math.min(pageHeight, card.scrollHeight + MARGIN * 2),
+                width: cardWidth,
+                height: card.scrollHeight,
                 logging: false,
                 onclone: function(clonedDoc) {
                     const clonedCard = clonedDoc.querySelector(`[data-card-index="${i}"]`) || 
@@ -2210,14 +2229,12 @@ async function exportToPDF() {
             restoreOriginalStyles(card, originalStyles);
 
             // 計算圖片在頁面中的尺寸
-            const imgWidth = pageWidth - MARGIN * 2;
+            const imgWidth = pageOrientation === 'landscape' ? pageHeight - MARGIN * 2 : pageWidth - MARGIN * 2;
             const imgHeight = (finalCanvas.height * imgWidth) / finalCanvas.width;
 
             // 添加圖片到PDF
             const imgData = finalCanvas.toDataURL('image/png', 1.0);
-            doc.addImage(imgData, 'PNG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, pageHeight - MARGIN * 2));
-            
-            card.setAttribute('data-card-index', i);
+            doc.addImage(imgData, 'PNG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, (pageOrientation === 'landscape' ? pageWidth : pageHeight) - MARGIN * 2));
         }
 
         document.body.removeChild(progressDiv);
