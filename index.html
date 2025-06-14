@@ -161,6 +161,62 @@ body {
     }
 }
 
+    /* 內容區域適應A4 */
+    #questionsDisplay {
+        width: 100% !important;
+        max-width: 754px !important; /* 保留20px邊距 */
+        margin: 0 auto !important;
+        padding: 20px !important;
+    }
+
+    /* 問題卡片樣式 */
+    .question-card {
+        width: 754px !important;
+        height: auto !important;
+        margin: 20px auto !important;
+        padding: 20px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        page-break-inside: avoid !important; /* 避免跨頁 */
+        box-sizing: border-box !important;
+        border: 1px solid #000000 !important; /* 深色邊框 */
+    }
+
+    /* 強制文字與背景高對比 */
+    .question-title, .answer-section, .steps-section, 
+    p, span, div, h1, h2, h3, h4, h5, h6 {
+        background: #ffffff !important;
+        color: #000000 !important;
+        opacity: 1 !important; /* 移除透明度 */
+    }
+
+    /* 表格清晰度 */
+    table, th, td {
+        border: 1px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* 移除不需要的元素 */
+    .floating-header, .floating-generate-btn, 
+    .copyright-footer, .btn-primary, .btn-secondary, 
+    .btn-accent, button {
+        display: none !important;
+    }
+
+    /* 移除漸變與透明度 */
+    [style*="linear-gradient"], [style*="opacity"], [style*="rgba"] {
+        background: #ffffff !important;
+        opacity: 1 !important;
+        color: #000000 !important;
+    }
+
+    /* 確保所有文字為黑色 */
+    * {
+        color: #000000 !important;
+    }
+}
+
 /* 設備適應性CSS */
 @media screen and (max-width: 768px) {
     .question-card {
