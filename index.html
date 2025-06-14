@@ -2064,11 +2064,15 @@ var selectedPracticalTypes = new Set();
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     
+    // 檢測設備方向
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const orientation = isLandscape ? 'landscape' : 'portrait';
+    
     const doc = new jsPDF({
-        orientation: 'portrait',
+        orientation: orientation,
         unit: 'px',
-        format: 'a4', // 初始格式，後續會動態調整
-        compress: true // 啟用壓縮
+        format: 'a4',
+        compress: true
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
@@ -2093,9 +2097,7 @@ async function exportToPDF() {
     document.body.appendChild(progressDiv);
 
     try {
-        // 檢測是否為手機設備
-        const isMobile = window.innerWidth <= 768;
-        const MARGIN = 20; // 統一邊距
+        const MARGIN = 20;
 
         for (let i = 0; i < questionCards.length; i++) {
             const card = questionCards[i];
@@ -2107,9 +2109,11 @@ async function exportToPDF() {
             
             // 設置用於測量的臨時樣式
             const originalStyle = card.getAttribute('style') || '';
+            const contentWidth = orientation === 'landscape' ? 1122 : 794; // A4 寬度 (px)
+            const contentHeight = orientation === 'landscape' ? 794 : 1122; // A4 高度 (px)
             card.style.cssText = `
                 position: relative !important;
-                width: auto !important;
+                width: ${contentWidth - MARGIN * 2}px !important;
                 height: auto !important;
                 margin: 0 !important;
                 padding: ${MARGIN}px !important;
@@ -2117,8 +2121,8 @@ async function exportToPDF() {
                 color: #000000 !important;
                 border: none !important;
                 max-width: none !important;
-                font-size: ${isMobile ? '16px' : '14px'} !important;
-                line-height: 1.6 !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
             `;
 
             // 等待樣式應用
@@ -2144,37 +2148,21 @@ async function exportToPDF() {
             restoreOriginalStyles(card, originalStyles);
 
             // 計算最佳頁面尺寸
-            const contentWidth = tempCanvas.width / 2; // 除以scale
-            const contentHeight = tempCanvas.height / 2;
+            const contentWidthPx = tempCanvas.width / 2;
+            const contentHeightPx = tempCanvas.height / 2;
             
-            // 動態計算頁面尺寸，確保內容充滿頁面
-            let pageWidth, pageHeight;
+            // 動態設置頁面尺寸
+            let pageWidth = orientation === 'landscape' ? 1122 : 794;
+            let pageHeight = orientation === 'landscape' ? 794 : 1122;
             
-            if (isMobile) {
-                // 手機版：根據內容動態調整，但保持合理比例
-                const minWidth = 400;
-                const maxWidth = 600;
-                const minHeight = 500;
-                const maxHeight = 1000;
-                
-                pageWidth = Math.max(minWidth, Math.min(maxWidth, contentWidth + MARGIN * 2));
-                pageHeight = Math.max(minHeight, Math.min(maxHeight, contentHeight + MARGIN * 2));
-                
-                // 如果內容很長，適當增加高度
-                if (contentHeight > 400) {
-                    pageHeight = Math.min(maxHeight, contentHeight + MARGIN * 2);
-                }
-            } else {
-                // 桌面版：使用標準A4或根據內容調整
-                pageWidth = Math.max(595, contentWidth + MARGIN * 2); // A4寬度為595px
-                pageHeight = Math.max(842, contentHeight + MARGIN * 2); // A4高度為842px
+            if (contentHeightPx > pageHeight - MARGIN * 2) {
+                pageHeight = contentHeightPx + MARGIN * 2;
             }
 
             // 為每頁設置頁面格式
             if (i > 0) {
-                doc.addPage([pageWidth, pageHeight], 'portrait');
+                doc.addPage([pageWidth, pageHeight], orientation);
             } else {
-                // 設置第一頁的尺寸
                 doc.internal.pageSize.width = pageWidth;
                 doc.internal.pageSize.height = pageHeight;
             }
@@ -2189,8 +2177,8 @@ async function exportToPDF() {
                 background: #ffffff !important;
                 color: #000000 !important;
                 border: none !important;
-                font-size: ${isMobile ? '16px' : '14px'} !important;
-                line-height: 1.6 !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
                 box-sizing: border-box !important;
             `;
 
@@ -2202,7 +2190,7 @@ async function exportToPDF() {
 
             // 生成最終的畫布
             const finalCanvas = await html2canvas(card, {
-                scale: 3, // 高解析度
+                scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 width: pageWidth,
@@ -2221,7 +2209,7 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            // 計算圖片在頁面中的尺寸（充滿頁面，保留少量邊距）
+            // 計算圖片在頁面中的尺寸
             const imgWidth = pageWidth - MARGIN * 2;
             const imgHeight = (finalCanvas.height * imgWidth) / finalCanvas.width;
 
@@ -2229,7 +2217,6 @@ async function exportToPDF() {
             const imgData = finalCanvas.toDataURL('image/png', 1.0);
             doc.addImage(imgData, 'PNG', MARGIN, MARGIN, imgWidth, Math.min(imgHeight, pageHeight - MARGIN * 2));
             
-            // 為下次循環設置卡片索引
             card.setAttribute('data-card-index', i);
         }
 
