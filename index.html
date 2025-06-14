@@ -93,7 +93,7 @@ body {
 @media print {
     html, body {
         width: 794px !important; /* A4寬度，96dpi */
-        height: 1123px !important; /* A4高度，96dpi */
+        height: auto !important; /* 改為auto以適應內容高度 */
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important; /* 確保內容不被截斷 */
@@ -111,12 +111,13 @@ body {
         max-width: 754px !important; /* 保留20px邊距 */
         margin: 0 auto !important;
         padding: 20px !important;
+        height: auto !important; /* 確保高度自適應 */
     }
 
     /* 問題卡片樣式 */
     .question-card {
         width: 754px !important;
-        height: auto !important;
+        height: auto !important; /* 改為auto以適應內容 */
         margin: 20px auto !important;
         padding: 20px !important;
         background: #ffffff !important;
