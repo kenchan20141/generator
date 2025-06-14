@@ -90,68 +90,73 @@ body {
 
 /* 響應式PDF輸出優化 */
 @media print {
-    @page {
-        size: landscape; /* 預設橫向，適合大多數內容 */
-        margin: 1cm; /* 統一邊距 */
-    }
     html, body {
-        width: 100% !important; /* 使用相對單位，適應設備 */
-        height: auto !important; /* 高度自適應內容 */
+        width: 794px !important; /* A4寬度，96dpi，約210mm */
+        height: auto !important; /* 自適應內容高度 */
         margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important; /* 防止內容截斷 */
         background: #ffffff !important; /* 純白背景 */
         color: #000000 !important; /* 純黑文字 */
+        -webkit-print-color-adjust: exact !important; /* 強制精確顏色 */
+        print-color-adjust: exact !important; /* 標準屬性 */
         font-size: 12pt !important; /* 提高可讀性 */
         line-height: 1.5 !important; /* 調整行距 */
     }
+
     #questionsDisplay {
         width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        max-width: 754px !important; /* 保留20px邊距，總寬度794px */
+        margin: 0 auto !important;
+        padding: 20px !important;
+        height: auto !important; /* 確保高度自適應 */
     }
+
     .question-card {
-        width: 100% !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 1cm !important;
+        width: 754px !important; /* 與#questionsDisplay一致，確保內容全顯 */
+        height: auto !important; /* 自適應內容高度 */
+        margin: 20px auto !important;
+        padding: 20px !important;
         background: #ffffff !important;
         color: #000000 !important;
-        page-break-inside: avoid !important; /* 避免內容跨頁截斷 */
-        box-sizing: border-box !important;
+        page-break-inside: avoid !important; /* 避免跨頁截斷 */
+        box-sizing: border-box !important; /* 包含內邊距和邊框 */
+        border: 1px solid #000000 !important; /* 深色邊框 */
     }
-    table {
+
+    /* 確保內部元素適配 */
+    .question-title, .answer-section, .steps-section, 
+    p, span, div, h1, h2, h3, h4, h5, h6 {
+        background: #ffffff !important;
+        color: #000000 !important;
+        opacity: 1 !important; /* 移除透明度 */
         width: 100% !important;
-        border-collapse: collapse !important;
+        max-width: 714px !important; /* 內部保留20px邊距 */
+        margin: 0 auto !important;
     }
-    th, td {
-        border: 1px solid #000 !important;
-        padding: 8pt !important;
-    }
-    .floating-header, .floating-generate-btn, .copyright-footer, 
-    .btn-primary, .btn-secondary, .btn-accent, button {
-        display: none !important; /* 移除不必要元素 */
-    }
-}
 
-/* 手機設備（螢幕寬度 <= 767px） */
-@media print and (max-width: 767px) {
-    @page {
-        size: portrait; /* 手機預設縱向 */
-        margin: 0.5cm; /* 較小邊距適應小螢幕 */
+    /* 表格樣式 */
+    table, th, td {
+        border: 1px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        max-width: 714px !important;
     }
-    .question-card {
-        padding: 0.5cm !important;
-    }
-}
 
-/* 平板和電腦設備（螢幕寬度 >= 768px） */
-@media print and (min-width: 768px) {
-    @page {
-        size: landscape; /* 橫向適應寬螢幕 */
-        margin: 1cm;
+    /* 隱藏不必要元素 */
+    .floating-header, .floating-generate-btn, 
+    .copyright-footer, .btn-primary, .btn-secondary, 
+    .btn-accent, button {
+        display: none !important;
     }
-    .question-card {
-        padding: 1cm !important;
+
+    /* 針對電腦和平板設備的額外調整 */
+    @media screen and (min-width: 768px) {
+        .question-card {
+            width: 100% !important;
+            max-width: 754px !important; /* 與A4寬度匹配 */
+        }
     }
 }
 
@@ -2059,13 +2064,6 @@ var selectedPracticalTypes = new Set();
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: 'a4', // 初始格式，後續會動態調整
-        compress: true // 啟用壓縮
-    });
-
     const questionsContainer = document.getElementById('questionsDisplay');
     const questionCards = questionsContainer.querySelectorAll('.question-card');
     
@@ -2091,6 +2089,7 @@ async function exportToPDF() {
         // 檢測是否為手機設備
         const isMobile = window.innerWidth <= 768;
         const MARGIN = 20; // 統一邊距
+        let doc;
 
         for (let i = 0; i < questionCards.length; i++) {
             const card = questionCards[i];
@@ -2138,43 +2137,35 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            // 計算最佳頁面尺寸
+            // 計算內容尺寸
             const contentWidth = tempCanvas.width / 2; // 除以scale
             const contentHeight = tempCanvas.height / 2;
-            
-            // 動態計算頁面尺寸，確保內容充滿頁面
+            const aspectRatio = contentWidth / contentHeight;
+            const orientation = aspectRatio > 1 ? 'landscape' : 'portrait';
+
+            // 計算頁面尺寸
             let pageWidth, pageHeight;
-            
-            if (isMobile) {
-                // 手機版：根據內容動態調整，但保持合理比例
-                const minWidth = 400;
-                const maxWidth = 600;
-                const minHeight = 500;
-                const maxHeight = 1000;
-                
-                pageWidth = Math.max(minWidth, Math.min(maxWidth, contentWidth + MARGIN * 2));
-                pageHeight = Math.max(minHeight, Math.min(maxHeight, contentHeight + MARGIN * 2));
-                
-                // 如果內容很長，適當增加高度
-                if (contentHeight > 400) {
-                    pageHeight = Math.min(maxHeight, contentHeight + MARGIN * 2);
-                }
+            if (orientation === 'landscape') {
+                pageWidth = Math.max(contentWidth + MARGIN * 2, 842); // A4 landscape width
+                pageHeight = Math.max(contentHeight + MARGIN * 2, 595); // A4 landscape height
             } else {
-                // 桌面版：使用標準A4或根據內容調整
-                pageWidth = Math.max(595, contentWidth + MARGIN * 2); // A4寬度為595px
-                pageHeight = Math.max(842, contentHeight + MARGIN * 2); // A4高度為842px
+                pageWidth = Math.max(contentWidth + MARGIN * 2, 595); // A4 portrait width
+                pageHeight = Math.max(contentHeight + MARGIN * 2, 842); // A4 portrait height
             }
 
-            // 為每頁設置頁面格式
-            if (i > 0) {
-                doc.addPage([pageWidth, pageHeight], 'portrait');
+            if (i === 0) {
+                // 創建PDF文檔
+                doc = new jsPDF({
+                    orientation: orientation,
+                    unit: 'px',
+                    format: [pageWidth, pageHeight],
+                    compress: true
+                });
             } else {
-                // 設置第一頁的尺寸
-                doc.internal.pageSize.width = pageWidth;
-                doc.internal.pageSize.height = pageHeight;
+                doc.addPage([pageWidth, pageHeight], orientation);
             }
 
-            // 重新設置卡片樣式以適應計算出的頁面尺寸
+            // 設置卡片樣式以適應頁面
             card.style.cssText = `
                 position: relative !important;
                 width: ${pageWidth - MARGIN * 2}px !important;
@@ -2189,7 +2180,7 @@ async function exportToPDF() {
                 box-sizing: border-box !important;
             `;
 
-            // 再次強化文字
+            // 強化文字
             enhanceTextForPDF(card);
             
             // 等待樣式應用
@@ -2197,7 +2188,7 @@ async function exportToPDF() {
 
             // 生成最終的畫布
             const finalCanvas = await html2canvas(card, {
-                scale: 3, // 高解析度
+                scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 width: pageWidth,
@@ -2216,7 +2207,7 @@ async function exportToPDF() {
             card.setAttribute('style', originalStyle);
             restoreOriginalStyles(card, originalStyles);
 
-            // 計算圖片在頁面中的尺寸（充滿頁面，保留少量邊距）
+            // 計算圖片在頁面中的尺寸
             const imgWidth = pageWidth - MARGIN * 2;
             const imgHeight = (finalCanvas.height * imgWidth) / finalCanvas.width;
 
