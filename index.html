@@ -2071,7 +2071,7 @@ async function exportToPDF() {
         orientation: 'portrait',
         unit: 'px',
         format: [A4_WIDTH, A4_HEIGHT],
-        compress: false // 禁用壓縮以提升質量
+        compress: true // 禁用壓縮以提升質量
     });
 
     const questionsContainer = document.getElementById('questionsDisplay');
