@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -146,18 +147,12 @@ body {
 
     /* 隱藏不必要元素 */
     .floating-header, .floating-generate-btn, 
-    .copyright-footer, .btn-primary, .btn-secondary, 
+    .btn-primary, .btn-secondary, 
     .btn-accent, button {
         display: none !important;
     }
 
-    /* 針對電腦和平板設備的額外調整 */
-    @media screen and (min-width: 768px) {
-        .question-card {
-            width: 100% !important;
-            max-width: 754px !important; /* 與A4寬度匹配 */
-        }
-    }
+  
 }
 
 /* 設備適應性CSS */
@@ -2244,8 +2239,8 @@ async function exportToPDF() {
         alert('PDF生成失敗，請稍後重試');
     }
 }
-
-// 修訂：強化PDF轉換前的文字樣式函數
+        
+        // 修訂：新增函數來強化PDF轉換前的文字樣式
 function enhanceTextForPDF(element) {
     const originalStyles = new Map();
     
@@ -2265,9 +2260,19 @@ function enhanceTextForPDF(element) {
             filter: el.style.filter
         });
         
-        // 強化文字顏色為純黑色
-        el.style.color = '#000000 !important';
-        el.style.backgroundColor = 'transparent !important';
+        // 強化文字顏色
+        if (originalColor && originalColor !== 'rgba(0, 0, 0, 0)') {
+            const rgb = parseRGBA(originalColor);
+            if (rgb && (rgb.r + rgb.g + rgb.b) / 3 > 127) {
+                // 淺色文字改為深色
+                el.style.color = '#000000 !important';
+            } else {
+                // 深色文字保持或加深
+                el.style.color = '#000000 !important';
+            }
+        }
+        
+        // 移除可能影響顏色的效果
         el.style.opacity = '1 !important';
         el.style.filter = 'none !important';
     });
@@ -2275,49 +2280,35 @@ function enhanceTextForPDF(element) {
     return originalStyles;
 }
 
-// 修訂：處理克隆元素的函數
+// 修訂：新增函數來處理克隆元素
 function enhanceClonedElementForPDF(clonedElement) {
-    // 為克隆元素添加強制樣式
     const style = document.createElement('style');
     style.textContent = `
         * {
             color: #000000 !important;
-            background-color: transparent !important;
+            background-color: #ffffff !important;
             opacity: 1 !important;
             -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
         }
         .question-card {
-            background: #ffffff !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        .question-title, .answer-section, .steps-section {
-            background: #f8f9fa !important;
-            border: 1px solid #dee2e6 !important;
+            width: 555px !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
         }
     `;
-    
-    if (clonedElement.ownerDocument && clonedElement.ownerDocument.head) {
-        clonedElement.ownerDocument.head.appendChild(style);
-    }
+    clonedElement.appendChild(style);
 }
 
-// 修訂：還原原始樣式的函數
+// 修訂：新增函數來還原原始樣式
 function restoreOriginalStyles(element, originalStyles) {
-    if (originalStyles && originalStyles.size > 0) {
-        originalStyles.forEach((styleData, index) => {
-            const el = styleData.element;
-            if (el && el.style) {
-                el.style.color = styleData.color;
-                el.style.backgroundColor = styleData.backgroundColor;
-                el.style.opacity = styleData.opacity;
-                el.style.filter = styleData.filter;
-            }
-        });
-    }
+    originalStyles.forEach((styleData, index) => {
+        const el = styleData.element;
+        el.style.color = styleData.color;
+        el.style.backgroundColor = styleData.backgroundColor;
+        el.style.opacity = styleData.opacity;
+        el.style.filter = styleData.filter;
+    });
 }
-
 
 // 修訂：新增解析RGBA顏色的輔助函數
 function parseRGBA(colorStr) {
