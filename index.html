@@ -1186,6 +1186,25 @@ textarea, input[type="text"] {
     line-height: 1.2 !important;
 }
 
+.custom-text-item {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #cbd5e0;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custom-text-item:hover {
+    border-color: #a0aec0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.custom-text-item.selected {
+    border-color: #4a5568;
+    background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+}
 
 
     </style>
@@ -4083,13 +4102,13 @@ const writingQuestionBank = {
             });
         }
 
-        function generateTextLibrary() {
+       function generateTextLibrary() {
     const grid = document.getElementById('textLibraryGrid');
     grid.innerHTML = '';
 
     // 添加自訂篇章選項
     const customItem = document.createElement('div');
-    customItem.className = 'text-item';
+    customItem.className = 'text-item custom-text-item';
     customItem.onclick = () => toggleCustomText(customItem);
     customItem.innerHTML = `
         <div class="text-item-title">自訂篇章</div>
@@ -4140,6 +4159,8 @@ function toggleCustomText(element) {
                 <p>請先選擇擬題篇章，系統將為每篇篇章提供獨立的題型設定</p>
             </div>
         `;
+        // 隱藏參考題目設定
+        document.getElementById('customReadingConfig').classList.add('hidden');
     } else {
         // 選中自訂篇章
         document.querySelectorAll('.text-item').forEach(item => {
@@ -4153,6 +4174,7 @@ function toggleCustomText(element) {
         updateSelectedTexts([]);
         // 為自訂篇章生成題型選擇
         generateCustomTextQuestionTypes();
+        // 不自動顯示參考題目設定
     }
 }
 
@@ -4175,7 +4197,7 @@ function generateCustomTextQuestionTypes() {
 
      
 
-        function selectText(textId, element) {
+   function selectText(textId, element) {
     // 檢查是否已選中
     if (element.classList.contains('selected')) {
         // 取消選擇
@@ -4186,6 +4208,8 @@ function generateCustomTextQuestionTypes() {
             selectedTexts.splice(index, 1);
             updateSelectedTexts(selectedTexts);
         }
+        // 隱藏參考題目設定
+        document.getElementById('customReadingConfig').classList.add('hidden');
     } else {
         // 選中範文
         element.classList.add('selected');
@@ -4195,6 +4219,7 @@ function generateCustomTextQuestionTypes() {
             selectedTexts.push(selectedText);
             updateSelectedTexts(selectedTexts);
         }
+        // 不自動顯示參考題目設定
     }
     updateTargetPassage();
 }
@@ -4324,8 +4349,7 @@ function toggleIndependentQuestionType(toggleElement, questionType, textId) {
         
         // 如果是自訂題型，隱藏參考題目設定
         if (questionType === '自訂') {
-            const customConfig = document.getElementById('customReadingConfig');
-            if (customConfig) customConfig.classList.add('hidden');
+            document.getElementById('customReadingConfig').classList.add('hidden');
         }
     } else {
         toggleElement.classList.add('active');
@@ -4335,8 +4359,7 @@ function toggleIndependentQuestionType(toggleElement, questionType, textId) {
         
         // 如果是自訂題型，顯示參考題目設定
         if (questionType === '自訂') {
-            const customConfig = document.getElementById('customReadingConfig');
-            if (customConfig) customConfig.classList.remove('hidden');
+            document.getElementById('customReadingConfig').classList.remove('hidden');
         } else {
             updateKeywordInputs(questionType, textId, 1);
         }
@@ -4502,7 +4525,7 @@ function getKeywordsForQuestion(questionType, textId, questionIndex) {
 
 
         // 參考題目相關函數
-        function addReferenceQA() {
+       function addReferenceQA() {
             const list = document.getElementById('referenceQAList');
             const currentCount = list.querySelectorAll('.reference-qa').length;
             const newQA = document.createElement('div');
@@ -4510,7 +4533,7 @@ function getKeywordsForQuestion(questionType, textId, questionIndex) {
             newQA.innerHTML = `
                 <div class="flex items-start space-x-4 bg-white p-8 rounded-2xl border-3 border-teal-200">
                     <span class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg question-number">${currentCount + 1}</span>
-                    <textarea class="flex-1 p-6 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical" placeholder="在此輸入參考題目與答案"></textarea>
+                    <textarea class="flex-1 p-6 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:ring-0 transition-colors duration-300 resize-vertical" placeholder="在此輸入參考題目"></textarea>
                 </div>
             `;
             list.appendChild(newQA);
